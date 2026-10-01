@@ -1,0 +1,98 @@
+{
+  "id": "altair.sample",
+  "title": "試作シナリオ",
+  "version": "0.1",
+  "characters": [
+    { "id": "lsa_test",  "affinity": { "default": 5 }, "social_panel": true },
+    { "id": "lsa_test2", "affinity": { "default": 0 }, "social_panel": true }
+  ],
+  "flags": [
+    { "id": "lsa_met", "default": 0 },
+    { "id": "lsa_route", "default": 0 }
+  ],
+  "events": [
+    {
+      "id": "meet",
+      "position": "Back_Free_001",
+      "story": "lsa_test_meet",
+      "rate": 10000,
+      "once": true,
+      "when": {
+        "logic": "AND",
+        "items": [
+          { "left": { "time": "now" },          "op": ">=", "right": { "time": [1, 4, 1] } },
+          { "left": { "flag": "lsa_met" },      "op": "=",  "right": 0 },
+          { "left": { "affinity": "lsa_test" }, "op": ">=", "right": 0 }
+        ]
+      },
+      "boosts": [
+        { "when": { "items": [ { "left": { "stat": "mental" }, "op": ">=", "right": 0 } ] }, "rate": 0 }
+      ]
+    }
+  ],
+  "visits": [
+    {
+      "id": "visit_test",
+      "position": "BackMountain",
+      "story": "lsa_test_visit",
+      "when": { "items": [ { "left": { "flag": "lsa_met" }, "op": "=", "right": 1 } ] }
+    }
+  ],
+  "endings": [
+    {
+      "id": "lsa_end_test",
+      "story": "lsa_test_ending",
+      "when": { "items": [ { "left": { "flag": "lsa_route" }, "op": "=", "right": 1 } ] }
+    }
+  ],
+  "duels": [
+    {
+      "id": "lsa_test_spar",
+      "character": "lsa_test",
+      "template": "3001_01",
+      "enemy": "Enemy_南宮淺_001",
+      "music": "lsa_theme",
+      "rates": { "attack": 0.5, "talk": 0.2, "block": 0.4 },
+      "stats": { "Dexterity": 70 },
+      "talents": [ { "id": "0001", "level": 3 }, { "id": "lsa_tal_guard", "level": 1 } ],
+      "talk": {
+        "normal": ["腕試しといこうか。", "ほら、どうした？"],
+        "good": ["やるじゃないか！"],
+        "bad": ["おいおい、その程度か？"],
+        "attacked": ["っ……効いたぜ。"]
+      }
+    }
+  ],
+  "talents": [
+    { "id": "lsa_tal_guard", "base": "0019", "effect": "lsa_eff_guard" },
+    { "id": "lsa_tal_sword", "base": "0025" }
+  ],
+  "effects": [
+    {
+      "key": "lsa_eff_guard",
+      "base": "B0019",
+      "units": [
+        { "base": "B_Stat_003_自身_防禦_加20", "set": { "_rate": 0.25 } },
+        { "base": "B_Stat_003_自身_輕功_減10", "set": { "_statType": ["迴避"], "_rate": 0.1 } }
+      ]
+    }
+  ],
+  "deaths": [ "lsa_dead_test" ],
+  "cgs": [ "lsa_cg_test" ],
+  "books": [
+    {
+      "id": "lsa_book_test",
+      "base": "2001",
+      "tier": 1,
+      "levels": [
+        { "points": 1, "stats": { "m-sword": 3 } },
+        { "points": 2, "stats": { "m-sword": 3, "dexterity": 2 } },
+        { "points": 2, "stats": { "m-sword": 4 }, "talents": { "lsa_tal_sword": 1 } }
+      ],
+      "bonus": { "m-sword": [2, 5, 10], "dexterity": [0, 1, 3] }
+    }
+  ],
+  "conditions": {
+    "lsa_test_close": { "items": [ { "left": { "affinity": "lsa_test" }, "op": ">=", "right": 17 } ] }
+  }
+}

@@ -1,0 +1,125 @@
+# 開発メモ
+
+[README に戻る](../README.md) · [シナリオ制作ガイド](scenario-guide.md)
+
+アドオン本体を開発する人向けの内部構成、ビルド手順、過去の動作確認記録です。
+パスは特記がなければリポジトリのルートを基準にしています。
+動作確認記録は記載日の結果であり、現行版の再検証結果ではありません。
+
+## 構成
+
+| パス | 役割 |
+|---|---|
+| `src/LoMScenarioAddon.Patcher/` | プリロードパッチャー。起動前に `Mortal.Core.RelationshipStatType` へ ID を足す（メモリ上のみ。DLL ファイルは変更しない） |
+| `src/LoMScenarioAddon/` | プラグイン本体 |
+| `src/Shared/` | パッチャーとプラグインが共有する `scenario.json` の読み取り (`ScenarioManifest.cs`) と、依存ライブラリなしの JSON 読み取り (`MiniJson.cs`) |
+| `sample/scenario/` | 試作キャラ `lsa_test`・`lsa_test2` の定義・テキスト・仮画像・登場シナリオ |
+| `tools/make_placeholders.py` | 仮画像の生成スクリプト (Pillow) |
+
+プラグイン本体の中身:
+
+| ファイル | 役割 |
+|---|---|
+| `CharacterRegistry.cs` | 好感度データ (`RelationshipStat`) を作って `RelationshipData` に登録し、画像を割り当てる |
+| `Patches.cs` | シナリオ読み込み (`LuaManager.ExecuteLuaScript`)、会話シーンのキャラ定義 (`StoryCharacterConfig.Get`) と立ち絵 (`StoryCharacterController.LoadPortrait*`)、社交パネルへのボタン複製 (`SocialStatPanel.Awake`)、公式に訳が無いキーだけテキストを埋める (`LeanLocalization.GetTranslationText`) |
+| `PositionEvents.cs` | `flags` を本編のフラグ一覧に足し、`events` から本編と同じクラス (`PositionEventData` / `ConditionResultItem` / `StatCompareItem` / `StatValueReference`) を組み立てて、場所の抽選 (`CheckPointManager.Position`) の候補一覧に追加する |
+| `StoryTextKeys.cs` | 既読判定のため、シナリオの `say("本文")` を読み込み時にキー付き (`GetStoryText`) へ変換し、本文をテキスト表に登録する |
+| `Books.cs` | 秘笈。本編の秘笈を複製して `ItemDatabase.Books` に登録し、レベルデータと能力値加成 (「〜加成_秘笈」への変換データ) を組み立てる |
+| `Talents.cs` | 天賦。本編の天賦を複製して `PlayerStatManagerData.Talents` に登録する |
+| `SocialInheritance.cs` | 周回の引き継ぎ「繼承人際」に追加キャラの行を足す (`FateBonusPanel.InitSocial`) |
+| `Duels.cs` | 決闘。決闘の場面の読み込み直後に本編の決闘設定と敵を複製して足し、敵の絵 (`CombatEnemyController.SetData`)・状態パネル (`CombatCharacterStatusUI.Setup`) を差し替える |
+| `Endings.cs` | エンディング。本編の分岐シナリオ `ch8_6_3_2` の Switch 直前に自前ルートの判定を差し込む。講經堂のカード (`LibraryItemData`) を汗青書・奪命譜・結局CG に登録する |
+| `StoryPictures.cs` | イベント CG。`StoryPicture.Show`/`Hide` で `pictures/*.png` を本編と同じ演出で出す |
+| `Visits.cs` | 場所選択時のシナリオ差し替え。`PositionController.OnPositionClick` の前後で、通常の行動に進んだときだけ行き先を指定したシナリオに差し替える |
+| `ScenarioConditions.cs` | `conditions` を Lua の `checkpointmanager.Condition(名前)` で判定できるようにする |
+| `StoryCharacters.cs` | 会話シーン用のキャラ定義 (`StoryCharacterData`) を作り、立ち絵を Addressables を通さずに渡す。逆向きの絵があれば向きに応じて差し替える (`PortraitController.Show` / `SetupPortrait`) |
+| `ScenarioContent.cs` | `scenario/` の背景 (`backgrounds/*.png` を背景部品 `StoryViewImage` の辞書へ入れる。`Patches.cs` の `Awake` 後) ・テキスト (`text.ja.csv`)・画像 (PNG → Sprite)・シナリオ (`story/*.lua`、毎回読み直す) を読む |
+| `Plugin.cs` | 起動処理と試作用のキー操作 |
+
+## ビルド
+
+必要なもの:
+
+- .NET SDK 8（`dotnet --version` で確認。手元では 8.0.423）
+- Python 3.9 以降（配布スクリプトは標準ライブラリのみ）
+- 活俠傳のインストール済みファイルと BepInEx 6 Unity Mono / Windows x86
+- 初回ビルド時の NuGet 接続（参照アセンブリと MoonSharp の取得）
+
+ゲーム DLL はリポジトリに含めません。各自の導入先を指定して参照します。配布版は .NET Framework 4.7.2 向け、制作ツールの検査用ビルドは .NET 8 向けです。
+
+Windows（PowerShell）:
+
+```powershell
+$env:LOM_GAME_DIR = 'D:\SteamLibrary\steamapps\common\LegendOfMortal'
+python tools/build_release.py
+```
+
+Linux / WSL（.NET SDK を PATH に設定済みの場合）:
+
+```bash
+export LOM_GAME_DIR='/path/to/LegendOfMortal'
+python3 tools/build_release.py
+```
+
+`--game-dir <場所>` でも指定できます。既存の `tools/build_release.sh` は同じ処理への入口で、PATH に dotnet がなければ `~/.dotnet/dotnet` を探します。
+
+ビルドとサンプル検査がすべて成功すると `dist/package/` と `dist/LoMScenarioAddon-<版>.zip` を更新します。版は `Plugin.cs` の `BepInPlugin` から取ります。ビルド・検査が失敗した場合、以前の配布物は残りますが新しい版として更新されません。配布時は必ずコマンドの成功を確認してください。
+
+`--install` を付けると Windows / WSL でゲーム終了を確認し、既存のアドオン・制作ツール・文書をゲーム内の `LoMScenarioAddon-backups/<日時>/` へ退避して導入します。プロセス一覧を取得できない環境では導入を中止します。サンプルが導入されるため、自作シナリオは必要に応じて退避先から戻してください。
+
+配布用の並び（ゲームフォルダからの相対パス）:
+
+```text
+BepInEx/patchers/LoMScenarioAddon/LoMScenarioAddon.Patcher.dll
+BepInEx/plugins/LoMScenarioAddon/LoMScenarioAddon.dll
+BepInEx/plugins/LoMScenarioAddon/LICENSE
+BepInEx/plugins/LoMScenarioAddon/LICENSE-GAME-EXCEPTION.txt
+BepInEx/plugins/LoMScenarioAddon/THIRD-PARTY-NOTICES.md
+BepInEx/plugins/LoMScenarioAddon/licenses/
+BepInEx/plugins/LoMScenarioAddon/Source/
+BepInEx/plugins/LoMScenarioAddon/scenario/
+LoMScenarioTool/
+LoMScenarioAddon-docs/             README・制作ガイド・ライセンス
+```
+
+制作ツールだけを検査する場合、ゲーム DLL は不要です。
+
+```bash
+dotnet run --project src/LoMScenarioTool -c Release -f net8.0 -- check sample/scenario --no-pause
+python3 -m unittest discover -s tests -v
+```
+
+仮画像・仮音声は `sample/scenario/` に用意済みです。再生成はビルドには不要です。画像生成には Pillow と日本語フォントが必要で、`LOM_PLACEHOLDER_FONT` でフォントのファイルパスを指定できます。音声生成は Python 標準ライブラリのみを使います。
+
+確認用のキー操作は [シナリオ制作ガイド](scenario-guide.md#確認用のキー操作) を参照してください。公開前の検証項目は [配布確認](release-checks.md) にまとめています。
+
+## 確認済み (2026-09-28, 日本語化 MOD v2.4 環境)
+
+- キャラ一覧の拡張 (`IsDefined` / `TryParseByStringValue` / `GetStringValue` がすべて通る)
+- Lua からの好感度増減、セーブ・ロードの往復 (`RelationshipSave.Key = "lsa_test"`)
+- 社交パネルの33個目のボタン、顔アイコン・立ち絵・名前・肩書き・列伝の表示
+- 試作 ID の無い古いセーブの読み込み
+- 2人のキャラの同時追加 (社交パネル34人、掛け合い、2人分の紹介カード)
+- 左右非対称の立ち絵: 右向きの絵があれば差し替え、無ければ自動反転
+- 場所イベント: 裏山の修練 (`Back_Free_001`) の抽選に追加 → 当選して試作シナリオ → 2回目は本編のイベント (1回きり)。セーブ・ロード後も保たれる
+- 自前のフラグの Lua からの設定とセーブ
+- 訪問: 出会い済みで裏山をクリック → 雑談メニュー。好感度による選択肢の出し分け (`conditions`)、本来の行動 (`back_001`) への移行
+- 周回の引き継ぎ: 新規ゲームの「繼承人際」に試作キャラ2人が並び、天命点での加算が反映される
+- 天賦: 決闘に勝って `AddTalent` → 取得表示・人物画面・説明、ロード後も保持。決闘の敵に本編の天賦 (防御強化 Lv3) を持たせる
+- イベント CG: `ShowPicture` (訪問の「旅の話」) と `ShowBigPicture` (エンディング) で自前の絵、フェード・消去も本編どおり
+- CG 画面: `cgpanel.Open` で絵と縦書きの本文 (左の余白に並ぶ)、結局CG の一覧に記録
+- 死亡エンディング: `ChangeScene("GameOver", ...)` で題名・本文 → タイトル、奪命譜に記録
+- 背景: 訪問シナリオの背景を自前の `lsa_camp` に → 画面いっぱいに表示、立ち絵・会話も問題なし
+- 秘笈: 入手 → 所持品・修練の画面 → 3段のレベルアップ (能力値・天賦) → 能力値加成の欄と実際の能力値、ロード後も保持
+- 言語: `Language = zh-CN` で社交パネルの名前・肩書きが簡体字に切り替わり、簡体字に無いキー (列伝) は既定の日本語で出る。`auto` では日本語化 MOD を検出して `ja`
+- 決闘: 訪問から手合わせ → 敵の4枚の絵・状態パネル・台詞・名前の差し替え、勝敗フラグ、戻り先での分岐。`enemy` / `rates` の反映 (口撃だけの重みにすると口撃ばかりになり、怒り状態では攻撃に切り替わる)
+- エンディング: ルートフラグを立てて `ch8_6_3_2` を流す → 共通部分の後で自前エンディングへ → エンディングカード (挿絵・題名・本文) → 列伝の保存と列伝本文の表示 → タイトル
+- 曲・効果音: 訪問で自前の曲がループ再生、効果音、本編の曲への切替、音量スライダーの反映、決闘の曲の指定、自由行動に戻ると本編の曲
+- 自由行動からの登場シナリオ: 背景、立ち絵、表情差分 (`portraits/smile.png`)、名前入りの台詞、初登場の紹介カード、好感度の増減表示、自由行動への復帰
+
+## 未着手
+
+- 集団戦 (Battle) への追加キャラの登場 (敵が門派単位のアニメーション部品で組まれているため見送り)
+- 圧縮音声 (ogg など)。今は wav を無圧縮で埋め込む (Wwise の ADPCM なら 1/4 だが符号化器が要る)
+
+配布スクリプトは、そのビルドのプロジェクトソースと MoonSharp 2.0.0 のソースを ZIP に同梱する。MoonSharp ソースの取得にはネットワーク接続が必要。ライセンスの適用範囲は [ライセンスと再配布](licensing.md) を参照。

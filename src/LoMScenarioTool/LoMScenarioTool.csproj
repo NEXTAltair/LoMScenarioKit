@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- 作る人向けの道具 (scenario フォルダの検査と配布用 zip)。配布するのは net472 版 (Windows に標準で入っている .NET Framework で動く)。
+       net8.0 は開発機 (Linux) での動作確認用。ゲームの DLL には依存しない。 -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <TargetFramework></TargetFramework>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>LoMScenarioTool</AssemblyName>
+    <RootNamespace>LoMScenarioTool</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../Shared/*.cs" />
+    <Compile Include="../LoMScenarioAddon/Audio/WavFile.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Lua の構文検査。ゲーム (Fungus) と同じ Lua 実装 (ライセンスは THIRD-PARTY-NOTICES.md を参照) -->
+    <PackageReference Include="MoonSharp" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+</Project>

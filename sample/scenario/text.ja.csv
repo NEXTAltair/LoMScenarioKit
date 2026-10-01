@@ -1,0 +1,44 @@
+# key,text — 公式に訳が無いキーだけ、この表で埋める
+Character/lsa_test,試作の客人
+CharacterTitle/lsa_test,流れ者
+CharacterIntro0/lsa_test,"ふらりと唐門に現れた旅の者。
+腕が立つのか、ただの物好きか――。"
+CharacterIntro1/lsa_test,"どこからともなく唐門に現れた旅の者。
+名も素性も定かでないが、本人はいたって気楽な様子である。
+（LoMScenarioAddon の試作キャラ）"
+CharacterIntro2/lsa_test,"列伝その二。好感度が4以上で開く。"
+CharacterIntro3/lsa_test,"列伝その三。好感度が7以上で開く。"
+CharacterIntro4/lsa_test,"列伝その四。好感度が10（最大）で開く。"
+Character/lsa_test2,試作の連れ
+CharacterTitle/lsa_test2,旅の伴
+CharacterIntro0/lsa_test2,"客人と連れ立って唐門を訪れた者。
+口数は少ないが、目つきは鋭い。"
+CharacterIntro1/lsa_test2,"客人の旅の連れ。二人がどこで出会ったのかは誰も知らない。
+（LoMScenarioAddon の試作キャラ・二人目）"
+CharacterIntro2/lsa_test2,"列伝その二。好感度が4以上で開く。"
+CharacterIntro3/lsa_test2,"列伝その三。好感度が7以上で開く。"
+CharacterIntro4/lsa_test2,"列伝その四。好感度が10（最大）で開く。"
+Library/Title/lsa_end_test,旅の空
+Library/Desc/lsa_end_test,"唐門に流れ着いた二人の旅人と共に、新たな地へと旅立った。
+（LoMScenarioAddon の試作エンディング）"
+LegendInfo/lsa_end_test_legend,"――やがて唐門を離れ、客人と連れと共に三人で旅に出た。その後の行方を知る者はいない。"
+PlayerTalent/Name/lsa_tal_guard,旅人の肩当て
+PlayerTalent/Desc/lsa_tal_guard,"試作の客人から譲り受けた、使い込まれた肩当て。
+（効果は本編の部品を組み替えた新効果「旅人の構え」。LoMScenarioAddon の試作天賦）"
+CombatSkill/Name/lsa_eff_guard,旅人の構え
+CombatSkill/Desc/lsa_eff_guard,旅人の構え：防御+25%、回避+10%。
+PlayerTalent/Name/lsa_tal_sword,試作剣譜の心得
+PlayerTalent/Desc/lsa_tal_sword,"「試作剣譜」を読み終えて得た心得。
+（効果は本編の「達人の風格」と同じ。LoMScenarioAddon の試作天賦）"
+Book/Title/lsa_book_test,試作剣譜
+Book/Name/lsa_book_test,試作剣譜
+Book/Desc/lsa_book_test,"試作の客人が旅の途中で書き留めた剣の覚え書き。
+（LoMScenarioAddon の試作秘笈。全3段）"
+Library/Title/lsa_dead_test,無謀な修行
+Library/Desc/lsa_dead_test,"客人の真似をして無茶な修行に挑み、そのまま帰らぬ人となった。
+（LoMScenarioAddon の試作の死亡エンディング）"
+Library/Title/lsa_cg_test,焚き火の夜
+Library/Desc/lsa_cg_test,"旅立ちの前夜
+三人は焚き火を囲み
+夜更けまで語り合った
+（試作のCG）"

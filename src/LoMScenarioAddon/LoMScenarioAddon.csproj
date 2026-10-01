@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>LoMScenarioAddon</AssemblyName>
+    <RootNamespace>LoMScenarioAddon</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../Shared/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx.Core"><HintPath>$(BepInExCoreDir)/BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx.Unity.Mono"><HintPath>$(BepInExCoreDir)/BepInEx.Unity.Mono.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(ManagedDir)/UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(BepInExCoreDir)/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="DOTween"><HintPath>$(ManagedDir)/DOTween.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="DOTween.Modules"><HintPath>$(ManagedDir)/DOTween.Modules.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Addressables"><HintPath>$(ManagedDir)/Unity.Addressables.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.ResourceManager"><HintPath>$(ManagedDir)/Unity.ResourceManager.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)/UnityEngine.UIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Fungus"><HintPath>$(ManagedDir)/Fungus.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="LeanLocalization"><HintPath>$(ManagedDir)/LeanLocalization.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedDir)/UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedDir)/UnityEngine.InputLegacyModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mortal.Combat"><HintPath>$(ManagedDir)/Mortal.Combat.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)/UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mortal.Core"><HintPath>$(ManagedDir)/Mortal.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mortal.Free"><HintPath>$(ManagedDir)/Mortal.Free.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mortal.Story"><HintPath>$(ManagedDir)/Mortal.Story.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="AK.Wwise.Unity.API"><HintPath>$(ManagedDir)/AK.Wwise.Unity.API.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="OBB.Framework"><HintPath>$(ManagedDir)/OBB.Framework.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

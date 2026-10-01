@@ -1,0 +1,20 @@
+<Project>
+  <!-- ゲームのインストール先。環境変数 LOM_GAME_DIR で上書きできる。 -->
+  <PropertyGroup>
+    <GameDir Condition="'$(LOM_GAME_DIR)' != ''">$(LOM_GAME_DIR)</GameDir>
+    <ManagedDir>$(GameDir)/Mortal_Data/Managed</ManagedDir>
+    <BepInExCoreDir>$(GameDir)/BepInEx/core</BepInExCoreDir>
+
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

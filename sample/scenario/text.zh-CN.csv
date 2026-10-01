@@ -1,0 +1,6 @@
+# key,text — 简体中文 (确认语言切换用的最小样本。缺少的键使用 default_language 的 text.ja.csv)
+Character/lsa_test,试作的客人
+CharacterTitle/lsa_test,流浪者
+Character/lsa_test2,试作的同伴
+CharacterTitle/lsa_test2,旅伴
+Library/Title/lsa_end_test,旅途的天空

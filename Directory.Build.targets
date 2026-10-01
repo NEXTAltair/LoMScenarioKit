@@ -1,0 +1,11 @@
+<Project>
+  <Target Name="CheckGameDirectory" BeforeTargets="ResolveReferences"
+          Condition="'$(MSBuildProjectName)' != 'LoMScenarioTool'">
+    <Error Condition="'$(GameDir)' == ''"
+           Text="LOM_GAME_DIR または -p:GameDir で活俠傳のインストール先を指定してください。" />
+    <Error Condition="!Exists('$(ManagedDir)/Mortal.Core.dll')"
+           Text="ゲーム DLL が見つかりません: $(ManagedDir)/Mortal.Core.dll" />
+    <Error Condition="!Exists('$(BepInExCoreDir)/BepInEx.Core.dll')"
+           Text="BepInEx 6 が見つかりません: $(BepInExCoreDir)/BepInEx.Core.dll" />
+  </Target>
+</Project>

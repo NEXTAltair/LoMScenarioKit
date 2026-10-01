@@ -1,0 +1,32 @@
+LoMScenarioKit: Legend of Mortal linking exception
+Additional permission under GNU GPL version 3 section 7
+
+Copyright (C) 2026 NEXTAltair
+
+For the code covered by this permission, the licensors grant you
+additional permission to link or combine that code, or a modified version
+of it, with Legend of Mortal (活俠傳) and the runtime libraries distributed
+with that game, and to convey the resulting covered work.
+
+The permitted game components include the Mortal and OBB assemblies, the
+Unity runtime and Unity packages, Wwise, Fungus, DOTween, and
+LeanLocalization as distributed with Legend of Mortal. This permission
+covers linking and runtime interoperability with those components,
+including through the BepInEx mod loader. It does not authorize copying
+implementation code or assets from those components into this project.
+
+When conveying a non-source form of the covered work under this
+permission, its Corresponding Source need not include the source of the
+game components listed above. The GPLv3 requirements continue to apply
+to the covered project code, including modifications to that code and
+the scripts needed to build and install it.
+
+This permission is granted only by the licensors of the covered project
+code. It does not grant rights to use, modify, or redistribute the game,
+its runtime libraries, its assets, or other third-party material beyond
+those granted by their respective rights holders. It does not impose
+GPLv3 on those components or change their license terms.
+
+If you modify the covered code, you may extend this permission to your
+modifications, but you are not obligated to do so. You may remove this
+additional permission from your version as allowed by GPLv3 section 7.
