@@ -30,11 +30,12 @@
 | `Duels.cs` | 決闘。決闘の場面の読み込み直後に本編の決闘設定と敵を複製して足し、敵の絵 (`CombatEnemyController.SetData`)・状態パネル (`CombatCharacterStatusUI.Setup`) を差し替える |
 | `Endings.cs` | エンディング。本編の分岐シナリオ `ch8_6_3_2` の Switch 直前に自前ルートの判定を差し込む。講經堂のカード (`LibraryItemData`) を汗青書・奪命譜・結局CG に登録する |
 | `StoryPictures.cs` | イベント CG。`StoryPicture.Show`/`Hide` で `pictures/*.png` を本編と同じ演出で出す |
+| `StoryBackgrounds.cs` | 背景読み込みコルーチンの実行直前に自前画像をキャッシュへ補充する。言語変更でキャッシュが消えても再表示できる |
 | `ScenarioSprites.cs` | 追加キャラの社交パネル用立ち絵・イベント CG を本編の Addressables 読み込みへ供給する。画像は `ScenarioContent` が所有し、ハンドルの解放では破棄しない |
 | `Visits.cs` | 場所選択時のシナリオ差し替え。`PositionController.OnPositionClick` の前後で、通常の行動に進んだときだけ行き先を指定したシナリオに差し替える |
 | `ScenarioConditions.cs` | `conditions` を Lua の `checkpointmanager.Condition(名前)` で判定できるようにする |
 | `StoryCharacters.cs` | 会話シーン用のキャラ定義 (`StoryCharacterData`) を作り、立ち絵を Addressables を通さずに渡す。逆向きの絵があれば向きに応じて差し替える (`PortraitController.Show` / `SetupPortrait`) |
-| `ScenarioContent.cs` | `scenario/` の背景 (`backgrounds/*.png` を背景部品 `StoryViewImage` の辞書へ入れる。`Patches.cs` の `Awake` 後) ・テキスト (`text.ja.csv`)・画像 (PNG → Sprite)・シナリオ (`story/*.lua`、毎回読み直す) を読む |
+| `ScenarioContent.cs` | `scenario/` の背景 (`backgrounds/*.png`、`StoryBackgrounds` から供給) ・テキスト (`text.ja.csv`)・画像 (PNG → Sprite)・シナリオ (`story/*.lua`、毎回読み直す) を読む |
 | `Plugin.cs` | 起動処理と試作用のキー操作 |
 
 ## ビルド
@@ -90,6 +91,12 @@ dotnet run --project src/LoMScenarioTool -c Release -f net8.0 -- check sample/sc
 python3 -m unittest discover -s tests -v
 ```
 
+背景読み込みの回帰テストもゲーム DLL なしで実行できます。Unity の表示確認とは別に、キャッシュ消去とコルーチンの実行順を再現します。
+
+```bash
+dotnet run --project tests/BackgroundLoading -c Release
+```
+
 仮画像・仮音声は `sample/scenario/` に用意済みです。再生成はビルドには不要です。画像生成には Pillow と日本語フォントが必要で、`LOM_PLACEHOLDER_FONT` でフォントのファイルパスを指定できます。音声生成は Python 標準ライブラリのみを使います。
 
 確認用のキー操作は [シナリオ制作ガイド](scenario-guide.md#確認用のキー操作) を参照してください。公開前の検証項目は [配布確認](release-checks.md) にまとめています。
@@ -102,14 +109,19 @@ python3 -m unittest discover -s tests -v
 
 0.14.1 ではキャラの立ち絵を `_avatarAsset`（`AssetReferenceCache<Sprite>`）へ登録する。画像がある場合は起動中だけの GUID を発行し、Addressables の locator / provider から `avatar.png` の共有 Sprite を返す。社交パネルは本編の `AvatarReference.LoadSync()` を使う。画像が無い場合は空のキャッシュを渡し、null 参照による中断を防ぐ。イベント CG と画像の供給処理を共通化し、解放・再読み込み時も共有画像は破棄しない。
 
-現行 DLL のフィールド型、社交パネルの呼び出し経路、`AssetReference` の GUID 検証、ロードと解放の処理を確認した。v2.4 の過去の動作確認は下記に残すが、0.14.1 を旧ゲームへ導入した場合の互換性は未検証。
+0.14.1 の実機ログでキャラ2人・フラグ4件・天賦2件・秘笈1件の登録完了、社交パネルへの2ボタン追加、訪問シナリオ開始まで確認した。ただし Save60 から裏山へ進むと黒画面で停止し、`StoryViewImage.LoadAsset` が null の Addressables キーを渡す例外が発生した。
+
+現行ゲームの背景キャッシュは言語変更時に消去される。Awake 後に自前画像を一度だけ入れる方式では、その後の読み込みに使えない。0.14.2 では `LoadAsset` のコルーチンを包み、最初の `MoveNext` の直前に要求された自前背景だけを補充する。本編のコルーチンをその場で進めるため、コルーチン取得から実行までの間にキャッシュが消えても対応できる。公式背景の読み込み・待機・例外は本編へ委ねる。
+
+現行 DLL のフィールド型、社交パネルの呼び出し経路、`AssetReference` の GUID 検証、ロードと解放の処理を確認した。v2.4 の過去の動作確認は下記に残すが、現行アドオンを旧ゲームへ導入した場合の互換性は未検証。
 
 検証・導入状況:
 
 - 現行ゲーム DLL を参照したパッチャー・プラグイン・Windows 向け制作ツールと .NET 8 検査ツールの Release ビルド: 警告0・エラー0。
 - サンプルシナリオの検査: 警告0・エラー0。配布スクリプトの既存テスト8件も成功。
-- `LoMScenarioAddon-0.14.1.zip` の生成成功。
-- ゲーム終了を確認してプラグイン DLL のみ差し替え、旧 DLL と修正前ログを `LoMScenarioAddon-backups/` に退避した。導入先とビルド済み DLL の SHA-256 一致、既存シナリオ・設定30ファイルの不変を確認。
+- 背景の回帰テスト: コルーチン実行前のキャッシュ消去、再読み込み、公式画像・待機オブジェクトの維持、例外伝播・中断時の破棄、未設定時の委譲を確認。
+- `LoMScenarioAddon-0.14.2.zip` の生成成功。
+- ゲーム終了を確認して0.14.2のプラグイン DLL のみ差し替え、旧 DLL と修正前ログを `LoMScenarioAddon-backups/` に退避した。導入先とビルド済み DLL の SHA-256 一致、既存シナリオ・設定30ファイルの不変を確認。
 
 実機での再確認項目:
 
