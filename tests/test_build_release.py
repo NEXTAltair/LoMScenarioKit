@@ -27,8 +27,8 @@ class ReleaseTests(unittest.TestCase):
                     "README.md", ".gitignore", "Directory.Build.props", "Directory.Build.targets",
                     "docs/scenario-guide.md", "sample/scenario/scenario.json", "sample/scenario/LICENSE"]:
             self.write(self.root / rel, "fixture")
-        self.write(self.root / "src/LoMScenarioAddon/Plugin.cs", 'BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "0.14.0")')
-        self.old_zip = self.root / "dist/LoMScenarioAddon-0.14.0.zip"
+        self.write(self.root / "src/LoMScenarioAddon/Plugin.cs", 'BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "2.5.00")')
+        self.old_zip = self.root / "dist/LoMScenarioAddon-2.5.00.zip"
         self.write(self.old_zip, "previous zip")
         self.write(self.root / "dist/package/previous.txt", "previous package")
         self.addCleanup(patch.stopall)
@@ -97,6 +97,7 @@ class ReleaseTests(unittest.TestCase):
         self.write(self.root / "src/LoMScenarioAddon/bin/dependency.dll", "must not ship")
         with patch.object(release, "run", side_effect=self.fake_run):
             release.build(self.game)
+        self.assertFalse((self.root / "dist/LoMScenarioAddon-2.5.0.zip").exists())
         with zipfile.ZipFile(self.old_zip) as z:
             names = z.namelist()
             self.assertIn("LoMScenarioAddon-docs/README.md", names)

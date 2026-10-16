@@ -18,7 +18,7 @@ namespace LoMScenarioAddon
     /// <summary>
     /// scenario/ フォルダのシナリオを本体に差し込む。キャラ定義は scenario.json から読む。
     /// </summary>
-    [BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "0.14.2")]
+    [BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "2.5.00")]
     public class Plugin : BaseUnityPlugin
     {
         internal static ManualLogSource Log;
