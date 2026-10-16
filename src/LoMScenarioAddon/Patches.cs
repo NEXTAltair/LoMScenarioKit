@@ -109,21 +109,14 @@ namespace LoMScenarioAddon
         }
 
         /// <summary>
-        /// 背景。本編の背景部品は、背景名ごとに読み込んだ画像を辞書 (_dicView) に持ち、辞書にある名前は読み込まずにそれを使う。
-        /// 部品の初期化直後に自前の背景を辞書へ入れておけば、Lua の flowcharts.LoadView("自前の背景名") がそのまま効く。
-        /// (Awake は Unity が直接呼ぶので JIT のインライン化で割り込みが外れる心配が無い)
+        /// 背景のキャッシュは言語変更時に消えるため、各読み込みの実行直前に自前画像を補充する。
+        /// 表示と公式画像の読み込みは本編のコルーチンに任せる。
         /// </summary>
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(StoryViewImage), "Awake")]
-        private static void StoryViewImageAwakePostfix(StoryViewImage __instance)
+        [HarmonyPatch(typeof(StoryViewImage), nameof(StoryViewImage.LoadAsset))]
+        private static void StoryViewImageLoadAssetPostfix(StoryViewImage __instance, string name, ref IEnumerator __result)
         {
-            if (Plugin.Content == null)
-                return;
-            var dic = AccessTools.Field(typeof(StoryViewImage), "_dicView").GetValue(__instance) as System.Collections.Generic.Dictionary<string, Sprite>;
-            if (dic == null)
-                return;
-            foreach (var pair in Plugin.Content.GetBackgrounds())
-                dic[pair.Key] = pair.Value;
+            __result = StoryBackgrounds.LoadAsset(__instance, name, __result);
         }
 
         /// <summary>自前のイベント画像だけ専用キーへ変換し、本編の表示処理を実行する。</summary>

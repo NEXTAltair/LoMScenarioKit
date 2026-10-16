@@ -3,10 +3,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.ResourceLocators;
-using UnityEngine.ResourceManagement.ResourceLocations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace LoMScenarioAddon
 {
@@ -18,20 +14,6 @@ namespace LoMScenarioAddon
     {
         private const string KeyPrefix = "LoMScenarioAddon/pictures/";
         private static readonly Dictionary<string, string> _keys = new Dictionary<string, string>(StringComparer.Ordinal);
-        private static ResourceLocationMap _locator;
-
-        // 最初の画像表示時に登録する。ScenarioContent と同じくゲームの起動中は保持する。
-        // 未解放のハンドルが残り得るシーン切り替えでは provider / locator を解除しない。
-        private static void EnsureRegistered()
-        {
-            if (_locator != null)
-                return;
-            var provider = new PictureProvider();
-            var locator = new ResourceLocationMap("LoMScenarioAddon.Pictures", 16);
-            Addressables.ResourceManager.ResourceProviders.Add(provider);
-            Addressables.AddResourceLocator(locator);
-            _locator = locator;
-        }
 
         internal static void RedirectKey(ref string key)
         {
@@ -57,35 +39,11 @@ namespace LoMScenarioAddon
             if (sprite == null)
                 return;
 
-            EnsureRegistered();
             string redirected = KeyPrefix + key;
             string address = "pic_" + redirected;
-            var location = new ResourceLocationBase(address, address, typeof(PictureProvider).FullName, typeof(Sprite))
-            {
-                Data = sprite
-            };
-            _locator.Add(address, location);
+            ScenarioSprites.Register(address, sprite);
             _keys.Add(key, redirected);
             key = redirected;
-        }
-
-        private sealed class PictureProvider : ResourceProviderBase
-        {
-            public override Type GetDefaultType(IResourceLocation location) => typeof(Sprite);
-
-            public override void Provide(ProvideHandle handle)
-            {
-                var sprite = handle.Location.Data as Sprite;
-                bool available = sprite != null;
-                handle.Complete<Sprite>(sprite, available,
-                    available ? null : new InvalidOperationException("Scenario picture is no longer available"));
-            }
-
-            public override void Release(IResourceLocation location, object asset)
-            {
-                // 取得ハンドルは Addressables が解放する。
-                // Sprite / Texture2D は ScenarioContent の共有キャッシュ所有なので破棄しない。
-            }
         }
     }
 }
