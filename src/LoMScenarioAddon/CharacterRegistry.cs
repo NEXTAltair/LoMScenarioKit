@@ -8,6 +8,7 @@ using LoMScenarioAddon.Shared;
 using Mortal.Core;
 using OBB.Framework.Utils;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace LoMScenarioAddon
 {
@@ -88,7 +89,7 @@ namespace LoMScenarioAddon
                 var images = Plugin.Content.GetCharacterImages(def.Id);
                 SetField(stat, "_icon", images.Icon);
                 SetField(stat, "_headIcon", images.Head);
-                SetField(stat, "_avatar", images.Avatar);
+                SetField(stat, "_avatarAsset", CreateAvatarReference(images.Avatar));
                 _stats[def.Id] = stat;
                 Plugin.Log.LogInfo($"registered {def.Id} ({(int)type}): default={def.DefaultAffinity} socialPanel={def.SocialPanel} " +
                                    $"images icon={images.Icon != null} head={images.Head != null} avatar={images.Avatar != null}");
@@ -102,6 +103,21 @@ namespace LoMScenarioAddon
             Registered = true;
             Plugin.Log.LogInfo($"characters registered: {_stats.Count}/{_defs.Count} (relationship list count={relationships.List.Count})");
             return true;
+        }
+
+        private static AssetReferenceCache<Sprite> CreateAvatarReference(Sprite sprite)
+        {
+            // 画像が無い場合も空のキャッシュを渡し、社交パネルの LoadSync() を成立させる。
+            var cache = new AssetReferenceCache<Sprite>();
+            if (sprite != null)
+            {
+                // AssetReference.RuntimeKeyIsValid() は GUID を要求する。
+                // 本編のアセットと衝突しない、この起動中だけのキーを登録する。
+                string address = Guid.NewGuid().ToString("N");
+                ScenarioSprites.Register(address, sprite);
+                SetField(cache, "_reference", new AssetReference(address));
+            }
+            return cache;
         }
 
         private static void Step(string name, System.Action action)

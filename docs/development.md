@@ -30,6 +30,7 @@
 | `Duels.cs` | 決闘。決闘の場面の読み込み直後に本編の決闘設定と敵を複製して足し、敵の絵 (`CombatEnemyController.SetData`)・状態パネル (`CombatCharacterStatusUI.Setup`) を差し替える |
 | `Endings.cs` | エンディング。本編の分岐シナリオ `ch8_6_3_2` の Switch 直前に自前ルートの判定を差し込む。講經堂のカード (`LibraryItemData`) を汗青書・奪命譜・結局CG に登録する |
 | `StoryPictures.cs` | イベント CG。`StoryPicture.Show`/`Hide` で `pictures/*.png` を本編と同じ演出で出す |
+| `ScenarioSprites.cs` | 追加キャラの社交パネル用立ち絵・イベント CG を本編の Addressables 読み込みへ供給する。画像は `ScenarioContent` が所有し、ハンドルの解放では破棄しない |
 | `Visits.cs` | 場所選択時のシナリオ差し替え。`PositionController.OnPositionClick` の前後で、通常の行動に進んだときだけ行き先を指定したシナリオに差し替える |
 | `ScenarioConditions.cs` | `conditions` を Lua の `checkpointmanager.Condition(名前)` で判定できるようにする |
 | `StoryCharacters.cs` | 会話シーン用のキャラ定義 (`StoryCharacterData`) を作り、立ち絵を Addressables を通さずに渡す。逆向きの絵があれば向きに応じて差し替える (`PortraitController.Show` / `SetupPortrait`) |
@@ -42,7 +43,7 @@
 
 - .NET SDK 8（`dotnet --version` で確認。手元では 8.0.423）
 - Python 3.9 以降（配布スクリプトは標準ライブラリのみ）
-- 活俠傳のインストール済みファイルと BepInEx 6 Unity Mono / Windows x86
+- 活俠傳のインストール済みファイル（現行64bit版）と BepInEx 6 Unity Mono / Windows x64
 - 初回ビルド時の NuGet 接続（参照アセンブリと MoonSharp の取得）
 
 ゲーム DLL はリポジトリに含めません。各自の導入先を指定して参照します。配布版は .NET Framework 4.7.2 向け、制作ツールの検査用ビルドは .NET 8 向けです。
@@ -92,6 +93,30 @@ python3 -m unittest discover -s tests -v
 仮画像・仮音声は `sample/scenario/` に用意済みです。再生成はビルドには不要です。画像生成には Pillow と日本語フォントが必要で、`LOM_PLACEHOLDER_FONT` でフォントのファイルパスを指定できます。音声生成は Python 標準ライブラリのみを使います。
 
 確認用のキー操作は [シナリオ制作ガイド](scenario-guide.md#確認用のキー操作) を参照してください。公開前の検証項目は [配布確認](release-checks.md) にまとめています。
+
+## 日本語化 MOD v2.5 環境への対応 (2026-10-16)
+
+導入済み環境はゲーム Steam Build ID `25957922`、Windows x64、Unity `2020.3.49f1`、BepInEx `6.0.0-be.692`（commit `851521c`）、日本語化 MOD runtime `2.5.52` / 翻訳 `2026.10.15.378`。`Mortal.exe` の形式と起動ログで64bit化を確認した。過去の32bit環境（Build ID `20337760`）とは区別する。
+
+0.14.0 の起動ログでは `Language = auto` が `ja` と判定される一方、`RelationshipStat._avatar` が存在しないためキャラ登録が中断していた。後続のフラグ・天賦登録に進めず、登場・訪問イベントの無効化と登録の毎秒再試行が発生していた。日本語化 MOD の検出名 `LOM_JP_StringVault` は維持されており、この例外は現行ゲームの画像取得方式との不整合による。
+
+0.14.1 ではキャラの立ち絵を `_avatarAsset`（`AssetReferenceCache<Sprite>`）へ登録する。画像がある場合は起動中だけの GUID を発行し、Addressables の locator / provider から `avatar.png` の共有 Sprite を返す。社交パネルは本編の `AvatarReference.LoadSync()` を使う。画像が無い場合は空のキャッシュを渡し、null 参照による中断を防ぐ。イベント CG と画像の供給処理を共通化し、解放・再読み込み時も共有画像は破棄しない。
+
+現行 DLL のフィールド型、社交パネルの呼び出し経路、`AssetReference` の GUID 検証、ロードと解放の処理を確認した。v2.4 の過去の動作確認は下記に残すが、0.14.1 を旧ゲームへ導入した場合の互換性は未検証。
+
+検証・導入状況:
+
+- 現行ゲーム DLL を参照したパッチャー・プラグイン・Windows 向け制作ツールと .NET 8 検査ツールの Release ビルド: 警告0・エラー0。
+- サンプルシナリオの検査: 警告0・エラー0。配布スクリプトの既存テスト8件も成功。
+- `LoMScenarioAddon-0.14.1.zip` の生成成功。
+- ゲーム終了を確認してプラグイン DLL のみ差し替え、旧 DLL と修正前ログを `LoMScenarioAddon-backups/` に退避した。導入先とビルド済み DLL の SHA-256 一致、既存シナリオ・設定30ファイルの不変を確認。
+
+実機での再確認項目:
+
+- キャラ2人、フラグ、天賦、秘笈の登録完了と `_avatar` の例外が出ないこと。
+- 社交パネルの立ち絵、公式キャラとの切り替え、パネルを閉じて開き直したときの画像表示。
+- 裏山の登場・訪問イベント、好感度・フラグのセーブとロード。
+- イベント CG の表示・非表示・繰り返し表示とシーン遷移。
 
 ## 確認済み (2026-09-28, 日本語化 MOD v2.4 環境)
 

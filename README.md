@@ -35,9 +35,9 @@
 
 ## 導入
 
-対象は Windows 版の活俠傳（Unity Mono・32bit）です。BepInEx 6 の **Unity Mono / Windows x86** 版を使います。
+対象は Windows 版の活俠傳（Unity Mono・64bit）です。BepInEx 6 の **Unity Mono / Windows x64** 版を使います。
 
-確認に使った環境は BepInEx `6.0.0-be.692`（commit `851521c`）、Unity `2020.3.49f1`、日本語化 MOD v2.4 です。現在手元にあるゲームの Steam Build ID は `20337760` です。過去の確認履歴は [開発メモ](docs/development.md) を参照してください。日本語化 MOD なしでの動作確認は未実施です。
+2026-10-16 に確認した導入済み環境は BepInEx `6.0.0-be.692`（commit `851521c`）、Unity `2020.3.49f1`、日本語化 MOD v2.5（runtime `2.5.52`、翻訳 `2026.10.15.378`）です。ゲームの Steam Build ID は `25957922` です。0.14.1 は現行ゲームのキャラ画像読み込み方式に対応しています。検証範囲と過去の確認履歴は [開発メモ](docs/development.md) を参照してください。日本語化 MOD なしでの動作確認は未実施です。
 
 BepInEx 未導入の場合は、[公式ビルド配布ページ](https://builds.bepinex.dev/projects/bepinex_be) と [Unity Mono の導入手順](https://docs.bepinex.dev/v6.0.0-pre.1/articles/user_guide/installation/unity_mono.html) を参照し、ゲームフォルダに導入して一度起動します。すでに日本語化 MOD などで導入済みなら、その環境の版をログで確認してください。BepInEx 本体はこのアドオンの ZIP には含まれません。
 
