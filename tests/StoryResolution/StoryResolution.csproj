@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/LoMScenarioAddon/StoryResolutionScope.cs" Link="StoryResolutionScope.cs" />
+  </ItemGroup>
+</Project>
