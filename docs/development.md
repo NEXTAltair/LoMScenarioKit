@@ -31,6 +31,7 @@
 | `Endings.cs` | エンディング。本編の分岐シナリオ `ch8_6_3_2` の Switch 直前に自前ルートの判定を差し込む。講經堂のカード (`LibraryItemData`) を汗青書・奪命譜・結局CG に登録する |
 | `StoryPictures.cs` | イベント CG。`StoryPicture.Show`/`Hide` で `pictures/*.png` を本編と同じ演出で出す |
 | `StoryBackgrounds.cs` | 背景読み込みコルーチンの実行直前に自前画像をキャッシュへ補充する。言語変更でキャッシュが消えても再表示できる |
+| `StoryResolutionScope.cs` | 1回の Lua 読み込みで行った自作シナリオの判定を Binarizer 互換処理と共有する。完了・例外時に破棄し、入れ子では親の判定に戻す |
 | `ScenarioSprites.cs` | 追加キャラの社交パネル用立ち絵・イベント CG を本編の Addressables 読み込みへ供給する。画像は `ScenarioContent` が所有し、ハンドルの解放では破棄しない |
 | `Visits.cs` | 場所選択時のシナリオ差し替え。`PositionController.OnPositionClick` の前後で、通常の行動に進んだときだけ行き先を指定したシナリオに差し替える |
 | `ScenarioConditions.cs` | `conditions` を Lua の `checkpointmanager.Condition(名前)` で判定できるようにする |
@@ -99,9 +100,30 @@ python3 -m unittest discover -s tests -v
 dotnet run --project tests/BackgroundLoading -c Release
 ```
 
+Lua 判定の共有は、ゲーム DLL なしで実行できる回帰テストで確認します。
+
+```bash
+dotnet run --project tests/StoryResolution -c Release
+```
+
+HarmonyX による割り込みと `__state` の後片付けは、導入済みの BepInEx の DLL を参照する別のテストで確認できます。`LOM_GAME_DIR` を設定してビルドし、生成した exe を Windows の .NET Framework 4.7.2 以降で実行してください。ゲーム本体は起動しません。
+
+```powershell
+dotnet build tests/StoryResolution.Harmony -c Release
+.\tests\StoryResolution.Harmony\bin\Release\StoryResolution.Harmony.exe
+```
+
 仮画像・仮音声は `sample/scenario/` に用意済みです。再生成はビルドには不要です。画像生成には Pillow と日本語フォントが必要で、`LOM_PLACEHOLDER_FONT` でフォントのファイルパスを指定できます。音声生成は Python 標準ライブラリのみを使います。
 
 確認用のキー操作は [シナリオ制作ガイド](scenario-guide.md#確認用のキー操作) を参照してください。公開前の検証項目は [配布確認](release-checks.md) にまとめています。
+
+## Lua 判定の共有（2.5.01）
+
+従来は `ExecuteLuaScript` のアドオン側の処理と、Binarizer の二重実行を防ぐ処理が、それぞれ自作 Lua の存在を確認していた。2.5.01 では1回の `ExecuteLuaScript` 呼び出しの間だけ、その判定結果を共有する。通常の公式・追加シナリオでは存在確認が2回から1回になる。
+
+実行順を保つため2か所の割り込みは維持し、対象の `LuaManager` とシナリオ名が一致する場合だけ結果を再利用する。訪問から本編への復帰など未判定の経路や、別のパッチで名前が変わった場合は、従来の判定に戻す。Harmony の finalizer で結果を破棄し、例外時や本編処理を省略した場合も次の読み込みへ持ち越さない。入れ子の呼び出しが終わると親の判定へ戻る。
+
+Lua 本文は従来どおり開始時にファイルから読む。次の読み込みでは再判定するため、ファイルの追加・編集・削除の反映は変わらない。シナリオフォルダを削除した後の継続動作を保証する変更ではない。Binarizer が見つからない環境では共有用オブジェクトを作らない。実ゲームの読み込み時間は未測定であり、体感速度の改善量は未確認。
 
 ## 日本語化 MOD v2.5 環境への対応 (2026-10-16)
 
