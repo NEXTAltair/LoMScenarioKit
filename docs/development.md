@@ -12,6 +12,7 @@
 |---|---|
 | `src/LoMScenarioAddon.Patcher/` | プリロードパッチャー。起動前に `Mortal.Core.RelationshipStatType` へ ID を足す（メモリ上のみ。DLL ファイルは変更しない） |
 | `src/LoMScenarioAddon/` | プラグイン本体 |
+| `src/Logging/` | パッチャーとプラグインだけで共有する専用ファイル出力と設定。制作ツールからは参照しない |
 | `src/Shared/` | パッチャーとプラグインが共有する `scenario.json` の読み取り (`ScenarioManifest.cs`) と、依存ライブラリなしの JSON 読み取り (`MiniJson.cs`) |
 | `sample/scenario/` | 試作キャラ `lsa_test`・`lsa_test2` の定義・テキスト・仮画像・登場シナリオ |
 | `tools/make_placeholders.py` | 仮画像の生成スクリプト (Pillow) |
@@ -99,9 +100,31 @@ python3 -m unittest discover -s tests -v
 dotnet run --project tests/BackgroundLoading -c Release
 ```
 
+専用ログのフィルター・バッファ・タイマー・終了・同時出力・世代管理・保存障害は、ゲームDLLなしで検査できます。
+
+```bash
+dotnet run --project tests/Logging -c Release -f net8.0
+```
+
+実際のBepInExを使った設定読み込みと共通ログからの分離は、ゲームのパスを指定して検査します。Unityの起動は不要です。
+
+```bash
+dotnet run --project tests/Logging.BepInEx -c Release -f net8.0 -p:GameDir='/path/to/LegendOfMortal'
+```
+
 仮画像・仮音声は `sample/scenario/` に用意済みです。再生成はビルドには不要です。画像生成には Pillow と日本語フォントが必要で、`LOM_PLACEHOLDER_FONT` でフォントのファイルパスを指定できます。音声生成は Python 標準ライブラリのみを使います。
 
 確認用のキー操作は [シナリオ制作ガイド](scenario-guide.md#確認用のキー操作) を参照してください。公開前の検証項目は [配布確認](release-checks.md) にまとめています。
+
+## 専用ログの構成
+
+`BufferedFileLog`はBepInExのSources/Listenersへ登録せず、アドオン専用ファイルを所有します。既存の`Plugin.Log`の呼び出し先をこのロガーへ変更し、パッチャーも同じ実装を使います。Unity/BepInEx全体の出力設定や他MODのロガーは変更しません。PlayはInfo以上、Debugは全レベルです。好感度監視・訪問不一致・既読キー変換件数をDebugに分け、Playでは好感度のログ用監視も省きます。
+
+通常はメッセージをロック下のバッファへ追加し、バックグラウンドのタイマーで未保存分だけを書き込みます。Playは30秒、Debugは10秒が既定です。エラーと64Ki文字のバッファ上限では、その呼び出し中に保存します。`StreamWriter.Flush`まで行いますが、OSのキャッシュを強制的に永続化する操作は行いません。
+
+プラグインの`OnApplicationQuit`/`OnDestroy`、パッチャーの`Finalizer`で未保存分とファイルを閉じます。終了とタイマーの競合、繰り返しの終了処理に対応します。実行中のファイルはロックファイルで所有し、別インスタンスが世代を移動しないようにします。各コンポーネントは5MiB以内の現行ファイルと2世代の履歴を保持します。
+
+ファイル作成・書き込みに失敗した場合はタイマーを停止し、保存が確認できなかったバッチと以後のメッセージを既存のBepInExロガーへ渡します。途中まで成功していた場合、バッチの一部が重複する可能性があります。設定ファイルの読み書きに失敗した場合はPlay/30秒を使い、その理由を記録します。保存先・設定・制約は[READMEのログ設定](../README.md#ログ設定)を参照してください。
 
 ## 日本語化 MOD v2.5 環境への対応 (2026-10-16)
 

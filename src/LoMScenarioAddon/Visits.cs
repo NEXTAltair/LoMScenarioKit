@@ -80,8 +80,8 @@ namespace LoMScenarioAddon
                 Plugin.Log.LogInfo($"visit '{visit.Id}' at {position}: {visit.Story} (default was {defaultScript})");
                 return visit.Story;
             }
-            if (Plugin.Manifest.Visits.Any(v => v.Position == position))
-                Plugin.Log.LogInfo($"visit check at {position}: no visit matched, default {defaultScript}");
+            if (Plugin.Log.IsDebugEnabled && Plugin.Manifest.Visits.Any(v => v.Position == position))
+                Plugin.Log.LogDebug($"visit check at {position}: no visit matched, default {defaultScript}");
             return defaultScript;
         }
 
