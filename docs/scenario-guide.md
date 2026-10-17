@@ -364,4 +364,4 @@ Lua には好感度を読む関数が無いので、好感度などによる分�
 
 F キーは日本語化 MOD (ルビ F5〜F7、フォント F7〜F12) と Binarizer (F1〜F6)、Ctrl は会話スキップが使うので避ける。
 
-結果は `BepInEx/LogOutput.log` の `LoMScenarioAddon` 行に出る。
+結果は `BepInEx/LogOutput/LoMScenarioAddon/Addon.log` に出る。好感度・出会い状態の変化などの詳細を確認するときは、[ログ設定](../README.md#ログ設定)で `Mode = Debug` を選んでからゲームを起動する。既定では10秒ごとに未保存分をまとめて保存し、エラーと正常終了時には間隔を待たず保存する。

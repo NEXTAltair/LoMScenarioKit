@@ -7,6 +7,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Preloader.Core.Patching;
 using LoMScenarioAddon.Shared;
+using LoMScenarioAddon.Logging;
 using Mono.Cecil;
 
 namespace LoMScenarioAddon.Patcher
@@ -22,13 +23,19 @@ namespace LoMScenarioAddon.Patcher
         // セーブには文字列 ID で保存されるので、この番号は起動ごとに変わってもよい。
         private const int FirstValue = 20001;
 
+        private BufferedFileLog _log;
+
+        public override void Initialize() => _log = LogSettings.Open("Patcher", Log);
+
+        public override void Finalizer() => _log?.Dispose();
+
         [TargetType("Mortal.Core.dll", "Mortal.Core.RelationshipStatType")]
         public void PatchRelationshipType(TypeDefinition type)
         {
             string path = Path.Combine(Path.Combine(Path.Combine(Paths.PluginPath, "LoMScenarioAddon"), "scenario"), ScenarioManifest.FileName);
             if (!File.Exists(path))
             {
-                Log.LogWarning($"{path} not found, no characters added");
+                _log.LogWarning($"{path} not found, no characters added");
                 return;
             }
 
@@ -40,11 +47,11 @@ namespace LoMScenarioAddon.Patcher
             }
             catch (Exception ex)
             {
-                Log.LogError($"failed to read scenario.json, no characters added: {ex.Message}");
+                _log.LogError($"failed to read scenario.json, no characters added: {ex.Message}");
                 return;
             }
             foreach (var w in warnings)
-                Log.LogWarning(w);
+                _log.LogWarning(w);
 
             // 既存メンバーから [StringValue("...")] のコンストラクタを借りる。
             var template = type.Fields
@@ -52,7 +59,7 @@ namespace LoMScenarioAddon.Patcher
                 .FirstOrDefault(a => a.AttributeType.Name == "StringValueAttribute");
             if (template == null)
             {
-                Log.LogError("StringValueAttribute not found on RelationshipStatType, abort");
+                _log.LogError("StringValueAttribute not found on RelationshipStatType, abort");
                 return;
             }
 
@@ -67,7 +74,7 @@ namespace LoMScenarioAddon.Patcher
             {
                 if (usedStrings.Contains(character.Id))
                 {
-                    Log.LogError($"character id '{character.Id}' collides with an official character, skipped");
+                    _log.LogError($"character id '{character.Id}' collides with an official character, skipped");
                     continue;
                 }
                 string memberName = ScenarioManifest.EnumMemberName(character.Id);
@@ -83,7 +90,7 @@ namespace LoMScenarioAddon.Patcher
                 field.CustomAttributes.Add(attr);
                 type.Fields.Add(field);
                 usedStrings.Add(character.Id);
-                Log.LogInfo($"added RelationshipStatType.{memberName} = {value} [StringValue(\"{character.Id}\")]");
+                _log.LogInfo($"added RelationshipStatType.{memberName} = {value} [StringValue(\"{character.Id}\")]");
                 value++;
             }
         }

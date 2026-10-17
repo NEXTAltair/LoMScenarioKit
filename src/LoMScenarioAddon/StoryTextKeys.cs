@@ -30,8 +30,8 @@ namespace LoMScenarioAddon
                 count++;
                 return $"say(luamanager.GetStoryText(\"{key}\"))";
             });
-            if (count > 0)
-                Plugin.Log.LogInfo($"story: {storyName}: {count} line(s) keyed for read tracking");
+            if (count > 0 && Plugin.Log.IsDebugEnabled)
+                Plugin.Log.LogDebug($"story: {storyName}: {count} line(s) keyed for read tracking");
             return converted;
         }
 
