@@ -92,9 +92,38 @@ Language = auto
 - `ja`・`zh-TW`・`zh-CN`・`ko` など: 指定した言語に固定します。
 - シナリオに訳がない項目は、そのシナリオの既定言語（指定がなければ日本語）で表示します。
 
+## ログ設定
+
+2.5.02から、アドオンが出すログは次の専用ファイルに保存します。
+
+- `BepInEx/LogOutput/LoMScenarioAddon/Addon.log`：プラグイン本体
+- `BepInEx/LogOutput/LoMScenarioAddon/Patcher.log`：起動前のキャラID登録
+
+初回起動後に作られる `BepInEx/config/lom.scenarioaddon.logging.cfg` を、ゲームを終了してから編集します。パッチャーとプラグインで同じ設定を使います。
+
+```ini
+[Logging]
+Mode = Play
+PlayFlushSeconds = 30
+DebugFlushSeconds = 10
+```
+
+| モード | 記録する内容 | まとめて保存する間隔の既定値 |
+|---|---|---|
+| `Play` | 起動・登録・イベント開始などの通常情報、警告、エラー | 30秒 |
+| `Debug` | Playの内容に加え、好感度・出会い状態の変化、訪問条件の不一致、既読用キーへの変換件数 | 10秒 |
+
+間隔は1〜300秒の整数で設定できます。新しいログが無い間は書き込みません。エラー、正常終了、パッチャーの処理終了時は間隔を待たず保存します。待機中のログが約64Ki文字に達した場合も保存します。強制終了した場合、最後のまとめ保存からの記録が失われることがあります。
+
+各ファイルは5MiBを超える前、または次の起動時に世代を切り替え、`.1`・`.2`の過去2世代を残します。極端に長い1件のメッセージは16Ki文字で省略し、`[truncated]`と記録します。
+
+通常時、自作アドオンのメッセージは共通の`LogOutput.log`やUnityの`Player.log`には転送しません。専用ファイルへ保存できない場合は、理由を通知して、その起動中はBepInExのロガーへ切り替えます。BepInEx自身が出すプラグインの読み込み状況・例外などは、引き続き共通ログに出ます。
+
+この設定は本体や日本語化MODのログには影響しません。`-nolog`はUnity全体のログ保存を止める別の設定で、アドオンの専用ログには影響しません。
+
 ## 動かないとき
 
-`BepInEx/LogOutput.log` の `LoMScenarioAddon` を含む行を確認してください。
+まず上記の`Addon.log`と`Patcher.log`を確認してください。ファイルが作られない場合は、`BepInEx/LogOutput.log`の読み込みエラーや`Dedicated log`を含む行も確認します。
 導入時はパッチャーとプラグインの両方が上記の場所にあり、`scenario/scenario.json` が配置されていることを確認します。
 シナリオの定義や素材の検査には [LoMScenarioTool](docs/scenario-guide.md#作る人向けの道具-lomscenariotool) を使えます。
 
@@ -106,6 +135,8 @@ Language = auto
 - `BepInEx/plugins/LoMScenarioAddon/`
 - `LoMScenarioTool/`（導入している場合）
 - `LoMScenarioAddon-docs/`（導入している場合）
+
+設定と記録も不要なら、`BepInEx/config/lom.scenarioaddon.logging.cfg`と`BepInEx/LogOutput/LoMScenarioAddon/`も削除できます。
 
 追加キャラを含むセーブをアドオンなしで読むと、そのキャラの ID は読み込み時に無視されます。
 ただし、**追加した決闘の開始時に作られたオートセーブは、アドオンを外すと決闘設定が見つからず進行が止まる恐れがあります**。外す前に、決闘以外の場面で保存したセーブを用意してください。

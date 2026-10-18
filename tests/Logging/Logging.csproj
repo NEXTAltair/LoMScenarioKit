@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <TargetFramework></TargetFramework>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/Logging/BufferedFileLog.cs" Link="BufferedFileLog.cs" />
+  </ItemGroup>
+</Project>

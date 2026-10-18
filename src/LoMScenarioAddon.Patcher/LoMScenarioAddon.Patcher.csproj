@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="../Shared/*.cs" />
+    <Compile Include="../Logging/*.cs" />
   </ItemGroup>
 
   <ItemGroup>
