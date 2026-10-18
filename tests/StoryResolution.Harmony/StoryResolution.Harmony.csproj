@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <ImportDirectoryBuildTargets>false</ImportDirectoryBuildTargets>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/LoMScenarioAddon/StoryResolutionScope.cs" Link="StoryResolutionScope.cs" />
+    <Reference Include="0Harmony"><HintPath>$(BepInExCoreDir)/0Harmony.dll</HintPath></Reference>
+    <Reference Include="Mono.Cecil"><HintPath>$(BepInExCoreDir)/Mono.Cecil.dll</HintPath></Reference>
+    <Reference Include="MonoMod.Utils"><HintPath>$(BepInExCoreDir)/MonoMod.Utils.dll</HintPath></Reference>
+    <Reference Include="MonoMod.RuntimeDetour"><HintPath>$(BepInExCoreDir)/MonoMod.RuntimeDetour.dll</HintPath></Reference>
+  </ItemGroup>
+  <Target Name="CheckHarmonyDirectory" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(BepInExCoreDir)/0Harmony.dll')"
+           Text="-p:GameDir または LOM_GAME_DIR で、BepInEx を導入したゲームの場所を指定してください。" />
+  </Target>
+</Project>

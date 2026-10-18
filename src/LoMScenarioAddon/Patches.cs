@@ -29,6 +29,7 @@ namespace LoMScenarioAddon
 
         private static readonly System.Reflection.FieldInfo LuaEnvironmentField =
             typeof(LuaManager).GetField("_luaEnvironment", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        private static bool _binarizerStoryRedirectPatched;
 
         /// <summary>
         /// ストーリー画面が開始するシナリオの読み込み。scenario/story/&lt;名前&gt;.lua があればそれを流す。
@@ -38,8 +39,9 @@ namespace LoMScenarioAddon
         [HarmonyPrefix]
         [HarmonyPriority(Priority.First)]
         [HarmonyPatch(typeof(LuaManager), "ExecuteLuaScript")]
-        private static bool ExecuteLuaScriptPrefix(LuaManager __instance)
+        private static bool ExecuteLuaScriptPrefix(LuaManager __instance, out StoryResolutionScope __state)
         {
+            __state = _binarizerStoryRedirectPatched ? new StoryResolutionScope(__instance) : null;
             string name = __instance.ScriptName;
             // 訪問シナリオから本来の行動へ: 差し替えたシナリオ名に戻して本編 (と Binarizer) に任せる
             if (name == Visits.DefaultActivityAlias)
@@ -53,7 +55,9 @@ namespace LoMScenarioAddon
                 Plugin.Log.LogInfo($"story: back to default activity {Visits.LastDefaultScript}");
                 return true;
             }
-            if (!TryResolveStory(name, out var story, out var ev, out var code))
+            bool isScenario = TryResolveStory(name, out var story, out var ev, out var code);
+            __state?.Record(name, isScenario);
+            if (!isScenario)
             {
                 if (ev != null)
                     Plugin.Log.LogError($"event '{ev.Id}': scenario/story/{story}.lua not found");
@@ -66,6 +70,13 @@ namespace LoMScenarioAddon
             env.RunLuaFunction(fn, runAsCoroutine: true);
             Plugin.Log.LogInfo(ev != null ? $"story: {story} started by event '{ev.Id}' ({name})" : $"story: {story} started from scenario/story");
             return false;
+        }
+
+        [HarmonyFinalizer]
+        [HarmonyPatch(typeof(LuaManager), "ExecuteLuaScript")]
+        private static void ExecuteLuaScriptFinalizer(StoryResolutionScope __state)
+        {
+            __state?.Dispose();
         }
 
         [HarmonyPrefix]
@@ -206,13 +217,14 @@ namespace LoMScenarioAddon
             if (method == null)
                 return;
             harmony.Patch(method, prefix: new HarmonyMethod(typeof(Patches), nameof(SkipBinarizerForOurStory)));
+            _binarizerStoryRedirectPatched = true;
             Plugin.Log.LogInfo("Binarizer story redirect found; it is skipped for scenario stories");
         }
 
         // Binarizer の LuaScriptRedirect(ref LuaManager __instance) は静的メソッドなので、引数は位置 (__0) で受け取る。
         private static bool SkipBinarizerForOurStory(ref LuaManager __0)
         {
-            return !IsScenarioScript(__0 != null ? __0.ScriptName : null);
+            return !StoryResolutionScope.IsScenario(__0, __0 != null ? __0.ScriptName : null, IsScenarioScript);
         }
 
         /// <summary>
