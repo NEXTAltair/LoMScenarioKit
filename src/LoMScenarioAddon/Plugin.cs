@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Logging;
 using BepInEx.Unity.Mono;
 using HarmonyLib;
 using LoMScenarioAddon.Shared;
+using LoMScenarioAddon.Logging;
 using Mortal.Core;
 using Mortal.Story;
 using UnityEngine;
@@ -18,10 +18,10 @@ namespace LoMScenarioAddon
     /// <summary>
     /// scenario/ フォルダのシナリオを本体に差し込む。キャラ定義は scenario.json から読む。
     /// </summary>
-    [BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "2.5.00")]
+    [BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "2.5.02")]
     public class Plugin : BaseUnityPlugin
     {
-        internal static ManualLogSource Log;
+        internal static BufferedFileLog Log;
         internal static ScenarioContent Content;
         internal static ScenarioManifest Manifest;
 
@@ -34,7 +34,7 @@ namespace LoMScenarioAddon
 
         private void Awake()
         {
-            Log = Logger;
+            Log = LogSettings.Open("Addon", Logger);
             // 試作・確認用のキー。F キーは日本語化 MOD (ルビ F5〜F7、フォント F7〜F12) と Binarizer (F1〜F6)、
             // Ctrl は会話スキップが使うので避ける。配布時に誤爆しないよう既定は無効 (None)。
             _testStoryKey = Config.Bind("Debug", "TestStoryKey", KeyCode.None, "自由行動の画面で押すと TestStoryName のシナリオを始める (例: Home)");
@@ -114,16 +114,22 @@ namespace LoMScenarioAddon
 
         private void ReportChanges()
         {
+            if (!Log.IsDebugEnabled)
+                return;
             foreach (var pair in CharacterRegistry.Stats)
             {
                 var now = (pair.Value.Value, pair.Value.Active);
                 if (_last.TryGetValue(pair.Key, out var prev) && prev == now)
                     continue;
                 string before = _last.ContainsKey(pair.Key) ? prev.Value.ToString() : "-";
-                Log.LogInfo($"{pair.Key}: value {before} -> {now.Value}, active={now.Active}");
+                Log.LogDebug($"{pair.Key}: value {before} -> {now.Value}, active={now.Active}");
                 _last[pair.Key] = now;
             }
         }
+
+        private void OnApplicationQuit() => Log?.Dispose();
+
+        private void OnDestroy() => Log?.Dispose();
 
         /// <summary>
         /// 本編の場所イベントと同じく、次のシナリオ名を設定してストーリー画面へ移る。

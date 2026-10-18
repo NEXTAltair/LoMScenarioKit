@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <TargetFramework></TargetFramework>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/Logging/*.cs" Link="%(Filename)%(Extension)" />
+    <Reference Include="BepInEx.Core"><HintPath>$(BepInExCoreDir)/BepInEx.Core.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="SemanticVersioning"><HintPath>$(BepInExCoreDir)/SemanticVersioning.dll</HintPath><Private>true</Private></Reference>
+  </ItemGroup>
+</Project>
