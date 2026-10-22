@@ -1,8 +1,11 @@
 // Copyright (C) 2026 NEXTAltair
 // GPL-3.0-only with the additional permission in LICENSE-GAME-EXCEPTION.txt.
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 using LoMScenarioAddon.Shared;
 using Mortal.Core;
 using Mortal.Free;
@@ -12,7 +15,7 @@ namespace LoMScenarioAddon
 {
     /// <summary>
     /// 訪問: 自由行動で場所をクリックしたとき、条件を満たす訪問があれば、その場所の固定シナリオの代わりに訪問シナリオを流す。
-    /// 本編の OnPositionClick で通常の行動に進んだ場合だけ差し替える。
+    /// 本編の ExecuteActivityAction が実行された場合だけ差し替える。
     /// 訪問シナリオから lsa_position_default へつなぐと、差し替えた固定シナリオ (本来の行動) に戻れる。
     /// </summary>
     internal static class Visits
@@ -32,20 +35,34 @@ namespace LoMScenarioAddon
         internal static string LastDefaultScript { get; private set; }
 
         /// <summary>
-        /// OnPositionClick の直前。_scriptName に値が入るのは「通常の行動」の分岐だけなので、空にしておいて後で見分ける。
-        /// (FreePositionData.GetExecuteScript は短いメソッドで JIT にインライン化され、割り込みが効かない)
+        /// 通常行動のコルーチンだけを包む。任務・行動不能時のクリックや、他MODのホバー表示には触れない。
         /// </summary>
-        internal static void BeforeClick(PositionController controller)
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PositionController), "ExecuteActivityAction")]
+        private static void ActivityPostfix(PositionController __instance, ref IEnumerator __result)
         {
-            ScriptNameField.SetValue(controller, "");
+            if (__result != null && Plugin.Manifest != null && Plugin.Manifest.Visits.Count > 0)
+                __result = RunActivity(__instance, __result);
         }
 
-        /// <summary>
-        /// OnPositionClick の直後。通常の行動に進んでいたら、訪問に差し替える。
-        /// 行動の処理 (ExecuteActivityAction) は最初の待ちより前に SetStoryScript を済ませ、シーン移動はその後なので、
-        /// ここでシナリオ名を書き換えれば移動先が変わる。
-        /// </summary>
-        internal static void AfterClick(PositionController controller)
+        private static IEnumerator RunActivity(PositionController controller, IEnumerator original)
+        {
+            try
+            {
+                // 本編が行き先を設定した後、最初の待機を外へ返す前に訪問へ差し替える。
+                // コルーチンを取得しただけでは条件判定や一度きりのフラグを消費しない。
+                if (!original.MoveNext())
+                    yield break;
+                AfterActivityStarted(controller);
+                do { yield return original.Current; } while (original.MoveNext());
+            }
+            finally
+            {
+                (original as IDisposable)?.Dispose();
+            }
+        }
+
+        private static void AfterActivityStarted(PositionController controller)
         {
             string defaultScript = ScriptNameField.GetValue(controller) as string;
             if (string.IsNullOrEmpty(defaultScript))

@@ -18,7 +18,8 @@ namespace LoMScenarioAddon
     /// <summary>
     /// scenario/ フォルダのシナリオを本体に差し込む。キャラ定義は scenario.json から読む。
     /// </summary>
-    [BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "2.5.02")]
+    [BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "2.5.03")]
+    [BepInDependency("LOMAssistant", BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : BaseUnityPlugin
     {
         internal static BufferedFileLog Log;
@@ -59,7 +60,9 @@ namespace LoMScenarioAddon
                 }
             };
             var harmony = Harmony.CreateAndPatchAll(typeof(Patches), "lom.scenarioaddon");
+            harmony.PatchAll(typeof(Visits));
             Patches.PatchBinarizerStoryRedirect(harmony);
+            AssistantCompatibility.Patch(harmony);
             Log.LogInfo($"loaded scenario '{Manifest.Title ?? Manifest.Id ?? "(untitled)"}' with {Manifest.Characters.Count} character(s). " +
                         $"{_testStoryKey.Value} = test story (free mode), {_toggleActiveKey.Value} = toggle active");
         }
@@ -100,9 +103,9 @@ namespace LoMScenarioAddon
 
             if (!CharacterRegistry.Registered)
                 return;
-            if (_testStoryKey.Value != KeyCode.None && Input.GetKeyDown(_testStoryKey.Value))
+            if (HotkeyDown(_testStoryKey.Value))
                 StartTestStory();
-            if (_toggleActiveKey.Value != KeyCode.None && Input.GetKeyDown(_toggleActiveKey.Value))
+            if (HotkeyDown(_toggleActiveKey.Value))
             {
                 foreach (var pair in CharacterRegistry.Stats)
                 {
@@ -111,6 +114,9 @@ namespace LoMScenarioAddon
                 }
             }
         }
+
+        private static bool HotkeyDown(KeyCode key) => key != KeyCode.None && Input.GetKeyDown(key)
+            && AssistantCompatibility.CanUseHotkey(key);
 
         private void ReportChanges()
         {

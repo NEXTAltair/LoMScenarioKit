@@ -93,6 +93,9 @@ namespace LoMScenarioAddon
 
         // ---------------------------------------------------------------- 場所イベント
 
+        internal static IEnumerable<PositionEventData> RegisteredEvents(string position) =>
+            Events.Where(e => e.Position == position && _built.ContainsKey(e.Id)).Select(e => _built[e.Id]);
+
         /// <summary>CheckPointManager.Position(name) の直前。その場所の候補一覧に追加イベントを足す (重複しない)。</summary>
         internal static void EnsureInjected(CheckPointManager manager, string position)
         {
