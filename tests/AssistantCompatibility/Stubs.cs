@@ -32,7 +32,11 @@ namespace Mortal.Story
 }
 namespace Mortal.Core
 {
-    internal sealed class ConditionResultItem { internal bool Check() => true; }
+    internal sealed class ConditionResultItem
+    {
+        internal static Func<bool> Evaluate = () => true;
+        internal bool Check() => Evaluate();
+    }
     internal enum PositionType { backmountain }
     internal sealed class PlayerStatManagerData
     {
@@ -56,6 +60,8 @@ namespace Mortal.Free
         internal readonly object Wait = new object();
         internal bool Disposed;
         internal Exception Failure;
+        internal bool UseActionUpdate, ActionDisposed;
+        internal int Actions = 2;
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal void OnPositionClick(bool normal)
         {
@@ -70,10 +76,15 @@ namespace Mortal.Free
             {
                 if (Failure != null) throw Failure;
                 PlayerStatManagerData.Instance.SetStoryScript(_scriptName);
-                yield return Wait;
+                yield return UseActionUpdate ? (object)UpdateAction() : Wait;
                 yield return null;
             }
             finally { Disposed = true; }
+        }
+        private IEnumerator UpdateAction()
+        {
+            try { Actions--; yield return null; }
+            finally { ActionDisposed = true; }
         }
     }
 }

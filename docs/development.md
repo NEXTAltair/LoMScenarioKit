@@ -34,7 +34,7 @@
 | `StoryBackgrounds.cs` | 背景読み込みコルーチンの実行直前に自前画像をキャッシュへ補充する。言語変更でキャッシュが消えても再表示できる |
 | `StoryResolutionScope.cs` | 1回の Lua 読み込みで行った自作シナリオの判定を Binarizer 互換処理と共有する。完了・例外時に破棄し、入れ子では親の判定に戻す |
 | `ScenarioSprites.cs` | 追加キャラの社交パネル用立ち絵・イベント CG を本編の Addressables 読み込みへ供給する。画像は `ScenarioContent` が所有し、ハンドルの解放では破棄しない |
-| `Visits.cs` | 通常行動の `PositionController.ExecuteActivityAction` を包み、最初の待機を返す前に行き先を訪問シナリオへ差し替える |
+| `Visits.cs` | 通常行動の `PositionController.ExecuteActivityAction` を包み、行動回数の更新後、シーン遷移前に行き先を訪問シナリオへ差し替える |
 | `AssistantCompatibility.cs` | LOMAssistantの候補一覧・Luaプレビュー・確認用キーを任意連携。DLLへの必須参照や他MODの設定変更は行わない |
 | `ScenarioConditions.cs` | `conditions` を Lua の `checkpointmanager.Condition(名前)` で判定できるようにする |
 | `StoryCharacters.cs` | 会話シーン用のキャラ定義 (`StoryCharacterData`) を作り、立ち絵を Addressables を通さずに渡す。逆向きの絵があれば向きに応じて差し替える (`PortraitController.Show` / `SetupPortrait`) |
@@ -133,7 +133,7 @@ dotnet run --project tests/Logging.BepInEx -c Release -f net8.0 -p:GameDir='/pat
 
 ## LoMアシスタントとの連携（2.5.03）
 
-LOMAssistant 2.6.1のソースと導入済みDLLを確認。旧版では同じ`PositionController.OnPositionClick`への登録だけで競合警告が出ていた。訪問は`ExecuteActivityAction`のコルーチンが最初に進んだ後に差し替え、元の待機・終了・例外を保つ。シナリオ判別のためにクリック時の`_scriptName`を消す必要がなくなる。
+LOMAssistant 2.6.1のソースと導入済みDLLを確認。旧版では同じ`PositionController.OnPositionClick`への登録だけで競合警告が出ていた。訪問は`ExecuteActivityAction`が返す最初の内側のコルーチン（`UpdateActionValue`）で行動回数を更新した後、シーン遷移前に差し替える。外側・内側の待機と終了処理を保ち、行動回数の消費前に条件を判定しない。シナリオ判別のためにクリック時の`_scriptName`を消す必要がなくなる。
 
 `BepInDependency("LOMAssistant", SoftDependency)`で任意の読み込み順だけを指定し、型・メソッドを実行時に探す。アシスタントの`GetPositionEvents`直前に対象の追加イベントを登録し、コピー済みの一覧に追加分が欠けている場合のみ、その場所のキャッシュを取り除く。元のメソッドが一覧とシナリオ接頭辞の対応を再生成する。`DataHelper.LoadLuaScript`にはアドオンの既存のシナリオ解決を使い、見つからない場合は元の取得へ委譲する。
 

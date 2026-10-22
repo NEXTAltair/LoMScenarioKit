@@ -47,19 +47,44 @@ namespace LoMScenarioAddon
 
         private static IEnumerator RunActivity(PositionController controller, IEnumerator original)
         {
+            IEnumerator firstStep = null;
             try
             {
-                // 本編が行き先を設定した後、最初の待機を外へ返す前に訪問へ差し替える。
+                // 本編が行き先と行動回数を更新した後、シーン遷移前に訪問へ差し替える。
                 // コルーチンを取得しただけでは条件判定や一度きりのフラグを消費しない。
                 if (!original.MoveNext())
                     yield break;
-                AfterActivityStarted(controller);
-                do { yield return original.Current; } while (original.MoveNext());
+                if (original.Current is IEnumerator actionUpdate)
+                {
+                    // 現行ゲームの最初の待機は UpdateActionValue。外側が yield しただけでは
+                    // まだ行動回数は減っていないので、内側の最初の MoveNext の後に判定する。
+                    firstStep = RunFirstStep(controller, actionUpdate);
+                    yield return firstStep;
+                }
+                else
+                {
+                    AfterActivityStarted(controller);
+                    yield return original.Current;
+                }
+                while (original.MoveNext()) yield return original.Current;
             }
             finally
             {
+                (firstStep as IDisposable)?.Dispose();
                 (original as IDisposable)?.Dispose();
             }
+        }
+
+        private static IEnumerator RunFirstStep(PositionController controller, IEnumerator original)
+        {
+            try
+            {
+                bool running = original.MoveNext();
+                AfterActivityStarted(controller);
+                if (running)
+                    do { yield return original.Current; } while (original.MoveNext());
+            }
+            finally { (original as IDisposable)?.Dispose(); }
         }
 
         private static void AfterActivityStarted(PositionController controller)

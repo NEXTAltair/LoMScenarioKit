@@ -87,6 +87,20 @@ internal static class Program
         catch (InvalidOperationException ex) { Check(ReferenceEquals(ex, controller.Failure), "original activity exception is preserved"); }
         Check(controller.Disposed && PositionEvents.GetFlagState("once") == 0, "failed activity does not consume a visit");
         Plugin.Manifest.Visits.Clear();
+        visit = new VisitDef { Id = "after-cost", Position = "backmountain", Story = "visit", When = new Dictionary<string, object>() };
+        Plugin.Manifest.Visits.Add(visit);
+        controller = new PositionController { UseActionUpdate = true };
+        ConditionResultItem.Evaluate = () => controller.Actions == 1;
+        pending = controller.BeginActivity();
+        Check(pending.MoveNext() && controller.Script == "official" && controller.Actions == 2,
+            "yielding the nested action update does not evaluate the visit too early");
+        var action = (IEnumerator)pending.Current;
+        Check(action.MoveNext() && action.Current == null && controller.Actions == 1 && controller.Script == "visit",
+            "visit conditions see the consumed action and retain the original nested yield");
+        ((IDisposable)pending).Dispose();
+        Check(controller.ActionDisposed && controller.Disposed, "cancellation disposes both nested action and outer activity");
+        ConditionResultItem.Evaluate = () => true;
+        Plugin.Manifest.Visits.Clear();
         controller = new PositionController();
         pending = controller.BeginActivity();
         Check(pending.GetType().DeclaringType == typeof(PositionController), "no visits leaves the original iterator untouched");
