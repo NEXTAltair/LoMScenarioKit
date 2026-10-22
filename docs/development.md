@@ -34,7 +34,8 @@
 | `StoryBackgrounds.cs` | 背景読み込みコルーチンの実行直前に自前画像をキャッシュへ補充する。言語変更でキャッシュが消えても再表示できる |
 | `StoryResolutionScope.cs` | 1回の Lua 読み込みで行った自作シナリオの判定を Binarizer 互換処理と共有する。完了・例外時に破棄し、入れ子では親の判定に戻す |
 | `ScenarioSprites.cs` | 追加キャラの社交パネル用立ち絵・イベント CG を本編の Addressables 読み込みへ供給する。画像は `ScenarioContent` が所有し、ハンドルの解放では破棄しない |
-| `Visits.cs` | 場所選択時のシナリオ差し替え。`PositionController.OnPositionClick` の前後で、通常の行動に進んだときだけ行き先を指定したシナリオに差し替える |
+| `Visits.cs` | 通常行動の `PositionController.ExecuteActivityAction` を包み、行動回数の更新後、シーン遷移前に行き先を訪問シナリオへ差し替える |
+| `AssistantCompatibility.cs` | LOMAssistantの候補一覧・Luaプレビュー・確認用キーを任意連携。DLLへの必須参照や他MODの設定変更は行わない |
 | `ScenarioConditions.cs` | `conditions` を Lua の `checkpointmanager.Condition(名前)` で判定できるようにする |
 | `StoryCharacters.cs` | 会話シーン用のキャラ定義 (`StoryCharacterData`) を作り、立ち絵を Addressables を通さずに渡す。逆向きの絵があれば向きに応じて差し替える (`PortraitController.Show` / `SetupPortrait`) |
 | `ScenarioContent.cs` | `scenario/` の背景 (`backgrounds/*.png`、`StoryBackgrounds` から供給) ・テキスト (`text.ja.csv`)・画像 (PNG → Sprite)・シナリオ (`story/*.lua`、毎回読み直す) を読む |
@@ -129,6 +130,21 @@ dotnet run --project tests/Logging.BepInEx -c Release -f net8.0 -p:GameDir='/pat
 仮画像・仮音声は `sample/scenario/` に用意済みです。再生成はビルドには不要です。画像生成には Pillow と日本語フォントが必要で、`LOM_PLACEHOLDER_FONT` でフォントのファイルパスを指定できます。音声生成は Python 標準ライブラリのみを使います。
 
 確認用のキー操作は [シナリオ制作ガイド](scenario-guide.md#確認用のキー操作) を参照してください。公開前の検証項目は [配布確認](release-checks.md) にまとめています。
+
+## LoMアシスタントとの連携（2.5.03）
+
+LOMAssistant 2.6.1のソースと導入済みDLLを確認。旧版では同じ`PositionController.OnPositionClick`への登録だけで競合警告が出ていた。訪問は`ExecuteActivityAction`が返す最初の内側のコルーチン（`UpdateActionValue`）で行動回数を更新した後、シーン遷移前に差し替える。外側・内側の待機と終了処理を保ち、行動回数の消費前に条件を判定しない。シナリオ判別のためにクリック時の`_scriptName`を消す必要がなくなる。
+
+`BepInDependency("LOMAssistant", SoftDependency)`で任意の読み込み順だけを指定し、型・メソッドを実行時に探す。アシスタントの`GetPositionEvents`直前に対象の追加イベントを登録し、コピー済みの一覧に追加分が欠けている場合のみ、その場所のキャッシュを取り除く。元のメソッドが一覧とシナリオ接頭辞の対応を再生成する。`DataHelper.LoadLuaScript`にはアドオンの既存のシナリオ解決を使い、見つからない場合は元の取得へ委譲する。
+
+入力状態のgetterは初期化時に取得する。確認用キーが実際に押されたときだけ、入力中・画面操作中・キー設定中か、アシスタントの現在の割当と重なるかを確認する。設定への書き込みは行わない。必須の入力情報を取得できない版では確認用キーのみ停止する。
+
+実際のHarmonyXでアドオンの`Visits`と`AssistantCompatibility`を小さな代替オブジェクトへ適用し、Windowsの.NET Frameworkで検証する。引数を2つ渡すと、導入済みDLLを実行せずメタデータから連携先の署名、soft dependency、パッチ対象の重複も検査する。
+
+```powershell
+dotnet build tests/AssistantCompatibility -c Release -p:GameDir="J:\path\to\LegendOfMortal"
+.\tests\AssistantCompatibility\bin\Release\AssistantCompatibility.exe "J:\path\to\LegendOfMortal" ".\src\LoMScenarioAddon\bin\Release\LoMScenarioAddon.dll"
+```
 
 ## Lua 判定の共有（2.5.02）
 

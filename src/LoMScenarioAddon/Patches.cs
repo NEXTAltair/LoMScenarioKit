@@ -79,21 +79,6 @@ namespace LoMScenarioAddon
             __state?.Dispose();
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Mortal.Free.PositionController), nameof(Mortal.Free.PositionController.OnPositionClick))]
-        private static void OnPositionClickPrefix(Mortal.Free.PositionController __instance)
-        {
-            Visits.BeforeClick(__instance);
-        }
-
-        /// <summary>場所をクリックした直後。通常の行動に進んでいて、条件を満たす訪問があれば差し替える。</summary>
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(Mortal.Free.PositionController), nameof(Mortal.Free.PositionController.OnPositionClick))]
-        private static void OnPositionClickPostfix(Mortal.Free.PositionController __instance)
-        {
-            Visits.AfterClick(__instance);
-        }
-
         /// <summary>Lua の checkpointmanager.Condition(名前)。scenario.json の conditions にあればそれで判定する。</summary>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(CheckPointManager), nameof(CheckPointManager.Condition))]
@@ -175,7 +160,7 @@ namespace LoMScenarioAddon
         /// シナリオ名を scenario/story の Lua に解決する。直接のシナリオ名 (TestStoryKey など) か、
         /// 場所イベントの候補名 (本編が「場所の接頭辞_候補名」にしたもの)。
         /// </summary>
-        private static bool TryResolveStory(string name, out string story, out EventDef ev, out string code)
+        internal static bool TryResolveStory(string name, out string story, out EventDef ev, out string code)
         {
             story = name;
             ev = null;
