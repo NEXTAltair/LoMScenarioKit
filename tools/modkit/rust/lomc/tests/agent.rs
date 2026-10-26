@@ -133,3 +133,33 @@ fn errors_and_discovery_are_json_and_failed_save_is_non_destructive() {
     let error: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(error["ok"], false);
 }
+
+#[test]
+fn official_intro_created_by_edit_can_be_checked_and_exported() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join("intro-project");
+    let init = agent("init", &root, json!({}), 0);
+    let edited = agent(
+        "edit",
+        &root,
+        json!({
+            "revision": init["data"]["revision"], "story": "main",
+            "operations": [{"op":"add_node","node_type":"intro","after":"say1","fields":{"character":"brother1"}}]
+        }),
+        0,
+    );
+    agent("check", &root, json!({}), 0);
+    let output = temp.path().join("scenario");
+    agent("export", &root, json!({"output":output}), 0);
+    assert!(std::fs::read_to_string(output.join("story/main.lua"))
+        .unwrap()
+        .contains("runwait(intropanel.Show(\"brother1\"))"));
+    agent(
+        "verdict",
+        &root,
+        json!({"revision":edited["data"]["revision"],"story":"main","verdict":"good","dry_run":"true"}),
+        1,
+    );
+    let unchanged = agent("checkout", &root, json!({}), 0);
+    assert_eq!(unchanged["data"]["revision"], edited["data"]["revision"]);
+}

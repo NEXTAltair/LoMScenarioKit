@@ -92,14 +92,20 @@ pub fn compile_story(story: &Value) -> Result<String> {
                 "scene" => {
                     fields(node,&["view"])?;
                     if string(node,"view","") == "out" { code.push_str("runblock(flowcharts.view, \"out\")\n"); }
-                    else { let view=q(node,"view",""); code.push_str(&format!("runwait(flowcharts.LoadView({view}))\ngetvar(flowcharts.view, \"ViewName\").value = {view}\nrunblock(flowcharts.view, \"view\")\n")); }
+                    else {
+                        let view = q(node, "view", "");
+                        if !["black", "white"].contains(&string(node, "view", "")) {
+                            code.push_str(&format!("runwait(flowcharts.LoadView({view}))\n"));
+                        }
+                        code.push_str(&format!("getvar(flowcharts.view, \"ViewName\").value = {view}\nrunblock(flowcharts.view, \"view\")\n"));
+                    }
                 }
                 "say" => {
                     fields(node,&["mode","character","portrait","text"])?;
                     let mode=string(node,"mode","character");
                     ensure!(["character","narrative","center"].contains(&mode), "台詞モード {mode} に未対応です");
                     code.push_str(&format!("setsaydialog(saydialogs.{mode})\n"));
-                    if mode=="character" { code.push_str(&format!("runwait(characters.LoadCharacterAsset({c}))\ncharacters.LoadCharacterPortrait({c}, {portrait})\ncharacters.Focus({c})\nsetcharacter(characters.Get({c}), characters.GetPortrait({c}, {portrait}))\n")); }
+                    if mode=="character" { code.push_str(&format!("runwait(characters.LoadCharacterAsset({c}))\ncharacters.LoadCharacterPortrait({c}, {portrait})\nstage.showPortrait(characters.Get({c}), characters.GetPortrait({c}, {portrait}))\ncharacters.Focus({c})\nsetcharacter(characters.Get({c}), characters.GetPortrait({c}, {portrait}))\n")); }
                     else { code.push_str("setcharacter(narrative)\n"); }
                     code.push_str(&format!("say({})\n",q(node,"text","")));
                 }
@@ -148,7 +154,17 @@ pub fn compile_story(story: &Value) -> Result<String> {
                     let arg=if op=="play" {q(node,"name","")} else {number(node,"seconds",1.0)};
                     code.push_str(&format!("luamanager.{method}({arg})\n")); if op=="fadeout" {code.push_str(&format!("wait({arg})\n"));}
                 }
-                "intro" => { fields(node,&["character","intro_source"])?; ensure!(string(node,"intro_source","official")=="official","Host用の紹介カードには未対応です"); code.push_str(&format!("runwait(intropanel.Show({c}))\n")); }
+                "intro" => {
+                    fields(node,&["character","intro_source","title","name","text","image","image_scale","image_x","image_y"])?;
+                    ensure!(string(node,"intro_source","official")=="official","Host用の紹介カードには未対応です");
+                    for key in ["title","name","text","image"] {
+                        ensure!(node[key].is_null() || node[key] == "", "紹介カードの独自フィールド {key} に未対応です");
+                    }
+                    for (key, default) in [("image_scale",100.0),("image_x",0.0),("image_y",0.0)] {
+                        ensure!(node[key].is_null() || node[key].as_f64() == Some(default), "紹介カードの独自フィールド {key} に未対応です");
+                    }
+                    code.push_str(&format!("runwait(intropanel.Show({c}))\n"));
+                }
                 "end" => {
                     fields(node,&["next_script"])?;
                     if let Some(next)=node["next_script"].as_str().filter(|s| !s.is_empty()) { ensure!(runtime_id(next),"次の章のIDは英小文字・数字・_で指定してください"); code.push_str(&format!("luamanager.SetNextScript({})\nluamanager.Init()\n",lua_str(next))); }
@@ -268,6 +284,32 @@ pub fn export(project: &Project, target: &Path) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn character_speech_updates_the_stage_expression_and_solid_views_need_no_asset() {
+        let mut project = new_project("表情");
+        let story = project.stories.get_mut("main").unwrap();
+        story["nodes"] = json!([
+            {"id":"say1","type":"show","character":"artist1","portrait":"normal","position":"M"},
+            {"id":"talk","type":"say","character":"artist1","portrait":"normal","text":"表情を更新する"},
+            {"id":"black","type":"scene","view":"black"},
+            {"id":"white","type":"scene","view":"white"},
+            {"id":"end1","type":"end"}
+        ]);
+        let lua = compile_story(story).unwrap();
+        let talk = lua
+            .split("nodes[\"talk\"] = function()")
+            .nth(1)
+            .unwrap()
+            .split("nodes[\"black\"]")
+            .next()
+            .unwrap();
+        assert!(talk.contains("stage.showPortrait(characters.Get(\"artist1\"), characters.GetPortrait(\"artist1\", \"normal\"))"));
+        assert!(!lua.contains("LoadView(\"black\")"));
+        assert!(!lua.contains("LoadView(\"white\")"));
+        assert!(lua.contains(".value = \"black\""));
+        story["nodes"][1]["voice"] = json!("user:voice");
+        assert!(compile_story(story).is_err());
+    }
     #[test]
     fn native_project_exports_official_lua_and_refuses_host_nodes_without_partial_output() {
         let mut project = new_project("テスト");
