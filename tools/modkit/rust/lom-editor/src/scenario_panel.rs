@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 use crate::{forms::Catalog, i18n::tr};
 use eframe::egui;
 use lom_core::project::Project;
@@ -108,13 +110,13 @@ pub fn navigation(
         let active = selected(config, true, selection).and_then(|t|t["id"].as_str()).map(str::to_owned);
         for t in config["tasks"].as_array().unwrap() {
             let id = t["id"].as_str().unwrap_or("");
-            if ui.selectable_label(task_page && active.as_deref()==Some(id), t["name"].as_str().unwrap_or("未命名任务")).clicked() {
+            if ui.selectable_label(task_page && active.as_deref()==Some(id), t["name"].as_str().map(str::to_owned).unwrap_or_else(|| tr("未命名任务"))).clicked() {
                 selection.task = Some(id.into()); target=Some(true);
             }
         }
         if ui.small_button(tr("＋ 添加任务")).clicked() {
             let id=unique(config["tasks"].as_array().unwrap(),"task");
-            config["tasks"].as_array_mut().unwrap().push(json!({"id":id,"name":"新的任务","initial":"locked","states":["locked","active","completed"],"transitions":[]}));
+            config["tasks"].as_array_mut().unwrap().push(json!({"id":id,"name":tr("新的任务"),"initial":"locked","states":["locked","active","completed"],"transitions":[]}));
             selection.task=Some(id);target=Some(true);
         }
     });
@@ -177,7 +179,10 @@ pub fn show(
     let mut remove = false;
     ui.push_id((&id, task_page), |ui| {
         ui.heading(if task_page {
-            e["name"].as_str().unwrap_or("未命名任务").to_owned()
+            e["name"]
+                .as_str()
+                .map(str::to_owned)
+                .unwrap_or_else(|| tr("未命名任务"))
         } else {
             names.event(e)
         });
@@ -278,9 +283,12 @@ pub fn context(
         let script = e["script"].as_str().unwrap_or("");
         if let Some(story) = project.stories.get(script) {
             ui.strong(story["title"].as_str().unwrap_or(script));
-            ui.small(format!(
-                "{} 个演出步骤",
-                story["nodes"].as_array().map_or(0, Vec::len)
+            ui.small(crate::i18n::text(
+                "{arg0} 个演出步骤",
+                &[(
+                    "arg0",
+                    format!("{}", story["nodes"].as_array().map_or(0, Vec::len)),
+                )],
             ));
             if ui.button(tr("编辑这段剧情")).clicked() {
                 navigate = Some(Navigate::Story(script.into()));

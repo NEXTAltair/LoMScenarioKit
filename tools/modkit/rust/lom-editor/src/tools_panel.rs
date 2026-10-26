@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Auxiliary native workflows share the same in-memory project as authoring.
 use eframe::egui;
 use lom_core::{content_library, game_tools, project::Project, release};
@@ -177,7 +179,10 @@ impl ToolsPanel {
             return Ok("试玩已准备：C# 宿主刚刚更新，请完整退出并重新启动游戏。".into());
         }
         game_tools::launch_game()?;
-        Ok(format!("试玩请求已发送：{script}/{node}"))
+        Ok(crate::i18n::text(
+            "试玩请求已发送：{script}/{node}",
+            &[("script", format!("{script}")), ("node", format!("{node}"))],
+        ))
     }
     fn save_setting(&mut self, key: &str, value: Value) -> bool {
         let path = settings_path();
@@ -294,7 +299,7 @@ impl ToolsPanel {
         };
         if crate::asset_extraction::validate_game(&self.game).is_err() {
             let Some(path) = rfd::FileDialog::new()
-                .set_title("选择包含 Mortal_Data 的游戏目录")
+                .set_title(crate::i18n::tr("选择包含 Mortal_Data 的游戏目录"))
                 .pick_folder()
             else {
                 return;
@@ -854,7 +859,9 @@ impl ToolsPanel {
                     .clicked()
                 {
                     if let Some(paths) = rfd::FileDialog::new()
-                        .set_title("选择 Save_universe.dat；将自动保留原始备份")
+                        .set_title(crate::i18n::tr(
+                            "选择 Save_universe.dat；将自动保留原始备份",
+                        ))
                         .add_filter("Universe", &["dat"])
                         .pick_files()
                     {
@@ -862,9 +869,9 @@ impl ToolsPanel {
                     }
                 }
                 if !self.read_reset.is_empty() {
-                    ui.label(
+                    ui.label(tr(
                         "只清理当前作品及临时试玩包的已读文本记录，保留其它存档内容。先建立备份。",
-                    );
+                    ));
                     for path in &self.read_reset {
                         ui.label(path.display().to_string());
                     }
@@ -938,7 +945,7 @@ impl ToolsPanel {
                         .clicked()
                     {
                         if let Some(path) = rfd::FileDialog::new()
-                            .set_title("选择包含 Mortal_Data 的游戏目录")
+                            .set_title(crate::i18n::tr("选择包含 Mortal_Data 的游戏目录"))
                             .pick_folder()
                         {
                             match crate::asset_extraction::validate_game(&path) {
@@ -1022,7 +1029,7 @@ impl ToolsPanel {
                     }
                     if ui.button(crate::i18n::tr("生成发布目录")).clicked() {
                         if let Some(path) = rfd::FileDialog::new()
-                            .set_title("发布包、校验和与安装说明的输出目录")
+                            .set_title(crate::i18n::tr("发布包、校验和与安装说明的输出目录"))
                             .pick_folder()
                         {
                             self.result(
@@ -1064,7 +1071,7 @@ impl ToolsPanel {
                 );
                 if ui.button(crate::i18n::tr("选择 FFmpeg 程序")).clicked() {
                     if let Some(path) = rfd::FileDialog::new()
-                        .set_title("选择 ffmpeg 可执行程序")
+                        .set_title(crate::i18n::tr("选择 ffmpeg 可执行程序"))
                         .pick_file()
                     {
                         self.ffmpeg = Some(path.clone());
@@ -1228,14 +1235,19 @@ impl ToolsPanel {
                     }
                 }
                 if let Some(info) = &self.pending_info {
-                    ui.label(format!(
-                        "{} · {} · 作者：{} · 许可：{}",
-                        info.name, info.version, info.author, info.license
+                    ui.label(crate::i18n::text(
+                        "{arg0} · {arg1} · 作者：{arg2} · 许可：{arg3}",
+                        &[
+                            ("arg0", format!("{}", info.name)),
+                            ("arg1", format!("{}", info.version)),
+                            ("arg2", format!("{}", info.author)),
+                            ("arg3", format!("{}", info.license)),
+                        ],
                     ));
                     if !info.missing_dependencies.is_empty() {
-                        ui.label(format!(
-                            "缺少依赖：{}",
-                            info.missing_dependencies.join("、")
+                        ui.label(crate::i18n::text(
+                            "缺少依赖：{arg0}",
+                            &[("arg0", format!("{}", info.missing_dependencies.join("、")))],
                         ));
                     }
                     let permitted = info.collision_type.is_none();
@@ -1454,7 +1466,7 @@ fn prepare_preview(project: &Project, script: &str, node: &str) -> anyhow::Resul
         .and_then(|n| n["id"].as_str())
         .unwrap_or(node));
     story["nodes"].as_array_mut().unwrap().extend(prelude);
-    preview.manifest = json!({"format":3,"package_format":3,"story_schema":2,"content_schema":1,"id":game_tools::PREVIEW_ID,"campaign_id":game_tools::PREVIEW_ID,"name":format!("编辑器临时试玩：{script}"),"version":"0.0.0-preview","author":"lom_modkit","description":format!("从 {script}/{node} 开始的临时测试包"),"entry":script,"campaign":{"new_game":true,"disable_official_events":true}});
+    preview.manifest = json!({"format":3,"package_format":3,"story_schema":2,"content_schema":1,"id":game_tools::PREVIEW_ID,"campaign_id":game_tools::PREVIEW_ID,"name":crate::i18n::text("编辑器临时试玩：{script}", &[("script", format!("{script}"))]),"version":"0.0.0-preview","author":"lom_modkit","description":crate::i18n::text("从 {script}/{node} 开始的临时测试包", &[("script", format!("{script}")), ("node", format!("{node}"))]),"entry":script,"campaign":{"new_game":true,"disable_official_events":true}});
     Ok(preview)
 }
 fn copy_content_to_project(

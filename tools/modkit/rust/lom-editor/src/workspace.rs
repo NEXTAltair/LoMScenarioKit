@@ -1,4 +1,4 @@
-// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-26.
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
 // GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 use crate::i18n::tr;
 
@@ -264,6 +264,7 @@ struct App {
     allow_close: bool,
     asset_dirty: bool,
     lua: String,
+    lua_valid: bool,
     diagnostics: Vec<lom_core::release::PreflightIssue>,
     needs_compile: bool,
     chapter_dialog: Option<ChapterDialog>,
@@ -438,20 +439,44 @@ fn smoke(path: &Path) -> anyhow::Result<Value> {
         json!({"ok":true,"runtime":"native-rust","chapters":p.stories.len(),"nodes":nodes,"preview_states":previews,"schema_node_types":catalog.schema["NODE_SCHEMAS"].as_object().unwrap().len(),"game_tested":false}),
     )
 }
+fn new_addon_project() -> Project {
+    let mut project = lom_core::scenario_addon::new_project(&tr("新しい物語"));
+    project.stories.get_mut("main").unwrap()["nodes"][0]["text"] =
+        json!(crate::i18n::key("new_story_text"));
+    project.manifest["author"] = json!(tr("作者"));
+    project
+}
 impl App {
     fn new(
         cc: &eframe::CreationContext<'_>,
         open: Option<PathBuf>,
         screenshot: Option<PathBuf>,
     ) -> Self {
-        style(&cc.egui_ctx);
         crate::i18n::set_locale("ja");
-        let mut p = lom_core::scenario_addon::new_project("新しい物語");
+        let prefs = lom_core::load_json(user_root().join("rust/preferences.json"))
+            .or_else(|_| lom_core::load_json(user_root().join("settings.json")))
+            .unwrap_or(json!({}));
+        if let Some(locale) = prefs["ui_locale"]
+            .as_str()
+            .or_else(|| prefs["language"].as_str())
+        {
+            crate::i18n::set_locale(locale);
+        }
+        style(&cc.egui_ctx);
+        let mut p = new_addon_project();
         let mut error = None;
         if let Some(path) = open {
             match open_project(&path) {
                 Ok(next) => p = next,
-                Err(e) => error = Some(format!("无法打开 {}\n{e:#}", path.display())),
+                Err(e) => {
+                    error = Some(crate::i18n::text(
+                        "无法打开 {arg0}\n{e}",
+                        &[
+                            ("arg0", format!("{}", path.display())),
+                            ("e", format!("{e:#}")),
+                        ],
+                    ))
+                }
             }
         }
         let current = p.manifest["entry"]
@@ -478,15 +503,6 @@ impl App {
             })
             .unwrap_or_default();
         let mut preview = Preview::new(&repository());
-        let prefs = lom_core::load_json(user_root().join("rust/preferences.json"))
-            .or_else(|_| lom_core::load_json(user_root().join("settings.json")))
-            .unwrap_or(json!({}));
-        if let Some(locale) = prefs["ui_locale"]
-            .as_str()
-            .or_else(|| prefs["language"].as_str())
-        {
-            crate::i18n::set_locale(locale);
-        }
         if let Some(path) = prefs["preview_library_dir"].as_str() {
             let _ = preview.set_library(Path::new(path));
         }
@@ -522,6 +538,7 @@ impl App {
             allow_close: false,
             asset_dirty: false,
             lua: String::new(),
+            lua_valid: false,
             diagnostics: vec![],
             needs_compile: true,
             chapter_dialog: None,
@@ -597,12 +614,15 @@ impl App {
                     }
                     self.center = selection.2;
                     self.view = selection.3;
-                    self.status = "CLI・外部の保存内容を読み込みました".into();
+                    self.status = tr("已读取 CLI 或外部保存的更改").into();
                 }
             }
             Err(error) => {
                 self.sync_conflict = true;
-                self.status = format!("外部の保存内容を確認できません: {error:#}");
+                self.status = crate::i18n::text(
+                    "外部の保存内容を確認できません: {error}",
+                    &[("error", format!("{error:#}"))],
+                );
             }
             _ => (),
         }
@@ -619,7 +639,10 @@ impl App {
                 if let Err(e) =
                     lom_core::project::atomic_write(&user_root().join("rust/recent.json"), &bytes)
                 {
-                    self.status = format!("项目已处理；最近列表保存失败：{e}");
+                    self.status = crate::i18n::text(
+                        "项目已处理；最近列表保存失败：{e}",
+                        &[("e", format!("{e}"))],
+                    );
                 }
             }
         }
@@ -628,7 +651,7 @@ impl App {
         match lom_core::stable_json(&self.templates).and_then(|b| {
             lom_core::project::atomic_write(&user_root().join("rust/node-templates.json"), &b)
         }) {
-            Ok(()) => self.status = "节点模板已保存到本机创作数据目录".into(),
+            Ok(()) => self.status = tr("节点模板已保存到本机创作数据目录"),
             Err(e) => self.error = Some(e.to_string()),
         }
     }
@@ -903,7 +926,7 @@ impl App {
         if let Some(s) = self.undo.pop() {
             self.redo.push(snapshot(&self.project));
             self.restore(s);
-            self.status = "已撤销".into();
+            self.status = tr("已撤销");
         }
     }
     fn redo(&mut self) {
@@ -914,7 +937,7 @@ impl App {
         if let Some(s) = self.redo.pop() {
             self.undo.push(snapshot(&self.project));
             self.restore(s);
-            self.status = "已重做".into();
+            self.status = tr("已重做");
         }
     }
     fn request(&mut self, p: Pending, ctx: &egui::Context) {
@@ -932,21 +955,26 @@ impl App {
                 self.clear_recovery();
                 ctx.send_viewport_cmd(egui::ViewportCommand::Close);
             }
-            Pending::New => self.install(lom_core::scenario_addon::new_project("新しい物語")),
+            Pending::New => self.install(new_addon_project()),
             Pending::NewAddon => self.install(Project::new_scenario("addon")),
             Pending::Template(key) => match template_project(&key) {
                 Ok(project) => {
                     self.install(project);
                     self.saved.manifest = json!({});
                     self.status =
-                        "已从模板创建项目；user:template.* 占位资源需要在内容库中替换".into();
+                        tr("已从模板创建项目；user:template.* 占位资源需要在内容库中替换");
                 }
                 Err(error) => self.error = Some(error.to_string()),
             },
             Pending::Recover(path) => self.recover(&path),
             Pending::Open(path) => match open_project(&path) {
                 Ok(p) => self.install(p),
-                Err(e) => self.error = Some(format!("打开失败\n{e:#}")),
+                Err(e) => {
+                    self.error = Some(crate::i18n::text(
+                        "打开失败\n{e}",
+                        &[("e", format!("{e:#}"))],
+                    ))
+                }
             },
         }
     }
@@ -993,11 +1021,14 @@ impl App {
         self.saved = self.last.clone();
         self.asset_dirty = false;
         self.needs_compile = true;
-        self.status = format!("已载入 {} 个章节", self.project.stories.len());
+        self.status = crate::i18n::text(
+            "已载入 {arg0} 个章节",
+            &[("arg0", format!("{}", self.project.stories.len()))],
+        );
     }
     fn save(&mut self, as_new: bool) -> bool {
         if self.review_panel.has_pending() {
-            self.error = Some("入力中のコメントは「コメントを追加」、Addon設定は「設定を反映」を押してから保存してください。".into());
+            self.error = Some(tr("请先添加正在输入的评论或应用 Addon 设置，再保存。").into());
             return false;
         }
         if !self.apply_pending_drafts() {
@@ -1015,7 +1046,7 @@ impl App {
         };
         let path = path.or_else(|| {
             rfd::FileDialog::new()
-                .set_title("选择项目保存目录（保存全部章节与素材）")
+                .set_title(tr("选择项目保存目录（保存全部章节与素材）"))
                 .pick_folder()
         });
         let Some(path) = path else { return false };
@@ -1063,15 +1094,20 @@ impl App {
                 self.saved = self.last.clone();
                 self.asset_dirty = false;
                 self.clear_recovery();
-                self.status = format!(
-                    "已保存全部 {} 个章节 · {}",
-                    self.project.stories.len(),
-                    path.display()
+                self.status = crate::i18n::text(
+                    "已保存全部 {arg0} 个章节 · {arg1}",
+                    &[
+                        ("arg0", format!("{}", self.project.stories.len())),
+                        ("arg1", format!("{}", path.display())),
+                    ],
                 );
                 true
             }
             Err(e) => {
-                self.error = Some(format!("保存失败；修改仍保留在编辑器中。\n{e:#}"));
+                self.error = Some(crate::i18n::text(
+                    "保存失败；修改仍保留在编辑器中。\n{e}",
+                    &[("e", format!("{e:#}"))],
+                ));
                 false
             }
         }
@@ -1082,13 +1118,23 @@ impl App {
                 return;
             }
             if let Some(path) = rfd::FileDialog::new()
-                .set_title("新しい書き出し先フォルダ名")
+                .set_title(tr("新的导出文件夹名称"))
                 .set_file_name("scenario")
                 .save_file()
             {
                 match lom_core::scenario_addon::export(&self.project, &path) {
-                    Ok(()) => self.status = format!("Addonを書き出しました: {}", path.display()),
-                    Err(error) => self.error = Some(format!("書き出しに失敗しました\n{error:#}")),
+                    Ok(()) => {
+                        self.status = crate::i18n::text(
+                            "Addonを書き出しました: {arg0}",
+                            &[("arg0", format!("{}", path.display()))],
+                        )
+                    }
+                    Err(error) => {
+                        self.error = Some(crate::i18n::text(
+                            "書き出しに失敗しました\n{error}",
+                            &[("error", format!("{error:#}"))],
+                        ))
+                    }
                 }
             }
             return;
@@ -1105,8 +1151,16 @@ impl App {
             .save_file()
         {
             match self.project.export(&path) {
-                Ok(p) => self.status = format!("已导出 {}", p.display()),
-                Err(e) => self.error = Some(format!("导出失败\n{e:#}")),
+                Ok(p) => {
+                    self.status =
+                        crate::i18n::text("已导出 {arg0}", &[("arg0", format!("{}", p.display()))])
+                }
+                Err(e) => {
+                    self.error = Some(crate::i18n::text(
+                        "导出失败\n{e}",
+                        &[("e", format!("{e:#}"))],
+                    ))
+                }
             }
         }
     }
@@ -1138,8 +1192,14 @@ impl App {
             }
         }
         match compile_with_assets(&self.project, &self.story()) {
-            Ok(lua) => self.lua = lua,
-            Err(e) => self.lua = format!("编译未通过：\n{e:#}"),
+            Ok(lua) => {
+                self.lua = lua;
+                self.lua_valid = true;
+            }
+            Err(e) => {
+                self.lua = crate::i18n::text("编译未通过：\n{e}", &[("e", format!("{e:#}"))]);
+                self.lua_valid = false;
+            }
         };
         self.needs_compile = false;
     }
@@ -1204,7 +1264,10 @@ impl App {
             .into_iter()
             .filter_map(|i| s["nodes"].get(i).cloned())
             .collect();
-        self.status = format!("已复制 {} 个节点，可切换章节后粘贴", self.clipboard.len());
+        self.status = crate::i18n::text(
+            "已复制 {arg0} 个节点，可切换章节后粘贴",
+            &[("arg0", format!("{}", self.clipboard.len()))],
+        );
     }
     fn paste(&mut self) {
         if self.clipboard.is_empty() {
@@ -1358,7 +1421,7 @@ impl App {
                 );
                 self.recovery_candidates
                     .retain(|candidate| candidate != path);
-                self.status = "已恢复创作副本，请检查并保存到原项目或新目录".into();
+                self.status = tr("已恢复创作副本，请检查并保存到原项目或新目录");
             }
             Err(error) => self.error = Some(error.to_string()),
         }
@@ -1430,9 +1493,13 @@ impl App {
             Ok(())
         })();
         if let Err(e) = result {
-            self.status = format!("自动恢复副本写入失败：{e:#}");
+            self.status =
+                crate::i18n::text("自动恢复副本写入失败：{e}", &[("e", format!("{e:#}"))]);
         } else if let Some(error) = pending_warning {
-            self.status = format!("恢复副本已保存其他修改；尚未包含未完成的素材输入：{error}");
+            self.status = crate::i18n::text(
+                "恢复副本已保存其他修改；尚未包含未完成的素材输入：{error}",
+                &[("error", format!("{error}"))],
+            );
         }
     }
     fn shortcuts(&mut self, ctx: &egui::Context) {
@@ -1558,7 +1625,7 @@ impl App {
             }
         } else if ctx.input_mut(|i| i.consume_key(egui::Modifiers::COMMAND, egui::Key::O)) {
             if let Some(path) = rfd::FileDialog::new()
-                .add_filter("剧情或 Mod 包", &["json", "lommod"])
+                .add_filter(tr("剧情或 Mod 包"), &["json", "lommod"])
                 .pick_file()
             {
                 self.request(Pending::Open(path), ctx);
@@ -1587,11 +1654,11 @@ impl App {
                         self.settings_error = None;
                     }
                     ui.menu_button(tr("文件"), |ui| {
-                        if ui.button("新規 LoMScenarioAddon プロジェクト").clicked() {
+                        if ui.button(tr("新建 LoMScenarioAddon 项目")).clicked() {
                             ui.close();
                             self.request(Pending::New, ctx);
                         }
-                        if ui.button("新規 MortalModHost プロジェクト（互換）").clicked() {
+                        if ui.button(tr("新建 MortalModHost 项目（兼容）")).clicked() {
                             ui.close();
                             self.request(Pending::NewAddon,ctx);
                         }
@@ -1620,7 +1687,7 @@ impl App {
                         if ui.button(tr("打开 JSON / Mod 包…")).clicked() {
                             ui.close();
                             if let Some(path) = rfd::FileDialog::new()
-                                .add_filter("剧情或 Mod 包", &["json", "lommod"])
+                                .add_filter(tr("剧情或 Mod 包"), &["json", "lommod"])
                                 .pick_file()
                             {
                                 self.request(Pending::Open(path), ctx);
@@ -1656,7 +1723,7 @@ impl App {
                             ui.close();
                             self.save(true);
                         }
-                        if ui.button(if lom_core::scenario_addon::enabled(&self.project) {"Addonを書き出す…".into()} else {tr("导出 .lommod…")}).clicked() {
+                        if ui.button(if lom_core::scenario_addon::enabled(&self.project) {tr("导出 Addon…")} else {tr("导出 .lommod…")}).clicked() {
                             ui.close();
                             self.export();
                         }
@@ -1674,7 +1741,7 @@ impl App {
                                 } else {
                                 match self.preview.set_library(&path) {
                                     Ok(()) => {
-                                        self.status = format!("预览素材库：{}", path.display());
+                                        self.status = crate::i18n::text("预览素材库：{arg0}", &[("arg0", format!("{}", path.display()))]);
                                         let mut prefs = lom_core::load_json(
                                             user_root().join("rust/preferences.json"),
                                         )
@@ -1683,7 +1750,7 @@ impl App {
                                         if let Err(error) = lom_core::project::atomic_write(
                                             &user_root().join("rust/preferences.json"),
                                             &lom_core::stable_json(&prefs).unwrap_or_default(),
-                                        ) { self.error = Some(format!("素材已载入，但无法记住素材位置：{error:#}")); }
+                                        ) { self.error = Some(crate::i18n::text("素材已载入，但无法记住素材位置：{error}", &[("error", format!("{error:#}"))])); }
                                     }
                                     Err(e) => self.error = Some(e.to_string()),
                                 }
@@ -1816,7 +1883,7 @@ impl App {
                         }
                         if ui
                             .add(
-                                egui::Button::new(if lom_core::scenario_addon::enabled(&self.project) { "Addonを書き出す".into() } else { crate::i18n::key("toolbar.export") })
+                                egui::Button::new(if lom_core::scenario_addon::enabled(&self.project) { tr("导出 Addon") } else { crate::i18n::key("toolbar.export") })
                                     .fill(Color32::from_rgb(213, 231, 247)),
                             )
                             .clicked()
@@ -1960,7 +2027,8 @@ impl App {
                     ui.strong(
                         self.project.manifest["name"]
                             .as_str()
-                            .unwrap_or("未命名作品"),
+                            .map(str::to_owned)
+                            .unwrap_or_else(|| tr("未命名作品")),
                     );
                     ui.horizontal(|ui| {
                         ui.small(tr(if self.project.manifest["play_mode"] == "addon" {
@@ -2039,14 +2107,12 @@ impl App {
                                         .unwrap_or_default();
                                     for (group_i, g) in groups.iter().enumerate() {
                                         ui.label(
-                                            RichText::new(
-                                                [
-                                                    "演出与画面",
-                                                    "属性与旗标",
-                                                    "玩法与结果",
-                                                    "流程控制",
-                                                ][group_i.min(3)],
-                                            )
+                                            RichText::new(tr([
+                                                "演出与画面",
+                                                "属性与旗标",
+                                                "玩法与结果",
+                                                "流程控制",
+                                            ][group_i.min(3)]))
                                             .color(ACCENT)
                                             .strong(),
                                         );
@@ -2076,8 +2142,9 @@ impl App {
                                             }
                                             if ui
                                                 .button(self.catalog.label(kind))
-                                                .on_hover_text(format!(
-                                                    "{kind} · 添加后可在属性页查看全部字段"
+                                                .on_hover_text(crate::i18n::text(
+                                                    "{kind} · 添加后可在属性页查看全部字段",
+                                                    &[("kind", format!("{kind}"))],
                                                 ))
                                                 .clicked()
                                             {
@@ -2172,7 +2239,7 @@ impl App {
                 }
                 ui.add_space(4.0);
                 if ui
-                    .selectable_label(self.center == Center::Review, "資料・添削・履歴")
+                    .selectable_label(self.center == Center::Review, tr("资料、审阅与历史"))
                     .clicked()
                 {
                     self.open_center(Center::Review);
@@ -2497,12 +2564,29 @@ impl App {
                                 "自由剧本：从自己的开场开始，使用独立存档。"
                             }));
                             ui.add_space(12.0);
-                            ui.label(format!("{} 段剧情", self.project.stories.len()));
+                            ui.label(crate::i18n::text(
+                                "{arg0} 段剧情",
+                                &[("arg0", format!("{}", self.project.stories.len()))],
+                            ));
                             if let Some(c) = &self.project.scenario {
-                                ui.label(format!(
-                                    "{} 个事件 · {} 个任务",
-                                    c["events"].as_array().map_or(0, Vec::len),
-                                    c["tasks"].as_array().map_or(0, Vec::len)
+                                ui.label(crate::i18n::text(
+                                    "{arg0} 个事件 · {arg1} 个任务",
+                                    &[
+                                        (
+                                            "arg0",
+                                            format!(
+                                                "{}",
+                                                c["events"].as_array().map_or(0, Vec::len)
+                                            ),
+                                        ),
+                                        (
+                                            "arg1",
+                                            format!(
+                                                "{}",
+                                                c["tasks"].as_array().map_or(0, Vec::len)
+                                            ),
+                                        ),
+                                    ],
                                 ));
                             }
                         } else if let Some(link) = crate::scenario_panel::context(
@@ -2661,8 +2745,8 @@ impl App {
                                     .set_file_name(format!("{}.lua", self.current))
                                     .save_file()
                                 {
-                                    if self.lua.starts_with("编译未通过") {
-                                        self.error = Some("编译尚未通过，不能导出 Lua。".into());
+                                    if !self.lua_valid {
+                                        self.error = Some(tr("编译尚未通过，不能导出 Lua。"));
                                     } else if let Err(e) =
                                         lom_core::project::atomic_write(&path, self.lua.as_bytes())
                                     {
@@ -2707,7 +2791,10 @@ impl App {
                                             }
                                         }
                                         let message = if issue.severity == "error" {
-                                            format!("错误：{}", issue.message)
+                                            crate::i18n::text(
+                                                "错误：{arg0}",
+                                                &[("arg0", format!("{}", issue.message))],
+                                            )
                                         } else {
                                             issue.message
                                         };
@@ -2741,8 +2828,15 @@ impl App {
             .frame(surface(true))
             .show(ctx, |ui| {
                 if self.sync_conflict {
-                    ui.colored_label(Color32::from_rgb(179, 55, 49), "外部の変更があります。未保存の編集を残しているため、自動更新・上書き保存を止めています。");
-                    if ui.button("ディスクの最新版を読み直す…").clicked() { if let Some(path) = self.project.source.clone() { self.request(Pending::Open(path), ctx); } }
+                    ui.colored_label(
+                        Color32::from_rgb(179, 55, 49),
+                        tr("检测到外部更改。由于仍有未保存的编辑，已暂停自动更新和覆盖保存。"),
+                    );
+                    if ui.button(tr("重新读取磁盘上的最新版本…")).clicked() {
+                        if let Some(path) = self.project.source.clone() {
+                            self.request(Pending::Open(path), ctx);
+                        }
+                    }
                 }
                 egui::ScrollArea::vertical()
                     .id_salt(format!(
@@ -2751,11 +2845,26 @@ impl App {
                     ))
                     .show(ui, |ui| match self.center {
                         Center::Review => {
-                            let node = self.story()["nodes"].get(self.selected).and_then(|n| n["id"].as_str()).map(str::to_owned);
-                            if let Some(id) = self.review_panel.show(ui, &mut self.project, &self.current, node.as_deref()) {
-                                if let Some(index) = self.story()["nodes"].as_array().and_then(|nodes| nodes.iter().position(|n| n["id"] == id)) {
-                                    self.selected = index; self.center = Center::Node;
-                                } else { self.status = "引用元のノードは削除されています。コメント内の引用を確認してください。".into(); }
+                            let node = self.story()["nodes"]
+                                .get(self.selected)
+                                .and_then(|n| n["id"].as_str())
+                                .map(str::to_owned);
+                            if let Some(id) = self.review_panel.show(
+                                ui,
+                                &mut self.project,
+                                &self.current,
+                                node.as_deref(),
+                            ) {
+                                if let Some(index) = self.story()["nodes"]
+                                    .as_array()
+                                    .and_then(|nodes| nodes.iter().position(|n| n["id"] == id))
+                                {
+                                    self.selected = index;
+                                    self.center = Center::Node;
+                                } else {
+                                    self.status =
+                                        tr("引用的节点已删除。请查看评论中的引用。").into();
+                                }
                             }
                         }
                         Center::Node => {
@@ -2960,7 +3069,12 @@ impl App {
         if let Some(result) = authoring::section_editor(ui, &story) {
             match result {
                 Ok(next) => story = next,
-                Err(e) => self.error = Some(format!("分区/分组修改未应用：{e}")),
+                Err(e) => {
+                    self.error = Some(crate::i18n::text(
+                        "分区/分组修改未应用：{e}",
+                        &[("e", format!("{e}"))],
+                    ))
+                }
             }
         }
         ui.collapsing(tr("高级"), |ui| {
@@ -2971,7 +3085,7 @@ impl App {
                     .map(|(k, v)| (k.clone(), v.clone()))
                     .collect(),
             );
-            if value_editor(ui, "离线测试及创作扩展数据", &mut other, 0) {
+            if value_editor(ui, &crate::i18n::tr("离线测试及创作扩展数据"), &mut other, 0) {
                 let sections = meta.get("sections").cloned();
                 *meta = other.as_object().cloned().unwrap_or_default();
                 if let Some(sections) = sections {
@@ -2987,7 +3101,7 @@ impl App {
                 story["_editor"]["tests"] = json!([]);
             }
             let tests = story["_editor"]["tests"].as_array_mut().unwrap();
-            tests.push(json!({"name":format!("测试{}",tests.len()+1),"story":self.current,"initial":{"variables":{},"flags":{}},"actions":{"choices":[]},"assert":{"reaches_node":[]}}));
+            tests.push(json!({"name":crate::i18n::text("测试{arg0}", &[("arg0", format!("{}", tests.len()+1))]),"story":self.current,"initial":{"variables":{},"flags":{}},"actions":{"choices":[]},"assert":{"reaches_node":[]}}));
         }
         });
         self.project.stories.insert(self.current.clone(), story);
@@ -2996,7 +3110,9 @@ impl App {
         ui.heading(tr("多语言对白"));
         ui.label(tr("逐句编辑翻译；人物 ID、资源路径和 Lua 保持原值。"));
         if lom_core::scenario_addon::enabled(&self.project) {
-            ui.label("LoMScenarioAddonへの多言語設定の書き出しは未対応です。翻訳は制作データに保存できますが、書き出し時の検査で停止します。");
+            ui.label(tr(
+                "尚不支持将多语言设置导出到 LoMScenarioAddon。翻译可保存到制作数据，但会阻止导出。",
+            ));
         }
         let mut s = self.story();
         if !s["localization"].is_object() {
@@ -3259,7 +3375,10 @@ impl App {
         }
         ui.separator();
         ui.collapsing(
-            format!("全部包内资源 · {} 个", self.project.assets.len()),
+            crate::i18n::text(
+                "全部包内资源 · {arg0} 个",
+                &[("arg0", format!("{}", self.project.assets.len()))],
+            ),
             |ui| {
                 for (name, bytes) in &self.project.assets {
                     ui.label(format!("{} · {:.1} KiB", name, bytes.len() as f64 / 1024.0));
@@ -3485,19 +3604,22 @@ impl App {
             && matches!(page, ToolPage::Game | ToolPage::Release)
         {
             ui.heading("LoMScenarioAddon");
-            ui.label("scenario.json と公式形式の story/*.lua を書き出します。ゲームへの導入はリポジトリのシナリオ制作ガイドを参照してください。");
-            if ui.button("Addon設定・対応ノードを確認").clicked() {
+            ui.label(tr("导出 scenario.json 和官方格式的 story/*.lua。游戏安装步骤请参阅仓库的剧本制作指南。"));
+            if ui.button(tr("查看 Addon 设置与支持的节点")).clicked() {
                 self.open_center(Center::Review);
             }
-            if ui.button("書き出しを検査").clicked() {
+            if ui.button(tr("检查导出")).clicked() {
                 match lom_core::scenario_addon::output(&self.project) {
                     Ok(files) => {
-                        self.status = format!("検査成功: {} ファイルを書き出せます", files.len())
+                        self.status = crate::i18n::text(
+                            "検査成功: {arg0} ファイルを書き出せます",
+                            &[("arg0", format!("{}", files.len()))],
+                        )
                     }
                     Err(error) => self.error = Some(format!("{error:#}")),
                 }
             }
-            if ui.button("Addonを書き出す…").clicked() {
+            if ui.button(tr("导出 Addon…")).clicked() {
                 self.export();
             }
             return;
@@ -3532,9 +3654,9 @@ impl App {
                 .iter()
                 .filter_map(|i| story["nodes"].get(*i).cloned())
                 .collect();
-            ui.label(format!(
-                "已选中 {} 个步骤。左侧 Shift 连选，⌘/Ctrl 多选。",
-                selected.len()
+            ui.label(crate::i18n::text(
+                "已选中 {arg0} 个步骤。左侧 Shift 连选，⌘/Ctrl 多选。",
+                &[("arg0", format!("{}", selected.len()))],
             ));
             let fields = authoring::bulk_fields(&self.catalog.schema, &selected);
             if selected.len() < 2 || fields.is_empty() {
@@ -3585,7 +3707,10 @@ impl App {
                         Ok(next) => {
                             self.flush();
                             self.project.stories.insert(self.current.clone(), next);
-                            self.status = format!("已批改 {} 个步骤，可撤销", selected.len());
+                            self.status = crate::i18n::text(
+                                "已批改 {arg0} 个步骤，可撤销",
+                                &[("arg0", format!("{}", selected.len()))],
+                            );
                         }
                         Err(e) => self.error = Some(format!("{e:#}")),
                     }
@@ -3616,7 +3741,10 @@ impl App {
                 for s in self.project.stories.values_mut() {
                     count += replace_prose(s, &self.search, &self.replace);
                 }
-                self.status = format!("已替换 {count} 处文本，可撤销");
+                self.status = crate::i18n::text(
+                    "已替换 {count} 处文本，可撤销",
+                    &[("count", format!("{count}"))],
+                );
             }
         });
         ui.collapsing(tr("节点模板"), |ui| {
@@ -3640,7 +3768,13 @@ impl App {
                     .cloned()
                     .unwrap_or_else(|| vec![template.clone()]);
                 ui.horizontal(|ui| {
-                    ui.label(format!("{name} · {} 步", nodes.len()));
+                    ui.label(crate::i18n::text(
+                        "{name} · {arg0} 步",
+                        &[
+                            ("name", format!("{name}")),
+                            ("arg0", format!("{}", nodes.len())),
+                        ],
+                    ));
                     if ui.small_button(tr("插入")).clicked() {
                         match authoring::validate_template(&nodes) {
                             Ok(()) => {
@@ -3677,7 +3811,7 @@ impl App {
         ui.separator();
         ui.horizontal_wrapped(|ui|{
             if ui.button(tr("变量 / 条件 / 引用分析")).clicked(){self.tools_report=lom_core::analysis::analyze_project(&self.project.stories,&self.project.manifest);self.tools_panel.present("变量 / 条件 / 引用分析", self.tools_report.clone());}
-            if ui.button(tr("运行项目离线测试")).clicked(){let cases:Vec<Value>=self.project.stories.values().flat_map(|s|s["_editor"]["tests"].as_array().cloned().unwrap_or_default()).collect();if cases.is_empty(){self.error=Some("还没有定义离线测试。请打开章节设置，添加测试并填写初始变量、选项和断言。".into());}else{match lom_core::analysis::run_story_tests(&self.project.stories,&Value::Array(cases)){Ok(result)=>{self.tools_report=result;self.tools_panel.present("运行项目离线测试", self.tools_report.clone());},Err(e)=>self.error=Some(e.to_string())}}}
+            if ui.button(tr("运行项目离线测试")).clicked(){let cases:Vec<Value>=self.project.stories.values().flat_map(|s|s["_editor"]["tests"].as_array().cloned().unwrap_or_default()).collect();if cases.is_empty(){self.error=Some(tr("还没有定义离线测试。请打开章节设置，添加测试并填写初始变量、选项和断言。").into());}else{match lom_core::analysis::run_story_tests(&self.project.stories,&Value::Array(cases)){Ok(result)=>{self.tools_report=result;self.tools_panel.present("运行项目离线测试", self.tools_report.clone());},Err(e)=>self.error=Some(e.to_string())}}}
             if ui.button(tr("从入口模拟当前章节")).clicked(){let case=json!([{"name":"入口路径模拟","story":self.current,"initial":{"variables":{},"flags":{}},"actions":{"choices":[]},"assert":{}}]);match lom_core::analysis::run_story_tests(&self.project.stories,&case){Ok(r)=>{self.tools_report=r;self.tools_panel.present("从入口模拟当前章节", self.tools_report.clone());},Err(e)=>self.error=Some(e.to_string())}}
         });
         ui.label(
@@ -3703,7 +3837,12 @@ impl App {
                 &issues,
                 &self.tools_panel.diagnostic_options(),
             ) {
-                Ok(saved) => self.status = format!("脱敏诊断包已保存：{}", saved.display()),
+                Ok(saved) => {
+                    self.status = crate::i18n::text(
+                        "脱敏诊断包已保存：{arg0}",
+                        &[("arg0", format!("{}", saved.display()))],
+                    )
+                }
                 Err(e) => self.error = Some(e.to_string()),
             }
         }
@@ -3821,6 +3960,9 @@ impl App {
                     .set_interface_locale(locale, &prefs)
                     .err()
                     .map(|e| e.to_string());
+                if self.settings_error.is_none() {
+                    shell::update_fonts(ctx);
+                }
             }
             if close || escape_pressed {
                 self.settings_open = false;
@@ -4081,17 +4223,24 @@ impl App {
                                 let title = manifest["name"]
                                     .as_str()
                                     .filter(|s| !s.is_empty())
-                                    .unwrap_or("未命名作品");
+                                    .map(str::to_owned)
+                                    .unwrap_or_else(|| tr("未命名作品"));
                                 egui::Frame::group(ui.style())
                                     .inner_margin(12)
                                     .show(ui, |ui| {
                                         ui.strong(title);
                                         ui.label(
-                                            RichText::new(format!(
-                                                "副本 {}",
-                                                path.file_name()
-                                                    .unwrap_or_default()
-                                                    .to_string_lossy()
+                                            RichText::new(crate::i18n::text(
+                                                "副本 {arg0}",
+                                                &[(
+                                                    "arg0",
+                                                    format!(
+                                                        "{}",
+                                                        path.file_name()
+                                                            .unwrap_or_default()
+                                                            .to_string_lossy()
+                                                    ),
+                                                )],
                                             ))
                                             .small()
                                             .weak(),
@@ -4158,7 +4307,10 @@ impl eframe::App for App {
                         )
                     })();
                     if let Err(error) = result {
-                        self.error = Some(format!("素材已载入，但无法记住素材位置：{error:#}"));
+                        self.error = Some(crate::i18n::text(
+                            "素材已载入，但无法记住素材位置：{error}",
+                            &[("error", format!("{error:#}"))],
+                        ));
                     }
                     self.status = tr("提取完成，预览素材已自动载入");
                 }
@@ -4229,7 +4381,7 @@ impl eframe::App for App {
             if branching.contains(&node["type"].as_str().unwrap_or("")) {
                 self.auto = false;
                 self.preview_elapsed = Some(preview::playback_duration(node));
-                self.status = "流程在条件或选项处分叉，自动浏览已暂停".into();
+                self.status = tr("流程在条件或选项处分叉，自动浏览已暂停");
             } else {
                 let targets = lom_core::analysis::successors(&story, self.selected);
                 if targets.len() == 1 {
@@ -4313,7 +4465,10 @@ impl eframe::App for App {
             format!(
                 "{}{} · LoMScenarioKit",
                 if self.dirty() { "* " } else { "" },
-                self.project.manifest["name"].as_str().unwrap_or("新作品")
+                self.project.manifest["name"]
+                    .as_str()
+                    .map(str::to_owned)
+                    .unwrap_or_else(|| tr("新作品"))
             ),
         );
         if self.frame == 12 && self.screenshot.is_some() {
@@ -5149,13 +5304,19 @@ mod application_regression_tests {
         let dir = tempfile::tempdir().unwrap();
         let prefs = dir.path().join("preferences.json");
         std::fs::write(&prefs, br#"{"preview_library":"keep-me"}"#).unwrap();
-        let locale = crate::i18n::locale();
-        app.set_interface_locale(locale, &prefs).unwrap();
-        let saved = lom_core::load_json(&prefs).unwrap();
-        assert_eq!(saved["ui_locale"], locale);
-        assert_eq!(saved["preview_library"], "keep-me");
-        assert!(app.set_interface_locale("unsupported", &prefs).is_err());
-        assert_eq!(lom_core::load_json(&prefs).unwrap(), saved);
+        let original_locale = crate::i18n::locale();
+        for locale in crate::i18n::LOCALES {
+            app.set_interface_locale(locale, &prefs).unwrap();
+            shell::update_fonts(&ctx);
+            let saved = lom_core::load_json(&prefs).unwrap();
+            assert_eq!(saved["ui_locale"], locale);
+            assert_eq!(saved["preview_library"], "keep-me");
+            let _ = ctx.run(Default::default(), |ctx| app.dialogs(ctx));
+            assert!(snapshot(&app.project) == before, "{locale}");
+            assert!(app.set_interface_locale("unsupported", &prefs).is_err());
+            assert_eq!(lom_core::load_json(&prefs).unwrap(), saved);
+        }
+        app.set_interface_locale(original_locale, &prefs).unwrap();
         let _ = ctx.run(
             egui::RawInput {
                 events: vec![key_event(egui::Key::Escape, egui::Modifiers::NONE)],
@@ -5166,6 +5327,22 @@ mod application_regression_tests {
         assert!(!app.settings_open);
         assert!(snapshot(&app.project) == before);
         assert!(!app.dirty());
+    }
+    #[test]
+    fn compile_validity_does_not_depend_on_error_message_language() {
+        let mut app = app();
+        let original_locale = crate::i18n::locale();
+        app.project.stories.get_mut(&app.current).unwrap()["nodes"][0]["type"] =
+            json!("unsupported");
+        for locale in crate::i18n::LOCALES {
+            crate::i18n::set_locale(locale);
+            app.compile();
+            assert!(!app.lua_valid, "{locale}");
+        }
+        crate::i18n::set_locale(original_locale);
+        app.project.stories.get_mut(&app.current).unwrap()["nodes"][0]["type"] = json!("say");
+        app.compile();
+        assert!(app.lua_valid);
     }
     #[test]
     fn compiler_diagnostic_link_selects_the_error_node_across_chapters() {
@@ -5677,7 +5854,9 @@ mod application_regression_tests {
         app.autosave();
         assert_eq!(std::fs::read(&collision).unwrap(), b"unowned data");
         assert!(app.recovery_paths.is_empty());
-        assert!(app.status.starts_with("自动恢复副本写入失败"));
+        assert!(app
+            .status
+            .starts_with(tr("自动恢复副本写入失败：{e}").split("{e}").next().unwrap()));
         assert!(app.project.source.is_none());
         assert!(app.project.paths.is_empty());
     }

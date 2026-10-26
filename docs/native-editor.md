@@ -10,7 +10,7 @@ LoMScenarioKitの制作エディターは、lom_modkitの既存Rust GUIを基盤
 
 ## 起動する
 
-Rust 1.89以降とCargoが必要です。確認環境はRust 1.93.1、Linux/X11です。LinuxではC/C++ビルド環境、OpenGLとウィンドウ環境、日本語を表示できるフォントも必要です。Windows向けのゲーム導入作業はエディターの起動には不要です。
+Rust 1.89以降とCargoが必要です。確認環境はRust 1.93.1、Linux/X11です。LinuxではC/C++ビルド環境、OpenGLとウィンドウ環境が必要です。表示用のNoto Sans CJKは同梱しているため、追加のフォント設定は不要です。Windows向けのゲーム導入作業はエディターの起動には不要です。
 
 Linux・macOS・WSLでは、リポジトリのルートで実行します。
 
@@ -18,7 +18,9 @@ Linux・macOS・WSLでは、リポジトリのルートで実行します。
 ./editor
 ```
 
-WSLではX11とCPU描画を自動で選びます。`WAYLAND_DISPLAY` / `WAYLAND_SOCKET` を外し、未指定なら `LIBGL_ALWAYS_SOFTWARE=true` と `GALLIUM_DRIVER=llvmpipe` を設定します。WSL以外の描画設定は変更しません。Rustのビルドは必要に応じて自動で行います。
+WSLではX11とCPU描画を自動で選びます。`WAYLAND_DISPLAY` / `WAYLAND_SOCKET` を外し、未指定なら `LIBGL_ALWAYS_SOFTWARE=true`、`GALLIUM_DRIVER=llvmpipe`、`XCURSOR_SIZE=24` を設定します。WSL以外の描画設定は変更しません。Rustのビルドは必要に応じて自動で行います。ポインターの大きさを変える場合は `XCURSOR_SIZE=32 ./editor` のように指定できます。
+
+表示言語は設定（`Ctrl+,`、macOSは`⌘,`）で、日本語・簡体字・繁体字・韓国語・英語に切り替えられます。切り替えはその場で反映され、次回起動時にも保持されます。台詞・作品名・人物名・コメント本文は書き換えません。英語表示で訳が用意されていないゲーム固有名は原表記を使います。表示言語の追加によって、ゲーム側のシナリオ翻訳対応言語が増えるわけではありません。
 
 章・選択肢・フラグ・分岐を含むサンプルも開けます。自作の作品にはサンプルのコピーを使ってください。
 

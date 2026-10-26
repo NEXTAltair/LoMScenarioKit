@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Editing operations are planned on a copy and committed only after validation.
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
@@ -142,9 +144,12 @@ pub fn selection_block(
         let successors = lom_core::analysis::successors(story, index);
         for target in successors {
             if !ids.contains(&target) {
-                warnings.insert(format!(
-                    "{} 指向模板外部步骤 {target}；插入后请重新绑定",
-                    node["id"].as_str().unwrap_or("")
+                warnings.insert(crate::i18n::text(
+                    "{arg0} 指向模板外部步骤 {target}；插入后请重新绑定",
+                    &[
+                        ("arg0", format!("{}", node["id"].as_str().unwrap_or(""))),
+                        ("target", format!("{target}")),
+                    ],
                 ));
             }
         }
@@ -193,7 +198,12 @@ pub fn template_warnings(block: &[Value]) -> Vec<String> {
     }
     refs.into_iter()
         .filter(|s| !ids.contains(s.as_str()))
-        .map(|s| format!("外部引用 {s} 会保留，请确认目标章节中存在该 ID"))
+        .map(|s| {
+            crate::i18n::text(
+                "外部引用 {s} 会保留，请确认目标章节中存在该 ID",
+                &[("s", format!("{s}"))],
+            )
+        })
         .collect()
 }
 pub fn validate_template(nodes: &[Value]) -> Result<()> {
@@ -268,8 +278,12 @@ pub fn validate_sections(story: &Value) -> Result<()> {
         let title = section["title"].as_str().unwrap_or("分区");
         let id = section["id"].as_str().context("分区缺少 ID")?;
         ensure!(ids.insert(id), "分区 ID 重复：{id}");
-        let (a, b) =
-            bounds(story, section).with_context(|| format!("分区「{title}」的起止步骤不存在"))?;
+        let (a, b) = bounds(story, section).with_context(|| {
+            crate::i18n::text(
+                "分区「{title}」的起止步骤不存在",
+                &[("title", format!("{title}"))],
+            )
+        })?;
         for i in a..=b {
             ensure!(occupied.insert(i), "分区「{title}」与另一分区重叠");
         }
@@ -279,8 +293,12 @@ pub fn validate_sections(story: &Value) -> Result<()> {
             let name = group["title"].as_str().unwrap_or("分组");
             let gid = group["id"].as_str().context("分组缺少 ID")?;
             ensure!(group_ids.insert(gid), "分组 ID 重复：{gid}");
-            let (x, y) =
-                bounds(story, group).with_context(|| format!("分组「{name}」起止步骤不存在"))?;
+            let (x, y) = bounds(story, group).with_context(|| {
+                crate::i18n::text(
+                    "分组「{name}」起止步骤不存在",
+                    &[("name", format!("{name}"))],
+                )
+            })?;
             ensure!(x >= a && y <= b, "分组「{name}」超出所在分区");
             for i in x..=y {
                 ensure!(group_nodes.insert(i), "分组「{name}」与同分区其他分组重叠");

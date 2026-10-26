@@ -12,6 +12,7 @@ Copyright (C) 2026 NEXTAltair。プロジェクト名は LoMScenarioKit。
 | `src/`、`tools/`、`tests/`、ビルド設定、サンプル Lua の実行コード、説明書のコード例 | GPL-3.0-only ＋ 活俠傳との連携を認める追加許諾 |
 | サンプルの PNG・WAV・台詞・紹介文・物語、コード以外のシナリオデータ | CC BY-NC-SA 4.0 |
 | `README.md` と `docs/` の説明文 | CC BY-NC-SA 4.0 |
+| 同梱のNoto Sans CJKフォント | SIL Open Font License 1.1（同梱のOFL.txtを保持） |
 | 第三者のコード、ライブラリ、ライセンス原文・表示 | 各権利者の元の条件を維持 |
 
 Lua や JSON に埋め込まれた台詞・物語の文字列も、コンテンツ側の条件に含む。プログラムの呼び出し・分岐などの実行コードとは区別する。API 名・ファイル形式・単なる事実について新たな権利を主張するものではない。

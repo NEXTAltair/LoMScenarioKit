@@ -34,3 +34,12 @@ BepInEx、Harmony、Mono.Cecil、およびゲームに含まれる Unity・Wwise
 互換経路に同梱するUnity Doorstop 4.3.0にはLGPL-2.1が適用されます。[元の表示](tools/modkit/editor/assets/doorstop/README.md)、ライセンス全文、対応するソースZIPを同じディレクトリへ保持しています。Addon制作プロジェクトではDoorstop/Hostの導入処理は使いません。
 
 ACからは資料・判定・引用付きコメント・履歴の機能を参考にしました。ACのHTML/CSSとWebサーバーのコードは取り込んでいません。
+
+## 制作エディターのフォント
+
+Noto Sans CJK Regular 2.004を改変せず同梱しています。Copyright 2014–2021 Adobe (http://www.adobe.com/)。フォントにはSIL Open Font License 1.1が適用されます。
+
+- ライセンス全文: [OFL.txt](tools/modkit/rust/lom-editor/assets/fonts/OFL.txt)
+- 取得元・固定コミット・SHA-256: [フォントの記録](tools/modkit/rust/lom-editor/assets/fonts/README.md)
+
+フォントはエディターに埋め込み、対応するソースZIPにも原ファイルと表記を含めます。
