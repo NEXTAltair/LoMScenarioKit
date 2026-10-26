@@ -2995,6 +2995,9 @@ impl App {
     fn localization(&mut self, ui: &mut egui::Ui) {
         ui.heading(tr("多语言对白"));
         ui.label(tr("逐句编辑翻译；人物 ID、资源路径和 Lua 保持原值。"));
+        if lom_core::scenario_addon::enabled(&self.project) {
+            ui.label("LoMScenarioAddonへの多言語設定の書き出しは未対応です。翻訳は制作データに保存できますが、書き出し時の検査で停止します。");
+        }
         let mut s = self.story();
         if !s["localization"].is_object() {
             if ui.button(tr("启用本章多语言")).clicked() {

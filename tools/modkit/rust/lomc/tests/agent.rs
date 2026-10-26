@@ -191,3 +191,36 @@ fn agent_can_edit_an_imported_folder_without_a_manifest() {
     );
     assert!(root.join("manifest.json").is_file());
 }
+
+#[test]
+fn localized_project_stays_editable_but_check_and_export_reject_it() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join("localized-project");
+    let init = agent("init", &root, json!({}), 0);
+    let mut document = init["data"]["document"].clone();
+    document["stories"]["main"]["localization"] = json!({
+        "default_locale":"ja", "fallback_locale":"ja",
+        "translations":{"cht":{"say1.text":"繁體台詞"}}
+    });
+    agent(
+        "save",
+        &root,
+        json!({"revision":init["data"]["revision"],"document":document}),
+        0,
+    );
+    let before = agent("checkout", &root, json!({}), 0);
+    let output = temp.path().join("scenario");
+    for command in ["check", "export"] {
+        let rejected = agent(command, &root, json!({"output":output}), 1);
+        assert_eq!(rejected["ok"], false);
+        assert!(rejected["issues"].to_string().contains("localization"));
+        assert!(rejected["issues"].to_string().contains("章 main"));
+    }
+    assert!(!output.exists());
+    let after = agent("checkout", &root, json!({}), 0);
+    assert_eq!(before["data"], after["data"]);
+    assert_eq!(
+        after["data"]["document"]["stories"]["main"]["localization"],
+        document["stories"]["main"]["localization"]
+    );
+}

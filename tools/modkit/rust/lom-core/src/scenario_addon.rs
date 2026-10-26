@@ -72,6 +72,11 @@ fn fields(node: &Value, allowed: &[&str]) -> Result<()> {
 }
 
 pub fn compile_story(story: &Value) -> Result<String> {
+    ensure!(
+        story.get("localization").is_none(),
+        "章 {}: LoMScenarioAddon の書き出しでは多言語設定（localization）に未対応です。翻訳は制作データに保持されています",
+        string(story, "id", "")
+    );
     crate::validate::validate_story(story)?;
     let nodes = story["nodes"].as_array().context("nodes がありません")?;
     ensure!(!nodes.is_empty(), "章にノードがありません");
@@ -284,6 +289,27 @@ pub fn export(project: &Project, target: &Path) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn localized_chapters_are_rejected_without_losing_catalogs_or_writing_output() {
+        let mut project = new_project("多言語");
+        for translations in [json!({}), json!({"cht":{"say1.text":"繁體台詞"}})] {
+            project.stories.get_mut("main").unwrap()["localization"] = json!({
+                "default_locale":"ja", "fallback_locale":"ja", "translations":translations
+            });
+            let story = &project.stories["main"];
+            crate::validate::validate_story(story).unwrap();
+            let original = story.clone();
+            let error = compile_story(story).unwrap_err().to_string();
+            assert!(error.contains("章 main"), "{error}");
+            assert!(error.contains("localization"), "{error}");
+            let temp = tempfile::tempdir().unwrap();
+            let target = temp.path().join("scenario");
+            assert!(export(&project, &target).is_err());
+            assert!(!target.exists());
+            assert_eq!(project.stories["main"], original);
+        }
+    }
+
     #[test]
     fn character_speech_updates_the_stage_expression_and_solid_views_need_no_asset() {
         let mut project = new_project("表情");
