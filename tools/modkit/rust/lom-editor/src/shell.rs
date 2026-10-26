@@ -20,7 +20,6 @@ impl Shell {
                 eprintln!("Native window appearance unavailable: {error}");
                 "portable".into()
             });
-            println!("Native window backend: {backend}");
             self.backend = Some(backend);
         }
     }

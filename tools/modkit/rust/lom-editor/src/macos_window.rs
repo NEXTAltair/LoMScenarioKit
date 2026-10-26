@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Standard AppKit window chrome for the portable Rust/OpenGL editor.
 //! Native glass belongs in the later macOS shell: putting AppKit effect views
 //! beside the content view breaks titlebar layout, and putting them inside it
@@ -9,16 +11,9 @@ static SETTINGS_REQUESTED: AtomicBool = AtomicBool::new(false);
 
 /// Install into winit's existing application menu after the event loop has started.
 /// Other standard AppKit items and their actions remain owned by winit.
+#[cfg(target_os = "macos")]
 pub fn install_settings_menu(ctx: &eframe::egui::Context) -> Result<(), String> {
-    #[cfg(target_os = "macos")]
-    {
-        settings_menu::install(ctx)
-    }
-    #[cfg(not(target_os = "macos"))]
-    {
-        let _ = ctx;
-        Ok(())
-    }
+    settings_menu::install(ctx)
 }
 
 /// Consume an action already delivered by AppKit. No timer or polling wakeup is used.
