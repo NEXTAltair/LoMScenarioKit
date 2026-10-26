@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-26.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Controlled JSON authoring API, shared by the CLI and desktop tooling.
 //! Every request works on a clone; an error never modifies the caller's story.
 use crate::{editing, release};
@@ -262,7 +264,7 @@ pub fn execute(op: &str, params: &Value) -> Result<Value> {
                 "delete_node"=>{story["nodes"].as_array_mut().unwrap().remove(i);},
                 "set_start"=>{story["start"]=json!(id);},
                 "move_node"=>{let d=params["delta"].as_i64().context("delta 必须是整数")?;ensure!(d==1||d==-1,"delta 必须是 ±1");let dest=i as i64+d;ensure!(dest>=0&&(dest as usize)<story["nodes"].as_array().unwrap().len(),"移动越界");story["nodes"].as_array_mut().unwrap().swap(i,dest as usize);},
-                "rename_node"=>{let new=string(params,"new_id")?.trim();ensure!(!new.is_empty()&&new.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'_'),"新节点 ID 不合法");ensure!(new==id||index(&story,new).is_err(),"新节点 ID 已存在");node["id"]=json!(new);story["nodes"][i]=node.clone();editing::retarget(&mut story,&BTreeMap::from([(id.into(),new.into())]));node=story["nodes"][i].clone();},_=>()
+                "rename_node"=>{let new=string(params,"new_id")?.trim();ensure!(!new.is_empty()&&new.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'_'),"新节点 ID 不合法");ensure!(new==id||index(&story,new).is_err(),"新节点 ID 已存在");node["id"]=json!(new);story["nodes"][i]=node.clone();editing::retarget(&mut story,&BTreeMap::from([(id.into(),new.into())]));crate::localization::rename_node_translations(&mut story,id,new);node=story["nodes"][i].clone();},_=>()
             }node
         },
         _=>bail!("未知操作 {op}")

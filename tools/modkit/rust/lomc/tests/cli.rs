@@ -180,3 +180,40 @@ fn event_modes_use_the_bundled_host_version() {
         assert_eq!(result["ok"], true);
     }
 }
+
+#[test]
+fn compatibility_edit_keeps_localized_renames_valid() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("main.json");
+    let ops = dir.path().join("operations.json");
+    let mut story = lom_core::project::Project::new().stories["main"].clone();
+    story["localization"] =
+        serde_json::json!({"default_locale":"ja","translations":{"cht":{"say1.text":"翻譯"}}});
+    fs::write(&path, serde_json::to_vec(&story).unwrap()).unwrap();
+    fs::write(
+        &ops,
+        br#"[{"op":"rename_node","node_id":"say1","new_id":"opening"}]"#,
+    )
+    .unwrap();
+    let output = cli(&[
+        "edit",
+        path.to_str().unwrap(),
+        "--operations",
+        ops.to_str().unwrap(),
+        "--json",
+    ]);
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    let renamed: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    lom_core::validate::validate_story(&renamed).unwrap();
+    assert_eq!(
+        renamed["localization"]["translations"]["cht"]["opening.text"],
+        "翻譯"
+    );
+    assert!(renamed["localization"]["translations"]["cht"]
+        .get("say1.text")
+        .is_none());
+}

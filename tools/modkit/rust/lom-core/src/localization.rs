@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-26.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Story prose localization. IDs, paths and raw Lua are never translated.
 use anyhow::{bail, ensure, Result};
 use serde_json::{Map, Value};
@@ -34,6 +36,30 @@ pub fn localization_config(story: &Value) -> Option<Value> {
         config.insert("translations".into(), Value::Object(canonical));
     }
     Some(Value::Object(config))
+}
+/// Keep every locale's prose attached to its node when the node ID changes.
+pub fn rename_node_translations(story: &mut Value, old: &str, new: &str) {
+    if let Some(translations) = story
+        .get_mut("localization")
+        .and_then(|v| v.get_mut("translations"))
+        .and_then(Value::as_object_mut)
+    {
+        let prefix = format!("{old}.");
+        for catalog in translations.values_mut() {
+            if let Some(entries) = catalog.as_object_mut() {
+                let keys: Vec<_> = entries
+                    .keys()
+                    .filter(|k| k.starts_with(&prefix))
+                    .cloned()
+                    .collect();
+                for key in keys {
+                    if let Some(value) = entries.remove(&key) {
+                        entries.insert(format!("{new}{}", &key[old.len()..]), value);
+                    }
+                }
+            }
+        }
+    }
 }
 pub fn iter_localizable_texts(story: &Value) -> BTreeMap<String, String> {
     let mut out = BTreeMap::new();

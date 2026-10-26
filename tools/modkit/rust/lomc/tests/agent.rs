@@ -258,3 +258,64 @@ fn adding_metadata_named_chapters_to_a_flat_import_fails_without_changing_the_pr
         );
     }
 }
+
+#[test]
+fn renaming_localized_nodes_preserves_all_locale_catalogs() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join("localized-project");
+    let init = agent("init", &root, json!({}), 0);
+    let mut document = init["data"]["document"].clone();
+    let story = &mut document["stories"]["main"];
+    story["nodes"] = json!([
+        {"id":"say1","type":"say","mode":"narrative","text":"本文"},
+        {"id":"say10","type":"say","mode":"narrative","text":"別の本文"},
+        {"id":"choice1","type":"choice","options":[{"text":"戻る","goto":"say1"},{"text":"終わる","goto":"end1"}]},
+        {"id":"end1","type":"end"}
+    ]);
+    story["localization"] = json!({"default_locale":"ja","translations":{
+        "cht":{"say1.text":"繁體本文","say10.text":"別の繁體本文","choice1.options.0.text":"戻る繁體","story.title":"繁體章"},
+        "ko":{"say1.text":"한국어","choice1.options.0.text":"돌아가기","story.title":"제목"}
+    }});
+    let original_catalogs = story["localization"]["translations"].clone();
+    let saved = agent(
+        "save",
+        &root,
+        json!({"revision":init["data"]["revision"],"document":document}),
+        0,
+    );
+    agent(
+        "edit",
+        &root,
+        json!({"revision":saved["data"]["revision"],"story":"main","operations":[
+            {"op":"rename_node","node_id":"say1","new_id":"opening"},
+            {"op":"rename_node","node_id":"choice1","new_id":"decision"}
+        ]}),
+        0,
+    );
+    let checkout = agent("checkout", &root, json!({}), 0);
+    let story = &checkout["data"]["document"]["stories"]["main"];
+    lom_core::validate::validate_story(story).unwrap();
+    assert_eq!(story["start"], "opening");
+    assert_eq!(story["nodes"][2]["options"][0]["goto"], "opening");
+    for locale in ["cht", "ko"] {
+        let catalog = &story["localization"]["translations"][locale];
+        assert_eq!(
+            catalog["opening.text"],
+            original_catalogs[locale]["say1.text"]
+        );
+        assert_eq!(
+            catalog["decision.options.0.text"],
+            original_catalogs[locale]["choice1.options.0.text"]
+        );
+        assert_eq!(
+            catalog["story.title"],
+            original_catalogs[locale]["story.title"]
+        );
+        assert_eq!(
+            catalog["say10.text"],
+            original_catalogs[locale]["say10.text"]
+        );
+        assert!(catalog.get("say1.text").is_none());
+        assert!(catalog.get("choice1.options.0.text").is_none());
+    }
+}

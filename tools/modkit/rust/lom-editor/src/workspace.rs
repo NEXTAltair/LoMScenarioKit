@@ -796,7 +796,7 @@ impl App {
                     .unwrap();
                 chapter["nodes"][index]["id"] = json!(new);
                 retarget(chapter, &BTreeMap::from([(node.clone(), new.clone())]));
-                rename_translations(chapter, &node, &new);
+                lom_core::localization::rename_node_translations(chapter, &node, &new);
             }
             RenameTarget::Chapter(old) => {
                 let mut story = self.project.stories.remove(&old).unwrap();
@@ -4610,28 +4610,6 @@ fn retarget(value: &mut Value, map: &BTreeMap<String, String>) {
             }
         }
         _ => {}
-    }
-}
-fn rename_translations(story: &mut Value, old: &str, new: &str) {
-    if let Some(translations) = story
-        .get_mut("localization")
-        .and_then(|v| v.get_mut("translations"))
-        .and_then(Value::as_object_mut)
-    {
-        for catalog in translations.values_mut() {
-            if let Some(o) = catalog.as_object_mut() {
-                let updates: Vec<_> = o
-                    .keys()
-                    .filter(|k| k.starts_with(&format!("{old}.")))
-                    .cloned()
-                    .collect();
-                for key in updates {
-                    if let Some(v) = o.remove(&key) {
-                        o.insert(format!("{new}{}", &key[old.len()..]), v);
-                    }
-                }
-            }
-        }
     }
 }
 fn rename_story_refs(value: &mut Value, old: &str, new: &str) {
