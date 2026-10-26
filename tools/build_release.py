@@ -45,7 +45,7 @@ def package_source(destination):
     paths = [ROOT / p for p in LEGAL_FILES + ["README.md", ".gitignore",
              "Directory.Build.props", "Directory.Build.targets"]]
     extensions = {".cs", ".csproj", ".py", ".sh", ".md", ".txt", ".lua",
-                  ".json", ".csv", ".png", ".wav"}
+                  ".json", ".csv", ".png", ".wav", ".html", ".css", ".js", ".cjs"}
     for folder in ["src", "tools", "tests", "docs", "licenses", "sample"]:
         for path in (ROOT / folder).rglob("*"):
             if any(p in {"bin", "obj", "__pycache__"} or p.startswith(".")

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>制作資料 — LoMScenarioKit</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f6f2;color:#293533;font:16px/1.8 system-ui,sans-serif}header{padding:16px 24px;background:#fff;border-bottom:1px solid #d5ded9;display:flex;gap:24px;align-items:center}a{color:#216250}h1{font-size:20px;margin:0}.layout{display:grid;grid-template-columns:260px minmax(280px,1fr) 230px;height:calc(100vh - 70px)}nav,main,aside{overflow:auto;padding:20px}nav,aside{background:#eeefea}main{padding:24px 40px}button{font:inherit;cursor:pointer;border:1px solid #c7d3cb;border-radius:6px;background:#fff;color:inherit;padding:8px;text-align:left}nav button,aside button{display:block;width:100%;margin:8px 0}button[aria-current=true]{border-color:#216250;background:#deeee5}input{width:100%;font:inherit;padding:8px;border:1px solid #c7d3cb;border-radius:6px}#body{max-width:900px;margin:auto;overflow-wrap:anywhere}#body p{white-space:pre-wrap}pre{white-space:pre-wrap;background:#e8ece8;padding:16px;border-radius:6px}h2,h3,h4{scroll-margin-top:20px}small,.hint{color:#65736b}#error{color:#a52c2c}@media(max-width:850px){.layout{grid-template-columns:200px 1fr}aside{display:none}main{padding:20px}}@media(max-width:550px){.layout{display:block;height:auto}nav{max-height:35vh}}
+</style>
+<header><a href="/">← 台本へ</a><h1>制作資料</h1><small>outline/ の Markdown</small></header>
+<div class="layout"><nav aria-label="文書一覧"><input id="search" aria-label="資料を全文検索" placeholder="資料を全文検索"><div id="documents"></div><p id="error" role="alert"></p></nav><main><div id="body"><h2>制作資料を選択</h2><p>プロジェクトの outline/ に Markdown を置くと、ここから読めます。</p><p class="hint">資料の編集は元の Markdown ファイルで行います。選択肢の分岐図は台本画面で確認できます。</p></div></main><aside aria-label="この文書のアウトライン"><strong>この文書の見出し</strong><div id="toc"></div></aside></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);let documents=[],selected='';
+function node(tag,text){const n=document.createElement(tag);n.textContent=text;return n;}
+function openDocument(doc){
+ selected=doc.id;renderList();$('body').replaceChildren();$('toc').replaceChildren();
+ const headings=new Map(doc.headings.map(h=>[h.line,h]));let fence=false,code=[];
+ function flush(){if(code.length){$('body').append(node('pre',code.join('\n')));code=[];}}
+ doc.markdown.split('\n').forEach((line,i)=>{
+  if(/^\s*(```|~~~)/.test(line)){if(fence)flush();fence=!fence;return;}
+  if(fence){code.push(line);return;}
+  const h=headings.get(i+1);
+  if(h){const el=node('h'+h.level,h.title);el.id='line-'+h.line;$('body').append(el);const b=node('button',h.title);b.style.paddingLeft=(8+(h.level-1)*12)+'px';b.onclick=()=>el.scrollIntoView({behavior:'smooth'});$('toc').append(b);}
+  else if(line.trim())$('body').append(node('p',line));
+ });flush();
+ history.replaceState(null,'','#'+encodeURIComponent(doc.id));
+}
+function renderList(){
+ const q=$('search').value.toLocaleLowerCase();$('documents').replaceChildren();
+ for(const d of documents.filter(d=>(d.title+'\n'+d.id+'\n'+d.markdown).toLocaleLowerCase().includes(q))){const b=node('button',d.title);b.setAttribute('aria-current',String(d.id===selected));b.title=d.id;b.onclick=()=>openDocument(d);$('documents').append(b);}
+}
+$('search').oninput=renderList;
+fetch('/api/outline',{cache:'no-store'}).then(async r=>{if(!r.ok)throw new Error('資料を取得できませんでした。');documents=await r.json();renderList();const d=documents.find(d=>d.id===decodeURIComponent(location.hash.slice(1)));if(d)openDocument(d);}).catch(e=>$('error').textContent=e.message);
+</script>
+</html>

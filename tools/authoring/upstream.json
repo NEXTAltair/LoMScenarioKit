@@ -1,0 +1,47 @@
+{
+  "repository": "addonLoMScenario-ac",
+  "commit": "1eabb96a5dae6270ff03a554294a9c0bb73a6672",
+  "snapshot": "2026-10-26 local working tree (including uncommitted changes), code only",
+  "files": [
+    {
+      "path": "scripts/script_store.py",
+      "sha256": "0cc6d5e7f52485a751c248fbf721f8baac5be2f2e21c1f2832cbe4a7da4868c9"
+    },
+    {
+      "path": "scripts/review_rules.py",
+      "sha256": "5d54e94f8723fa1703e985646d927801412c338c547c04202ebc5e504eab9685"
+    },
+    {
+      "path": "scripts/script_server.py",
+      "sha256": "e1d7213afbf3c40054769ca8f3b43f6e9488294ebe96f67a34b1d91efca72328"
+    },
+    {
+      "path": "scripts/script_editor/collaboration.js",
+      "sha256": "5f6adaea3235fe3bb355be6659170c3f15b60e7cb533c2e9e246f1490d18f72a"
+    },
+    {
+      "path": "scripts/script_editor/app.js",
+      "sha256": "231e3967cb755c63adaff62e5e2369f00a3d54e5764d9793493f0eaa8d9afaf7"
+    },
+    {
+      "path": "scripts/script_editor/editor.css",
+      "sha256": "96bc54cbc2eaf00ec23c85ed29f017aedd9d5523765b24e24d06b188f4fb267f"
+    },
+    {
+      "path": "scripts/script_editor/shell.html",
+      "sha256": "0d2bec158e9c862d45dde0f1a30b9cc8c59c3fd2b09e96a73b943af8e7e685e3"
+    },
+    {
+      "path": "scripts/script_editor/chart.js",
+      "sha256": "18a6202b8681a505c13a75b6517722d32ab0b98e7752025075f93975abc1a50e"
+    },
+    {
+      "path": "scripts/script_editor/review.js",
+      "sha256": "099e60a88a214aeecc02eb3ebe5abd77c3d5de516b26baaccfa7e0a9342fba83"
+    },
+    {
+      "path": "scripts/script_editor/model.js",
+      "sha256": "a76bc863b73281c786610c24ebde88b252cb6d701558725751985f684b2ab7ad"
+    }
+  ]
+}
