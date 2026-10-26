@@ -153,6 +153,7 @@ DebugFlushSeconds = 10
 
 ## 制作・開発の資料
 
+- [制作GUI・エージェント用CLI](docs/authoring.md): 台本編集、アウトライン、判定タグ、添削コメント、履歴、分岐チャート。Pythonで起動します。
 - [シナリオ制作ガイド](docs/scenario-guide.md): キャラ・イベント・画像・音声などの定義、検査・配布、確認用のキー操作
 - [コード・素材の由来の監査](docs/provenance-audit.md): 参考元・ライセンス・比較結果・公開する履歴の範囲
 - [開発メモ](docs/development.md): 内部構成、ビルド、動作確認記録、未着手の機能
