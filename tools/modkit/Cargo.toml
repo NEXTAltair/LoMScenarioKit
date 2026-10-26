@@ -1,0 +1,19 @@
+[workspace]
+members = ["rust/lom-core", "rust/lomc", "rust/lom-editor"]
+resolver = "2"
+
+[workspace.package]
+version = "1.3.1"
+edition = "2021"
+license = "GPL-3.0-only"
+# Upstream portions retain MIT; see LICENSE and ../../LICENSE-GAME-EXCEPTION.txt.
+
+[workspace.dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["arbitrary_precision", "preserve_order"] }
+sha2 = "0.10"
+regex = "1"
+tempfile = "3"
+zip = { version = "2", default-features = false, features = ["deflate"] }
+lom-core = { path = "rust/lom-core" }

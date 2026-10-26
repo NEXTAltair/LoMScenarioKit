@@ -1,0 +1,92 @@
+{
+  "story_schema": 2,
+  "id": "battle_demo",
+  "title": "3.0 第四章：原版 Battle 编排",
+  "mood": false,
+  "nodes": [
+    {
+      "id": "message1",
+      "type": "message",
+      "text": "【3.0/4】Battle 失败中的 PlayerDie 可能按原版进入重试/标题；可选择跳过。"
+    },
+    {
+      "id": "choice1",
+      "type": "choice",
+      "options": [
+        {
+          "text": "进入原版 Battle",
+          "goto": "battle1"
+        },
+        {
+          "text": "跳过 Battle",
+          "goto": "say3"
+        }
+      ],
+      "dialog": "Options"
+    },
+    {
+      "id": "say3",
+      "type": "say",
+      "text": "已跳过 Battle。",
+      "portrait": "normal",
+      "mode": "narrative",
+      "goto": "end1"
+    },
+    {
+      "id": "battle1",
+      "type": "battle",
+      "friend_factions": [
+        {
+          "id": "500",
+          "people": 2
+        }
+      ],
+      "friend_characters": [
+        "special4"
+      ],
+      "enemy_factions": [
+        {
+          "id": "001",
+          "people": 2
+        }
+      ],
+      "enemy_characters": [
+        "special102"
+      ],
+      "win": "battle_result1",
+      "lose": "battle_result1",
+      "title": "丐帮围攻",
+      "friend_health": 220,
+      "enemy_health": 180
+    },
+    {
+      "id": "battle_result1",
+      "type": "battle_result",
+      "kind": "battle",
+      "win": "say1",
+      "lose": "say2"
+    },
+    {
+      "id": "say1",
+      "type": "say",
+      "text": "Battle 结果：FriendWin。",
+      "portrait": "normal",
+      "mode": "narrative",
+      "goto": "end1"
+    },
+    {
+      "id": "say2",
+      "type": "say",
+      "text": "Battle 结果：EnemyWin。",
+      "portrait": "normal",
+      "mode": "narrative",
+      "goto": "end1"
+    },
+    {
+      "id": "end1",
+      "type": "end",
+      "next_script": "finale"
+    }
+  ],
+  "start": "message1"
+}

@@ -26,3 +26,11 @@ BepInEx、Harmony、Mono.Cecil、およびゲームに含まれる Unity・Wwise
 - [bnnm / wwiser](https://github.com/bnnm/wwiser): ゲームの音声バンク形式の調査に使用。ツールのコードやゲームのバンクファイルは同梱しません。
 
 立ち絵の登録手順、ゲーム API、音声バンクの形式・定数など、本編を参考にした互換処理を含みます。詳しい対象・比較結果・限界は [由来の監査レポート](docs/provenance-audit.md) に記載しています。これらの記載は、ゲーム本体や参考 MOD の素材への再配布許諾を与えるものではありません。
+
+## 制作エディターに取り込んだコード
+
+`tools/modkit/` は [mohui666/lom_modkit](https://github.com/mohui666/lom_modkit) のコミット `f7c20f8d37e0a03cb2ec0ca26a6b6261911d1e00` から、Rustエディター・core・CLI・メタデータ・互換テスト用サンプルを取り込んでいます。元のMIT表示は [tools/modkit/LICENSE](tools/modkit/LICENSE)、取得時のファイルとハッシュは [UPSTREAM.json](tools/modkit/UPSTREAM.json) に保持しています。LoMScenarioKitでの追加・改変には、本リポジトリのGPL-3.0-onlyと追加許諾を適用します。
+
+互換経路に同梱するUnity Doorstop 4.3.0にはLGPL-2.1が適用されます。[元の表示](tools/modkit/editor/assets/doorstop/README.md)、ライセンス全文、対応するソースZIPを同じディレクトリへ保持しています。Addon制作プロジェクトではDoorstop/Hostの導入処理は使いません。
+
+ACからは資料・判定・引用付きコメント・履歴の機能を参考にしました。ACのHTML/CSSとWebサーバーのコードは取り込んでいません。

@@ -1,0 +1,323 @@
+//! The existing four offline dictionaries, shared by the native widgets.
+use serde_json::Value;
+use std::{
+    collections::BTreeMap,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        OnceLock,
+    },
+};
+static LOCALE: AtomicUsize = AtomicUsize::new(0);
+pub const LOCALES: [&str; 4] = ["chs", "cht", "ja", "ko"];
+pub const NAMES: [&str; 4] = ["简体中文", "繁體中文", "日本語", "한국어"];
+pub fn locale() -> &'static str {
+    LOCALES[LOCALE.load(Ordering::Relaxed)]
+}
+pub fn set_locale(name: &str) {
+    if let Some(index) = LOCALES.iter().position(|s| *s == name) {
+        LOCALE.store(index, Ordering::Relaxed);
+    }
+}
+fn dictionaries() -> &'static [Value; 4] {
+    static DICTS: OnceLock<[Value; 4]> = OnceLock::new();
+    DICTS.get_or_init(|| {
+        [
+            serde_json::from_str(include_str!("../../../editor/i18n/locales/chs.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/locales/cht.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/locales/ja.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/locales/ko.json")).unwrap(),
+        ]
+    })
+}
+fn normalize(text: &str) -> String {
+    static RE: OnceLock<regex::Regex> = OnceLock::new();
+    let re = RE.get_or_init(|| regex::Regex::new(r"\(&[A-Za-z]\)|&").unwrap());
+    re.replace_all(text, "")
+        .trim()
+        .trim_end_matches(['…', '.', '：', ':'])
+        .trim()
+        .to_owned()
+}
+pub fn key(name: &str) -> String {
+    let all = dictionaries();
+    let i = LOCALE.load(Ordering::Relaxed);
+    all[i][name]
+        .as_str()
+        .or_else(|| all[0][name].as_str())
+        .unwrap_or(name)
+        .to_owned()
+}
+pub fn tr(source: &str) -> String {
+    tr_index(source, LOCALE.load(Ordering::Relaxed))
+}
+fn tr_index(source: &str, index: usize) -> String {
+    if index == 0 {
+        return source.into();
+    }
+    static NATIVE: OnceLock<Value> = OnceLock::new();
+    let native = NATIVE.get_or_init(|| {
+        serde_json::from_str(include_str!("../data/native-translations.json"))
+            .expect("native UI translations")
+    });
+    if let Some(translated) = native[source][index - 1].as_str() {
+        return translated.into();
+    }
+    static REVERSE: OnceLock<BTreeMap<String, String>> = OnceLock::new();
+    let reverse = REVERSE.get_or_init(|| {
+        dictionaries()[0]
+            .as_object()
+            .unwrap()
+            .iter()
+            .filter_map(|(k, v)| Some((normalize(v.as_str()?), k.clone())))
+            .collect()
+    });
+    let alias = match source {
+        "文件" => "menu.file",
+        "打开目录" => "menu.open_folder",
+        "作品设置" => "menu.release_settings",
+        "多语言" => "menu.localization",
+        "内容库" => "menu.content_library",
+        "导出 Mod" => "toolbar.export",
+        "检查项目" => "menu.preflight",
+        "节点参考与帮助" => "menu.node_reference",
+        "演出" => "preview.tab.stage",
+        "流程" => "preview.tab.flow",
+        "统计" => "menu.project_stats",
+        _ => "",
+    };
+    let translated = if !alias.is_empty() && dictionaries()[0].get(alias).is_some() {
+        dictionaries()[index][alias].as_str().map(str::to_owned)
+    } else {
+        reverse
+            .get(&normalize(source))
+            .and_then(|k| dictionaries()[index][k].as_str().map(str::to_owned))
+    };
+    translated
+        .map(|s| {
+            static MENU: OnceLock<regex::Regex> = OnceLock::new();
+            MENU.get_or_init(|| regex::Regex::new(r"\(&[A-Za-z]\)|&").unwrap())
+                .replace_all(&s, "")
+                .into_owned()
+        })
+        .unwrap_or_else(|| source.into())
+}
+pub fn term(category: &str, id: &str, fallback: &str) -> String {
+    term_index(category, id, fallback, LOCALE.load(Ordering::Relaxed))
+}
+fn term_index(category: &str, id: &str, fallback: &str, index: usize) -> String {
+    static TERMS: OnceLock<[Value; 4]> = OnceLock::new();
+    let tables = TERMS.get_or_init(|| {
+        [
+            serde_json::from_str(include_str!("../../../editor/i18n/terms/chs.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/terms/cht.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/terms/ja.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/terms/ko.json")).unwrap(),
+        ]
+    });
+    if id.starts_with("user:") {
+        return fallback.into();
+    }
+    tables[index][category][id]
+        .as_str()
+        .filter(|s| !s.is_empty())
+        .or_else(|| tables[0][category][id].as_str().filter(|s| !s.is_empty()))
+        .unwrap_or(fallback)
+        .into()
+}
+pub fn help_html(locale: &str) -> &'static str {
+    match locale {
+        "cht" => include_str!("../../../editor/i18n/help/cht.html"),
+        "ja" => include_str!("../../../editor/i18n/help/ja.html"),
+        "ko" => include_str!("../../../editor/i18n/help/ko.html"),
+        _ => include_str!("../../../editor/i18n/help/chs.html"),
+    }
+}
+#[cfg(test)]
+pub fn help_text() -> String {
+    let html = help_html(locale());
+    let without_style = regex::Regex::new(r"(?s)<style[^>]*>.*?</style>")
+        .unwrap()
+        .replace_all(html, "");
+    let breaks = regex::Regex::new(r"</(?:p|li|h[1-6]|tr)>|<br\s*/?>")
+        .unwrap()
+        .replace_all(&without_style, "\n");
+    regex::Regex::new(r"<[^>]+>")
+        .unwrap()
+        .replace_all(&breaks, "")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&amp;", "&")
+        .replace("&nbsp;", " ")
+}
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn four_dictionaries_and_help_are_embedded() {
+        for value in super::dictionaries() {
+            assert!(value["app.title"].is_string());
+            assert!(value["node.say"].is_string());
+            let schema: serde_json::Value =
+                serde_json::from_str(include_str!("../data/authoring.json")).unwrap();
+            for kind in schema["NODE_SCHEMAS"].as_object().unwrap().keys() {
+                assert!(
+                    value[format!("help.{kind}")]
+                        .as_str()
+                        .is_some_and(|s| !s.trim().is_empty()),
+                    "Missing reader-facing explanation: {kind}"
+                );
+            }
+        }
+        assert!(super::help_text().len() > 1000);
+        assert_eq!(super::normalize("文件(&F)…"), "文件");
+    }
+}
+
+#[cfg(test)]
+mod native_tests {
+    #[test]
+    fn important_menus_and_all_node_labels_translate_in_three_locales() {
+        let native: serde_json::Value =
+            serde_json::from_str(include_str!("../data/native-translations.json")).unwrap();
+        for index in 1..4 {
+            for label in [
+                "新建项目",
+                "打开目录…",
+                "保存全部章节  ⌘S",
+                "剧情工具",
+                "剧情编辑",
+                "素材管理",
+                "游戏与 MOD",
+                "发布",
+                "作品素材",
+                "共享内容库",
+                "一键配置游戏",
+                "批量修改与模板",
+                "高级维护",
+                "安装当前作品",
+                "查看安装检查结果",
+                "作品设置",
+                "发布体检与打包",
+                "批量修改选中步骤字段",
+                "从模板新建",
+                "共享内容库与 .lomcontent",
+                "编辑器",
+                "设置",
+                "界面语言",
+                "一键提取游戏资产",
+                "游戏预览素材",
+                "查看进度或结果",
+                "技术详情（排查问题时使用）",
+                "状态正常",
+            ] {
+                let translated = super::tr_index(label, index);
+                assert!(!translated.is_empty());
+                // Some Chinese/Japanese labels share the same spelling. An
+                // explicit entry distinguishes that from a missing fallback.
+                assert!(
+                    translated != label || native[label][index - 1].as_str() == Some(label),
+                    "locale {}: {label}",
+                    super::LOCALES[index]
+                );
+            }
+            let source = super::dictionaries();
+            for key in [
+                "node.say",
+                "node.show",
+                "node.combat",
+                "field.combat.max_health",
+                "field.character",
+                "field.position",
+            ] {
+                assert!(source[index][key].is_string(), "{key}");
+                assert!(!source[index][key].as_str().unwrap().is_empty());
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod term_tests {
+    #[test]
+    fn resource_codes_have_display_names_in_every_ui_language() {
+        let data: serde_json::Value =
+            serde_json::from_str(include_str!("../../../data/editor_data.json")).unwrap();
+        for category in [
+            "characters",
+            "views",
+            "sounds",
+            "env_sounds",
+            "stats",
+            "effects",
+            "menu_dialogs",
+        ] {
+            let entries: Vec<(String, String)> = if let Some(rows) = data[category].as_array() {
+                rows.iter()
+                    .filter_map(|row| {
+                        Some((row["id"].as_str()?.into(), row["name"].as_str()?.into()))
+                    })
+                    .collect()
+            } else {
+                data[category]
+                    .as_object()
+                    .unwrap()
+                    .iter()
+                    .map(|(id, name)| (id.clone(), name.as_str().unwrap().into()))
+                    .collect()
+            };
+            for (id, name) in entries {
+                if name.is_ascii() {
+                    for locale in 0..4 {
+                        let translated = super::term_index(category, &id, &name, locale);
+                        assert!(!translated.is_empty());
+                        assert_ne!(
+                            translated,
+                            id,
+                            "untranslated {category}/{id} in {}",
+                            super::LOCALES[locale]
+                        );
+                    }
+                }
+            }
+        }
+        for portrait in data["characters"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .flat_map(|row| row["portraits"].as_array().unwrap().iter())
+        {
+            let id = portrait.as_str().unwrap();
+            for locale in 0..4 {
+                assert_ne!(
+                    super::term_index("portraits", id, id, locale),
+                    id,
+                    "portrait {id} in {}",
+                    super::LOCALES[locale]
+                );
+            }
+        }
+        assert_eq!(super::term_index("characters", "bun", "bun", 0), "包子");
+        assert_eq!(
+            super::term_index("characters", "carriage1", "carriage1", 0),
+            "马车"
+        );
+        assert_eq!(
+            super::term_index("characters", "checkerboard", "checkerboard", 0),
+            "棋盘"
+        );
+    }
+    #[test]
+    fn translations_preserve_user_names_and_lookup_game_ids() {
+        assert_eq!(
+            super::term_index("characters", "artist1", "fallback", 3),
+            "무사"
+        );
+        assert_eq!(
+            super::term_index("characters", "user:demo.hero", "My hero", 3),
+            "My hero"
+        );
+        assert_eq!(
+            super::term_index("characters", "future_hero", "Future hero", 1),
+            "Future hero"
+        );
+    }
+}

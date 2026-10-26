@@ -123,6 +123,26 @@ class ReleaseTests(unittest.TestCase):
             run.assert_not_called()
         self.assert_old_release()
 
+    def test_source_archive_contains_native_build_inputs_but_no_build_or_authoring_state(self):
+        included = ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "LICENSE",
+                    "rust/lom-editor/src/main.rs", "editor/i18n/help/ja.html",
+                    "editor/assets/combo_arrow.svg", "editor/assets/lom_editor.icns",
+                    "editor/assets/doorstop/win-x64-doorstop.dll",
+                    "editor/assets/doorstop/win-x86-doorstop.dll",
+                    "editor/assets/doorstop/LICENSE.UnityDoorstop",
+                    "editor/assets/doorstop/UnityDoorstop-4.3.0-source.zip"]
+        excluded = ["target/debug/output.json", ".authoring/history/private.json",
+                    "editor/assets/unrelated.dll"]
+        for rel in included + excluded:
+            self.write(self.root / "tools/modkit" / rel, "fixture")
+        archive = Path(self.tmp.name) / "source.zip"
+        release.package_source(archive)
+        with zipfile.ZipFile(archive) as source:
+            for rel in included:
+                self.assertIn("tools/modkit/" + rel, source.namelist())
+            for rel in excluded:
+                self.assertNotIn("tools/modkit/" + rel, source.namelist())
+
     def test_install_backs_up_custom_scenario_and_removes_stale_files(self):
         with patch.object(release, "run", side_effect=self.fake_run):
             release.build(self.game)

@@ -1,0 +1,20 @@
+LoMScenarioKit sample scenario
+Copyright (C) 2026 NEXTAltair
+Source: https://github.com/NEXTAltair/LoMScenarioKit
+
+Original images, audio, dialogue, narrative text (including literary
+strings embedded in Lua or JSON), and scenario data other than program
+code are licensed under Creative Commons Attribution-NonCommercial-
+ShareAlike 4.0 International:
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+The executable code in the Lua scripts is licensed under GPL-3.0-only
+with the LoMScenarioKit Legend of Mortal linking exception. The sample
+content's NonCommercial condition does not apply to that program code.
+See the project's LICENSE, LICENSE-GAME-EXCEPTION.txt and licenses/
+(provided alongside the plugin and in the source archive).
+
+Preserve the applicable notices, indicate modifications, and follow the
+applicable license when sharing adaptations. These materials are supplied
+without warranties under their respective license terms. Game content
+and other third-party material are not relicensed by this notice.

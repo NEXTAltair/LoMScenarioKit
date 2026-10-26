@@ -1,0 +1,34 @@
+{
+  "_editor": {
+    "scenario_addon": {
+      "id": "lsa_demo",
+      "title": "分岐のある物語",
+      "version": "0.1.0",
+      "flags": [
+        {
+          "id": "lsa_demo_route",
+          "default": 0
+        }
+      ],
+      "events": [
+        {
+          "id": "demo_meet",
+          "position": "Back_Free_001",
+          "story": "lsa_demo_main",
+          "rate": 60,
+          "once": true
+        }
+      ]
+    }
+  },
+  "author": "作者",
+  "content_schema": 1,
+  "entry": "lsa_demo_main",
+  "format": 3,
+  "id": "lsa_demo",
+  "name": "分岐のある物語",
+  "package_format": 3,
+  "story_schema": 2,
+  "target": "LoMScenarioAddon",
+  "version": "0.1.0"
+}

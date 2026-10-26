@@ -3,3 +3,5 @@ obj/
 dist/
 __pycache__/
 *.py[cod]
+target/
+.authoring/
