@@ -95,6 +95,17 @@ class AuthorTest(unittest.TestCase):
         self.assertEqual([h['line'] for h in docs[0]['headings']], [1, 6])
         self.assertEqual(len(self.command('outline')['data']), 1)
 
+    def test_invalid_explicit_target_does_not_break_choice_fallthrough(self):
+        event = project.new_event('分岐')
+        event['rows'] = [dict(id='choice', type='choice', text='', options=[
+            dict(id='o1', text='誤った移動先', target='line', condition=''),
+            dict(id='o2', text='続ける', target='', condition='')]),
+            dict(id='line', type='narration', text='次の行')]
+        graph = project.graph(event)
+        self.assertEqual([edge['missing'] for edge in graph['edges']], [True, False])
+        self.assertTrue(graph['nodes'][1]['reachable'])
+        self.assertEqual([issue['code'] for issue in project.inspect(event)], ['TARGET_NOT_FOUND'])
+
 
 if __name__ == '__main__':
     unittest.main()

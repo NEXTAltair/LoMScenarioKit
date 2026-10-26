@@ -92,13 +92,12 @@ def graph(event):
         following = rows[i + 1]['id'] if i + 1 < len(rows) else None
         if row['type'] == 'end':
             continue
-        targets = [(following, '', '')]
+        targets = [(following, '', '', False)]
         if row['type'] == 'jump':
-            targets = [(row['target'], '', '')]
+            targets = [(row['target'], '', '', True)]
         elif row['type'] == 'choice':
-            targets = [(o['target'] or following, o['text'], o['condition']) for o in row['options']]
-        for target, text, condition in targets:
-            explicit = row['type'] == 'jump' or row['type'] == 'choice' and any(o['target'] == target and target for o in row['options'])
+            targets = [(o['target'] or following, o['text'], o['condition'], bool(o['target'])) for o in row['options']]
+        for target, text, condition, explicit in targets:
             if target is not None:
                 edges.append(dict(source=row['id'], target=target, text=text, conditionNote=condition,
                                   missing=bool(explicit and target not in labels)))
