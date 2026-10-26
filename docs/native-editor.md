@@ -12,16 +12,25 @@ LoMScenarioKitの制作エディターは、lom_modkitの既存Rust GUIを基盤
 
 Rust 1.89以降とCargoが必要です。確認環境はRust 1.93.1、Linux/X11です。LinuxではC/C++ビルド環境、OpenGLとウィンドウ環境、日本語を表示できるフォントも必要です。Windows向けのゲーム導入作業はエディターの起動には不要です。
 
-リポジトリのルートで実行します。
+Linux・macOS・WSLでは、リポジトリのルートで実行します。
 
 ```sh
-cargo run --locked --manifest-path tools/modkit/Cargo.toml -p lom-editor
+./editor
 ```
+
+WSLではX11とCPU描画を自動で選びます。`WAYLAND_DISPLAY` / `WAYLAND_SOCKET` を外し、未指定なら `LIBGL_ALWAYS_SOFTWARE=true` と `GALLIUM_DRIVER=llvmpipe` を設定します。WSL以外の描画設定は変更しません。Rustのビルドは必要に応じて自動で行います。
 
 章・選択肢・フラグ・分岐を含むサンプルも開けます。自作の作品にはサンプルのコピーを使ってください。
 
 ```sh
-cargo run --locked --manifest-path tools/modkit/Cargo.toml -p lom-editor -- tools/modkit/samples/scenario-addon
+./editor tools/modkit/samples/scenario-addon
+./editor "/path/to/自分の作品"
+```
+
+別のディレクトリからスクリプトのパスを指定して呼ぶ場合も、制作フォルダの相対パスは呼び出し元が基準です。WindowsのPowerShellなど、shを使わない環境では次のコマンドで起動します。
+
+```sh
+cargo run --locked --manifest-path tools/modkit/Cargo.toml -p lom-editor
 ```
 
 既存のMortalModHost制作フォルダ・JSON・`.lommod` も読み込めます。新規プロジェクトはLoMScenarioAddon向けです。互換用のMortalModHostプロジェクトはファイルメニューから作成できます。両形式のランタイムや書き出し先は異なります。

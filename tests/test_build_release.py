@@ -24,7 +24,7 @@ class ReleaseTests(unittest.TestCase):
             self.write(self.game / rel, "fixture")
         for rel in release.LEGAL_FILES + ["licenses/MoonSharp.txt", "licenses/GPL-3.0.txt",
                     "licenses/CC-BY-NC-SA-4.0.txt", "licenses/Plugin-DD2.txt", "licenses/lom_modkit.txt",
-                    "README.md", ".gitignore", "Directory.Build.props", "Directory.Build.targets",
+                    "README.md", ".gitignore", "editor", "Directory.Build.props", "Directory.Build.targets",
                     "docs/scenario-guide.md", "sample/scenario/scenario.json", "sample/scenario/LICENSE"]:
             self.write(self.root / rel, "fixture")
         self.write(self.root / "src/LoMScenarioAddon/Plugin.cs", 'BepInPlugin("lom.scenarioaddon", "LoMScenarioAddon", "2.5.00")')
@@ -135,9 +135,12 @@ class ReleaseTests(unittest.TestCase):
                     "editor/assets/unrelated.dll"]
         for rel in included + excluded:
             self.write(self.root / "tools/modkit" / rel, "fixture")
+        (self.root / "editor").chmod(0o755)
         archive = Path(self.tmp.name) / "source.zip"
         release.package_source(archive)
         with zipfile.ZipFile(archive) as source:
+            self.assertIn("editor", source.namelist())
+            self.assertEqual((source.getinfo("editor").external_attr >> 16) & 0o111, 0o111)
             for rel in included:
                 self.assertIn("tools/modkit/" + rel, source.namelist())
             for rel in excluded:

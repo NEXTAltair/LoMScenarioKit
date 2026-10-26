@@ -42,7 +42,7 @@ def copy_moonsharp_source(destination):
 
 def package_source(destination):
     """現在のビルドのソースを同梱。履歴・生成物・外部資料は取り込まない。"""
-    paths = [ROOT / p for p in LEGAL_FILES + ["README.md", ".gitignore",
+    paths = [ROOT / p for p in LEGAL_FILES + ["README.md", ".gitignore", "editor",
              "Directory.Build.props", "Directory.Build.targets"]]
     extensions = {".cs", ".csproj", ".py", ".sh", ".md", ".txt", ".lua",
                   ".json", ".csv", ".png", ".wav", ".rs", ".toml", ".lock", ".ico", ".ps1", ".cmd", ".html", ".svg", ".icns"}
