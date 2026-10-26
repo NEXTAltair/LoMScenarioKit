@@ -163,3 +163,31 @@ fn official_intro_created_by_edit_can_be_checked_and_exported() {
     let unchanged = agent("checkout", &root, json!({}), 0);
     assert_eq!(unchanged["data"]["revision"], edited["data"]["revision"]);
 }
+
+#[test]
+fn agent_can_edit_an_imported_folder_without_a_manifest() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path();
+    let project = lom_core::project::Project::new();
+    std::fs::write(
+        root.join("chapter.json"),
+        project.stories["main"].to_string(),
+    )
+    .unwrap();
+    let checkout = agent("checkout", root, json!({}), 0);
+    agent(
+        "edit",
+        root,
+        json!({
+            "revision":checkout["data"]["revision"],"story":"main",
+            "operations":[{"op":"update_node","node_id":"say1","fields":{"text":"読み込んだ章を編集"}}]
+        }),
+        0,
+    );
+    let saved = agent("show", root, json!({"story":"main"}), 0);
+    assert_eq!(
+        saved["data"]["result"]["story"]["nodes"][0]["text"],
+        "読み込んだ章を編集"
+    );
+    assert!(root.join("manifest.json").is_file());
+}

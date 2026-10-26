@@ -122,7 +122,7 @@ pub fn save(
         name,
         message,
         |project, target| {
-            if target.join("manifest.json").is_file() {
+            if expected.is_some() || target.join("manifest.json").is_file() {
                 let previous = Project::open(target)?;
                 crate::project_files::save_project(
                     project,
@@ -167,8 +167,14 @@ where
     fs::create_dir_all(target)?;
     let target = target.canonicalize()?;
     let _guard = lock(&target)?;
-    let before = if target.join("manifest.json").exists() {
-        let current = Project::open(&target)?;
+    let existing = if expected.is_some() || target.join("manifest.json").exists() {
+        Some(Project::open(&target)?)
+    } else {
+        // A directory of chapter JSON files is also an existing project.
+        // Never merge a new project into it just because it has no manifest.
+        Project::open(&target).ok()
+    };
+    let before = if let Some(current) = existing {
         let actual = revision(&current)?;
         if expected != Some(actual.as_str()) {
             return Err(Conflict {
@@ -274,6 +280,68 @@ pub fn chart(project: &Project, story: &str) -> Result<Value> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn manifestless_folders_compare_revisions_and_keep_deleted_chapters_deleted() {
+        for nested in [false, true] {
+            let temp = tempfile::tempdir().unwrap();
+            let folder = if nested {
+                temp.path().join("story")
+            } else {
+                temp.path().to_owned()
+            };
+            fs::create_dir_all(&folder).unwrap();
+            let original = Project::new();
+            let mut extra = original.stories["main"].clone();
+            extra["id"] = json!("extra");
+            fs::write(
+                folder.join("chapter-a.json"),
+                stable_json(&original.stories["main"]).unwrap(),
+            )
+            .unwrap();
+            fs::write(folder.join("chapter-b.json"), stable_json(&extra).unwrap()).unwrap();
+            let (mut editing, token) = read(temp.path()).unwrap();
+            assert!(!editing.has_manifest);
+            let mut stale = editing.clone();
+            let error = save(
+                &mut Project::new(),
+                temp.path(),
+                None,
+                Actor::Agent,
+                "Codex",
+                "新規作成",
+            )
+            .unwrap_err();
+            assert!(error.downcast_ref::<Conflict>().is_some());
+            editing.stories.get_mut("main").unwrap()["title"] = json!("既存の章を編集");
+            editing.stories.remove("extra");
+            let saved = save(
+                &mut editing,
+                temp.path(),
+                Some(&token),
+                Actor::Human,
+                "作者",
+                "編集",
+            )
+            .unwrap();
+            let (disk, revision) = read(temp.path()).unwrap();
+            assert_eq!(revision, saved);
+            assert_eq!(disk.stories["main"]["title"], "既存の章を編集");
+            assert!(!disk.stories.contains_key("extra"));
+            assert!(!folder.join("chapter-b.json").exists());
+            assert!(temp.path().join("manifest.json").is_file());
+            stale.stories.get_mut("main").unwrap()["title"] = json!("古い編集");
+            let error = save(
+                &mut stale,
+                temp.path(),
+                Some(&token),
+                Actor::Agent,
+                "Codex",
+                "競合",
+            )
+            .unwrap_err();
+            assert!(error.downcast_ref::<Conflict>().is_some());
+        }
+    }
     #[test]
     fn stale_gui_or_agent_save_cannot_overwrite_and_history_preserves_both_authors() {
         let temp = tempfile::tempdir().unwrap();
