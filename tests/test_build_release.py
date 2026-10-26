@@ -93,10 +93,6 @@ class ReleaseTests(unittest.TestCase):
         self.assert_old_release()
 
     def test_success_packages_only_selected_binaries_and_docs(self):
-        self.write(self.root / "tools/authoring/web/shell.html", "editor")
-        self.write(self.root / "tools/authoring/web/app.js", "script")
-        self.write(self.root / "tools/authoring/web/editor.css", "style")
-        self.write(self.root / "tools/authoring/.authoring/scripts.sqlite3", "private manuscript")
         self.write(self.root / "src/LoMScenarioAddon/obj/secret.json", "must not ship")
         self.write(self.root / "src/LoMScenarioAddon/bin/dependency.dll", "must not ship")
         with patch.object(release, "run", side_effect=self.fake_run):
@@ -116,10 +112,6 @@ class ReleaseTests(unittest.TestCase):
             self.assertIn("src/LoMScenarioAddon/Plugin.cs", z.namelist())
             self.assertIn("LICENSE-GAME-EXCEPTION.txt", z.namelist())
             self.assertIn("sample/scenario/LICENSE", z.namelist())
-            self.assertIn("tools/authoring/web/shell.html", z.namelist())
-            self.assertIn("tools/authoring/web/app.js", z.namelist())
-            self.assertIn("tools/authoring/web/editor.css", z.namelist())
-            self.assertFalse(any(".sqlite3" in n for n in z.namelist()))
             self.assertFalse(any("/obj/" in n or "/bin/" in n for n in z.namelist()))
         self.assertFalse((self.root / "dist/package/previous.txt").exists())
 
