@@ -45,13 +45,19 @@ def package_source(destination):
     paths = [ROOT / p for p in LEGAL_FILES + ["README.md", ".gitignore",
              "Directory.Build.props", "Directory.Build.targets"]]
     extensions = {".cs", ".csproj", ".py", ".sh", ".md", ".txt", ".lua",
-                  ".json", ".csv", ".png", ".wav"}
+                  ".json", ".csv", ".png", ".wav", ".rs", ".toml", ".lock", ".ico", ".ps1", ".cmd", ".html", ".svg", ".icns"}
     for folder in ["src", "tools", "tests", "docs", "licenses", "sample"]:
         for path in (ROOT / folder).rglob("*"):
-            if any(p in {"bin", "obj", "__pycache__"} or p.startswith(".")
+            if any(p in {"bin", "obj", "target", "__pycache__"} or p.startswith(".")
                    for p in path.relative_to(ROOT).parts):
                 continue
-            if path.is_file() and (path.suffix in extensions or path.name == "LICENSE"):
+            embedded = {
+                "tools/modkit/editor/assets/doorstop/win-x64-doorstop.dll",
+                "tools/modkit/editor/assets/doorstop/win-x86-doorstop.dll",
+                "tools/modkit/editor/assets/doorstop/UnityDoorstop-4.3.0-source.zip",
+            }
+            if path.is_file() and (path.suffix in extensions or path.name.startswith("LICENSE")
+                                   or path.relative_to(ROOT).as_posix() in embedded):
                 paths.append(path)
     with zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(paths):

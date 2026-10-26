@@ -1,0 +1,84 @@
+{
+  "story_schema": 2,
+  "id": "lsa_demo_main",
+  "title": "裏山での選択",
+  "start": "scene1",
+  "nodes": [
+    {
+      "id": "scene1",
+      "type": "scene",
+      "view": "backmountain2"
+    },
+    {
+      "id": "say1",
+      "type": "say",
+      "mode": "narrative",
+      "text": "裏山に着いた。今日はどう過ごそうか。"
+    },
+    {
+      "id": "choice1",
+      "type": "choice",
+      "dialog": "Options",
+      "options": [
+        {
+          "text": "少し休む",
+          "goto": "rest"
+        },
+        {
+          "text": "稽古をする",
+          "goto": "train"
+        }
+      ]
+    },
+    {
+      "id": "rest",
+      "type": "game_flag",
+      "flag": "lsa_demo_route",
+      "op": "set",
+      "value": 1,
+      "goto": "branch1"
+    },
+    {
+      "id": "train",
+      "type": "game_flag",
+      "flag": "lsa_demo_route",
+      "op": "set",
+      "value": 2
+    },
+    {
+      "id": "branch1",
+      "type": "branch",
+      "source": "flag_value",
+      "flag": "lsa_demo_route",
+      "cases": [
+        {
+          "op": "==",
+          "value": 1,
+          "goto": "rest_text"
+        },
+        {
+          "op": "==",
+          "value": 2,
+          "goto": "train_text"
+        }
+      ]
+    },
+    {
+      "id": "rest_text",
+      "type": "say",
+      "mode": "narrative",
+      "text": "風に揺れる木々を眺めた。",
+      "goto": "end1"
+    },
+    {
+      "id": "train_text",
+      "type": "say",
+      "mode": "narrative",
+      "text": "気が済むまで身体を動かした。"
+    },
+    {
+      "id": "end1",
+      "type": "end"
+    }
+  ]
+}

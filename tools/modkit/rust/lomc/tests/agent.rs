@@ -1,0 +1,135 @@
+// Copyright (C) 2026 NEXTAltair
+// GPL-3.0-only with the additional permission in the repository LICENSE-GAME-EXCEPTION.txt.
+use serde_json::{json, Value};
+use std::{
+    io::Write,
+    path::Path,
+    process::{Command, Stdio},
+};
+
+fn agent(command: &str, root: &Path, input: Value, exit: i32) -> Value {
+    let mut child = Command::new(env!("CARGO_BIN_EXE_lomc"))
+        .args(["agent", command, "--project"])
+        .arg(root)
+        .args(["--input", "-"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(input.to_string().as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    let value: Value = serde_json::from_slice(&output.stdout)
+        .unwrap_or_else(|e| panic!("JSON expected: {e}; {:?}", output));
+    assert_eq!(output.status.code(), Some(exit), "{value}");
+    assert!(value["purpose"].is_string());
+    assert!(!value["next_actions"].as_array().unwrap().is_empty());
+    value
+}
+
+#[test]
+fn shared_authoring_protocol_handles_comments_conflicts_restore_and_export() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join("制作");
+    let init = agent("init", &root, json!({"title":"CLI試験"}), 0);
+    let revision = init["data"]["revision"].clone();
+    let original = init["data"]["document"]["stories"]["main"].clone();
+    let first = init["data"]["document"]["manifest"]["_editor"]["authoring_head"].clone();
+    let posted = agent(
+        "comment",
+        &root,
+        json!({"revision":revision,"story":"main","node":"say1","text":"短くしてほしい","name":"Codex"}),
+        0,
+    );
+    let id = posted["data"]["result"]["id"].clone();
+    let stale = agent(
+        "edit",
+        &root,
+        json!({"revision":revision,"story":"main","operations":[{"op":"update_node","node_id":"say1","fields":{"text":"古い編集"}}]}),
+        2,
+    );
+    assert_eq!(stale["issues"][0]["code"], "revision_conflict");
+    let edited = agent(
+        "edit",
+        &root,
+        json!({"revision":posted["data"]["revision"],"story":"main","operations":[{"op":"update_node","node_id":"say1","fields":{"text":"修正済み"}}]}),
+        0,
+    );
+    let reply = agent(
+        "comment",
+        &root,
+        json!({"revision":edited["data"]["revision"],"story":"main","parent":id,"text":"反映しました"}),
+        0,
+    );
+    let resolved = agent(
+        "resolve",
+        &root,
+        json!({"revision":reply["data"]["revision"],"id":id,"resolved":true}),
+        0,
+    );
+    let restored = agent(
+        "restore",
+        &root,
+        json!({"revision":resolved["data"]["revision"],"id":first,"story":"main"}),
+        0,
+    );
+    let checkout = agent("checkout", &root, json!({}), 0);
+    assert_eq!(checkout["data"]["document"]["stories"]["main"], original);
+    let comments = agent("comments", &root, json!({"story":"main"}), 0);
+    assert_eq!(comments["data"]["result"]["comments"][0]["resolved"], true);
+    assert_eq!(comments["data"]["result"]["comments"][1]["actor"], "agent");
+    let dry = agent(
+        "verdict",
+        &root,
+        json!({"revision":restored["data"]["revision"],"story":"main","verdict":"good","dry_run":true}),
+        0,
+    );
+    assert_eq!(dry["data"]["revision"], checkout["data"]["revision"]);
+    let again = agent("checkout", &root, json!({}), 0);
+    assert_eq!(checkout["data"], again["data"]);
+    agent("check", &root, json!({}), 0);
+    let output = temp.path().join("scenario");
+    agent("export", &root, json!({"output":output}), 0);
+    let lua = std::fs::read_to_string(output.join("story/main.lua")).unwrap();
+    assert!(lua.contains("say("));
+    assert!(!lua.contains("mod_"));
+    agent("export", &root, json!({"output":output}), 1);
+    let chart = agent("chart", &root, json!({"story":"main"}), 0);
+    assert_eq!(
+        chart["data"]["result"]["nodes"].as_array().unwrap().len(),
+        2
+    );
+    let history = agent("history", &root, json!({}), 0);
+    assert_eq!(history["data"]["result"].as_array().unwrap().len(), 6);
+}
+
+#[test]
+fn errors_and_discovery_are_json_and_failed_save_is_non_destructive() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join("project");
+    agent("commands", &root, json!({}), 0);
+    agent("unknown", &root, json!({}), 1);
+    let init = agent("init", &root, json!({}), 0);
+    let mut document = init["data"]["document"].clone();
+    document["stories"]["main"]["start"] = json!("missing");
+    agent(
+        "save",
+        &root,
+        json!({"revision":init["data"]["revision"],"document":document}),
+        1,
+    );
+    let next = agent("checkout", &root, json!({}), 0);
+    assert_eq!(next["data"]["document"], init["data"]["document"]);
+    let output = Command::new(env!("CARGO_BIN_EXE_lomc"))
+        .args(["agent", "checkout", "--oops"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    let error: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(error["ok"], false);
+}

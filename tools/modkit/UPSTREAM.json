@@ -1,0 +1,633 @@
+{
+  "repository": "https://github.com/mohui666/lom_modkit",
+  "commit": "f7c20f8d37e0a03cb2ec0ca26a6b6261911d1e00",
+  "license": "MIT",
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "f3ff17011bbae3eae42d577cd3cf52e98ba7c0ab8df88ed6625ecbb50541723a"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "382d7835e81f31c9cf44a41bfea07058f886dd6ef107edf7b2902df90157abe3"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "918c25367ae6f1c79dbf6a53b5b99263d8ad9d4f800cdf222171a6db80b3d520"
+    },
+    {
+      "path": "data/editor_data.json",
+      "sha256": "f55ca83346b938143f41b1e2e69eb388acb8f522a6a1512493eb14f662de92b2"
+    },
+    {
+      "path": "data/preview_map.json",
+      "sha256": "fb9e9d6e7705812d825dd58377eef8cde53666f38010872db4309e70eea1d03c"
+    },
+    {
+      "path": "data/ref/combat_skills.json",
+      "sha256": "8deb7650babcebb3963cc63c0e2a9687ea35d0c85282d84c932edfb2fbe8850a"
+    },
+    {
+      "path": "data/ref/death_ending_ids.json",
+      "sha256": "4b404f6503d432eaebae3d128c7e9bf609edb0233c464c2847ab7fbb48b71699"
+    },
+    {
+      "path": "data/stage_positions.json",
+      "sha256": "25a8df752a99c7b7b2c6f62da4f58c489aafafc3a408c8bf945c0185830c2612"
+    },
+    {
+      "path": "editor/assets/combo_arrow.svg",
+      "sha256": "885fad4d1a066f7793c66bf8dbb1047000da4db4900317b055d6ac4feab52e25"
+    },
+    {
+      "path": "editor/assets/doorstop/LICENSE.UnityDoorstop",
+      "sha256": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331"
+    },
+    {
+      "path": "editor/assets/doorstop/README.md",
+      "sha256": "6dee45347f0177958fcb57b00bbe47003c3898a5c989f62d817e572e7dc4ef1a"
+    },
+    {
+      "path": "editor/assets/doorstop/win-x64-doorstop.dll",
+      "sha256": "d3b62f4c9c3e2196ef82603c52d6b98c043a0d6c125c081fd33d7ca3798b41b8"
+    },
+    {
+      "path": "editor/assets/doorstop/win-x86-doorstop.dll",
+      "sha256": "6d33639f3c330efa0afd9c48801091d8acae43eed606d2b64ab49db5fea7c308"
+    },
+    {
+      "path": "editor/assets/lom_editor.icns",
+      "sha256": "5e0784ce43cdb1b1080751b09f38e92f677c08196ddcae7754ab180f30f9f477"
+    },
+    {
+      "path": "editor/assets/lom_editor.ico",
+      "sha256": "200a77e1c79f734a4d6fa04fbe655ada2af096a2c778ef306b84b854343a59af"
+    },
+    {
+      "path": "editor/assets/lom_editor_icon.png",
+      "sha256": "ea32e221916fcab505f10ff0a7af7f9349a2f6c28494c393b323034a942dd2c9"
+    },
+    {
+      "path": "editor/i18n/help/chs.html",
+      "sha256": "43949e9ab41252a0ce9263425a3dec0c913df68edae096574e51708707dda85f"
+    },
+    {
+      "path": "editor/i18n/help/cht.html",
+      "sha256": "70d6711a61f47df67c11e0ce8b7e6c8c879c117ca7c275b6213c7a5f505b2b61"
+    },
+    {
+      "path": "editor/i18n/help/ja.html",
+      "sha256": "6e617b48c006f68069ae7cd3d4c9dc2f68497dd2ee174752a904e4f38fa1c642"
+    },
+    {
+      "path": "editor/i18n/help/ko.html",
+      "sha256": "9ba12f0fb6a07d49299c37fbf02b5c601f1243765e0d48bb5da1869010aca519"
+    },
+    {
+      "path": "editor/i18n/locales/chs.json",
+      "sha256": "e8f3bb4c4c87d6b8153ec3b4e2e1f8ca1f70701cf0dd8a88eec02dc4e311c495"
+    },
+    {
+      "path": "editor/i18n/locales/cht.json",
+      "sha256": "4bb669708d2e2a062753b1ab5a66ca4b9380d1cc021edabfed430e8f6f2b600a"
+    },
+    {
+      "path": "editor/i18n/locales/ja.json",
+      "sha256": "a82de02b715b6b5d120471797ee92598491fa32b01a2d7ddefe50b4c78822917"
+    },
+    {
+      "path": "editor/i18n/locales/ko.json",
+      "sha256": "5663b791caaf351fe6e905546d825e6aa2d1746e526ca16ec4a39aabe2bca431"
+    },
+    {
+      "path": "editor/i18n/terms/chs.json",
+      "sha256": "60e5b64717dfa7b121e95b873d3c34a452afe16c4bcfed6f1fe702d6fbfb1548"
+    },
+    {
+      "path": "editor/i18n/terms/cht.json",
+      "sha256": "a053c6c183f06ba637bcc1475b23f518b85b093e92b078f508d5f78cc392916a"
+    },
+    {
+      "path": "editor/i18n/terms/ja.json",
+      "sha256": "52209b2d7f2cc6886ece170caf9d5e613b02fb4d5ac1f8f24cc7e8d9847c5e80"
+    },
+    {
+      "path": "editor/i18n/terms/ko.json",
+      "sha256": "14b3ec40cf21b1c5ace3307e214e5214bd0d5a7392009a6b58635d33b0a7416e"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "7458b2d74495e6fb1c1edeea4d5a793705476431dadb60627187111f91441e13"
+    },
+    {
+      "path": "rust/lom-core/Cargo.toml",
+      "sha256": "2c2f5c373937bfa330b06b054120300e30a0ce11e69d6f4939b573ad06b666c0"
+    },
+    {
+      "path": "rust/lom-core/data/new-story.json",
+      "sha256": "518b5df2f9654dc6a79ca53e34ba7fba0a3b53e904bb1b816167838ef74fe251"
+    },
+    {
+      "path": "rust/lom-core/data/node-defaults.json",
+      "sha256": "525de07f759d094a826dd4109a4287c7831b383ba4ed57f46a4e55e158f566e5"
+    },
+    {
+      "path": "rust/lom-core/data/parallel.lua",
+      "sha256": "34a9f13a0abb232736c1b60cfc5cf45a4922d0ba914578f8c1d895711782ccc8"
+    },
+    {
+      "path": "rust/lom-core/data/schema.json",
+      "sha256": "84b2c5bfb0935290fc926eb805472969298b25f1b256072f2b37b19742cf0a8b"
+    },
+    {
+      "path": "rust/lom-core/src/analysis.rs",
+      "sha256": "bf8b93bc17d2d66ac86864cd256142c10ca2b0118bd5610240fd6d3a12563486"
+    },
+    {
+      "path": "rust/lom-core/src/codegen.rs",
+      "sha256": "9cf60f8e1590a2cc77a3aef97d0713154d67d08b713a7834678bb5b1b268fba9"
+    },
+    {
+      "path": "rust/lom-core/src/content.rs",
+      "sha256": "aefc857db3cc1adb1014b8038a5036d07f8dd24f3792223b8b57cc797fa96b95"
+    },
+    {
+      "path": "rust/lom-core/src/content_edit.rs",
+      "sha256": "e0cb14b2a5ee6d1cb08bb1b08002ff940c6910dff357a216d28b7adbce021ee5"
+    },
+    {
+      "path": "rust/lom-core/src/content_library.rs",
+      "sha256": "515bb4352ecf2a012917c9067c0ea8182ac1f5fd84293d22d1e5f4ac64ff20e5"
+    },
+    {
+      "path": "rust/lom-core/src/editing.rs",
+      "sha256": "60882c4822f122c9f619a54cee4b78978e159b53862c1677195f8071835ba865"
+    },
+    {
+      "path": "rust/lom-core/src/game_discovery.rs",
+      "sha256": "2842886ec48520b12ea5c11c9f141746c311b646a58d47baac3dfa2cec0cd4b2"
+    },
+    {
+      "path": "rust/lom-core/src/game_tools.rs",
+      "sha256": "b57c2e1d1c7670beb5ec98498faf4d95c1af7e933534b8c19881144d485a3f66"
+    },
+    {
+      "path": "rust/lom-core/src/lib.rs",
+      "sha256": "a29b43a180934c264156c419bf2b33680d6632ef63b1dfca8a824013cf7076ad"
+    },
+    {
+      "path": "rust/lom-core/src/localization.rs",
+      "sha256": "c24f26581f60e7b2d148c5f7de2cccf8d81e30bfc40ca6eb7c7572ff22a036c4"
+    },
+    {
+      "path": "rust/lom-core/src/migration.rs",
+      "sha256": "de2b8ae94282f25f3bdaff805a9b6a8091bb3e1b5df2d09870ea6ef26f064dc9"
+    },
+    {
+      "path": "rust/lom-core/src/package.rs",
+      "sha256": "370d538d6a04d536ca2a8893e9f6f5bcaade6cc64ff3a29644e71204dbfe8707"
+    },
+    {
+      "path": "rust/lom-core/src/parallel.rs",
+      "sha256": "850b14c3277aad30a2952557e7e89fbbe3c9438a30815fcc103db30f4d19bdee"
+    },
+    {
+      "path": "rust/lom-core/src/project.rs",
+      "sha256": "410dedd74f3d4f58198c0fd47abbac32faa081a70c3d8ba0f7b982de6b62aab4"
+    },
+    {
+      "path": "rust/lom-core/src/release.rs",
+      "sha256": "c92b8900cf7a9c9d5fcadda58436b13aa1dbee4b58aad3596da196b8db5e0718"
+    },
+    {
+      "path": "rust/lom-core/src/release/diagnostic.rs",
+      "sha256": "c07ab28f7025a732096f3beff8405e3a42f89d887615f673d5bc8f5d8b60fda9"
+    },
+    {
+      "path": "rust/lom-core/src/release/flow.rs",
+      "sha256": "9e90103528bc6e73d3dd518da9f95682b456303018be1d8373ecf1eb62767a32"
+    },
+    {
+      "path": "rust/lom-core/src/release/stage.rs",
+      "sha256": "e41defb4bb9ac6d0d10ad26517f48953b48a9fe8f14b27e02488a6f5bd3ba4d5"
+    },
+    {
+      "path": "rust/lom-core/src/release/statistics.rs",
+      "sha256": "9da390c391e2acb423497ddb596d0737ff46265d4336449615bb8f7146e09f4c"
+    },
+    {
+      "path": "rust/lom-core/src/scenario.rs",
+      "sha256": "c5a8829b7c51a8e10effbdc142836bfd868ec9ebbdde10fe0633549f71638fee"
+    },
+    {
+      "path": "rust/lom-core/src/story_api.rs",
+      "sha256": "ec44b7760325fe1e0284ec06ae791b70ed5aebd7d55b5bba6f87e8fd45b1d92d"
+    },
+    {
+      "path": "rust/lom-core/src/validate.rs",
+      "sha256": "ac8f23ee806f0a6e275ce19e6a37311a6a8ed5456ac2b9e26b36c5aa8774aca3"
+    },
+    {
+      "path": "rust/lom-core/src/watermark.rs",
+      "sha256": "9a9f1d27db3f590144c9a7c83fbbf492499cccbc00d34b3bbb3b1260c5c42c58"
+    },
+    {
+      "path": "rust/lom-core/src/workdir.rs",
+      "sha256": "30d2884a6f50aba47d4c91994dacd19e6632c5c81fb89bed2679ccdf573f5faa"
+    },
+    {
+      "path": "rust/lom-core/tests/authoring_parity.rs",
+      "sha256": "b027c98abae9d544639db147f24e18d80c2c4808fd9ec0e2c24bb87713e93181"
+    },
+    {
+      "path": "rust/lom-core/tests/codegen_parity.rs",
+      "sha256": "0ebd194873d8afcd35f8105b7236f1ec6f94554cfbd526849a28af51bf9ccbee"
+    },
+    {
+      "path": "rust/lom-core/tests/content_parity.rs",
+      "sha256": "88c9750462c563a345f5dfc933bd09f73528b45a0558af06627d11c77b3898b7"
+    },
+    {
+      "path": "rust/lom-core/tests/corpus/watermark/README.md",
+      "sha256": "0b6f43d17512e99cd59a45a0c52239421cb4b13da42087b09c5a1577b81a4b0e"
+    },
+    {
+      "path": "rust/lom-core/tests/editing.rs",
+      "sha256": "406d146bf37a8b6ea35734643ee1b54971d01615d0edb44787074711708841df"
+    },
+    {
+      "path": "rust/lom-core/tests/editor_semantics.rs",
+      "sha256": "4d4b9ccce93d624aabe90c68aa6137fc0df1e5b69452306ca12a9fc7af54270b"
+    },
+    {
+      "path": "rust/lom-core/tests/fixtures/authoring_golden.json",
+      "sha256": "00abf2514c32646d54ef5597f69724fd987dd48d567c1421b7931c8930368435"
+    },
+    {
+      "path": "rust/lom-core/tests/fixtures/codegen_golden.json",
+      "sha256": "5c17cff491efa8c357234a5331e0d967a512545efabe1e46b1db76d723d70a3d"
+    },
+    {
+      "path": "rust/lom-core/tests/fixtures/content_golden.json",
+      "sha256": "5cfcd5f60758d75c99a86a38e78649e9a7752db76b47ed788596b72c0602529f"
+    },
+    {
+      "path": "rust/lom-core/tests/fixtures/release_golden.json",
+      "sha256": "54f196c40d1c35b646ebf38215bd552cb752444322e8c9365cc35a6900679b58"
+    },
+    {
+      "path": "rust/lom-core/tests/fixtures/scenario-contract.json",
+      "sha256": "6b45cf5970a0ec2b26d092138da80dac2fdc2b6c3f11dc032d527cb2df4248df"
+    },
+    {
+      "path": "rust/lom-core/tests/game_read_state_fixtures.json",
+      "sha256": "8f1460cbd18a2e0c5c7bfe53503d82c1434388d271d765e8eb99b0bffb30f199"
+    },
+    {
+      "path": "rust/lom-core/tests/game_tools.rs",
+      "sha256": "21a0b40ac2be329906c9e3885713c5338badfbc9753c4d1128a790a8dc337376"
+    },
+    {
+      "path": "rust/lom-core/tests/game_tools_architecture.rs",
+      "sha256": "23a1387b3cdc4a5a4e57aec7cdd97289f5a07cafdf0048b314fd0287b367b95c"
+    },
+    {
+      "path": "rust/lom-core/tests/game_tools_parity.rs",
+      "sha256": "b46f6bb7b4dda116410a8edce690bec0d724c2e0b8572eb5450e1ff085ac7375"
+    },
+    {
+      "path": "rust/lom-core/tests/library_parity.rs",
+      "sha256": "cdb255b8c266ce66d3656261ec563ffa8da3eb12f897ebb2624219cfe5d62269"
+    },
+    {
+      "path": "rust/lom-core/tests/package_compat.rs",
+      "sha256": "ccf1d48f3a5fa8abe05b5501e70b867665ea04346112d2ced35e2a0cf724ddef"
+    },
+    {
+      "path": "rust/lom-core/tests/parallel.rs",
+      "sha256": "cfa4951eeaa79a8807e945d39f1c1c6984db9511d055a5ac0ae8c37e506a89d5"
+    },
+    {
+      "path": "rust/lom-core/tests/release.rs",
+      "sha256": "296dc8fa76e78cc7371accae3c49c8b710c6a237104f9a7d6dfbccd7edb7f38a"
+    },
+    {
+      "path": "rust/lom-core/tests/release_parity.rs",
+      "sha256": "0fbec07a47d7f0f6ae9b4f189d24d31ad59f29ba7b48874eeb52382d5a8eb0aa"
+    },
+    {
+      "path": "rust/lom-core/tests/scenario.rs",
+      "sha256": "8024d0075ad7d7a9a627feb958e3e830450c2394610842910545b180ab5bb21f"
+    },
+    {
+      "path": "rust/lom-core/tests/test_library_fixtures.json",
+      "sha256": "8da00cefc91033265d3e7f678fc0cc51b0984094ef5da2462ea5007b7d3be87f"
+    },
+    {
+      "path": "rust/lom-core/tests/test_package.rs",
+      "sha256": "779dd8a4dabc5f77d624959bbf7a028f6eb4b1a618ad7b5f126418345c48863e"
+    },
+    {
+      "path": "rust/lom-core/tests/test_package_fixtures.json",
+      "sha256": "31efc9e08a0a4b30e688994835406eabb21da68072369ac2463cda6b69c87f6e"
+    },
+    {
+      "path": "rust/lom-core/tests/test_validate.rs",
+      "sha256": "9bede59d80480cf487bb314b85da1d1b1142daa6548b27189b6918f56c8f23fd"
+    },
+    {
+      "path": "rust/lom-core/tests/test_validate_fixtures.json",
+      "sha256": "e93c12428d03324c0740b33b4f3025cad885733327e961e9b540bfc6033758f7"
+    },
+    {
+      "path": "rust/lom-core/tests/watermark.rs",
+      "sha256": "c2fbf1e745caeb1cdb06c92ea2dd8ff1df5efa65873ba7b745939f7b25fecef7"
+    },
+    {
+      "path": "rust/lom-core/tests/watermark_python_corpus.rs",
+      "sha256": "4681ff6ce0ada43e08d53479430f8457ca8cd5e15c16499c403393bf671090ff"
+    },
+    {
+      "path": "rust/lom-editor/Cargo.toml",
+      "sha256": "fd7180e17b19d053ac2e2fa88e31b84ca53f358cd45bf71425eaf173045ceb55"
+    },
+    {
+      "path": "rust/lom-editor/data/authoring.json",
+      "sha256": "6109765a78836cca296bf06f10d256a637657e7aa51182f8404adcbdb0d71b44"
+    },
+    {
+      "path": "rust/lom-editor/data/native-translations.json",
+      "sha256": "8ee061d6c72ff2d64d48abbbafb6d1d3f43c4da9151d0b5a74281fb89fb52954"
+    },
+    {
+      "path": "rust/lom-editor/data/project-templates.json",
+      "sha256": "fe05abd3c455f7ab937cb53e3092ba4499cad6e42b65082704bc2b5f3948e7f1"
+    },
+    {
+      "path": "rust/lom-editor/data/reference.json",
+      "sha256": "00a299f811869686e7315fa90225f99804075b840ac9c065ca7f4c6253513fd8"
+    },
+    {
+      "path": "rust/lom-editor/src/advanced.rs",
+      "sha256": "7edb38be6bca5e8eefdf94616b288f8a52ada0f310e99cfba8e2f103512c07a1"
+    },
+    {
+      "path": "rust/lom-editor/src/asset_extraction.rs",
+      "sha256": "1e58bac9742eb6812408e8a674a09724c7eff808c051f6d0d80612a8770275de"
+    },
+    {
+      "path": "rust/lom-editor/src/audio.rs",
+      "sha256": "dbfc939b11dd8c54016668e34abfc0371ac20dc2432a9a6dcf1439418d37ba34"
+    },
+    {
+      "path": "rust/lom-editor/src/authoring.rs",
+      "sha256": "c93687afbc006f82595ab3f64885ea57464db1995a76cf113280a8acf3272c91"
+    },
+    {
+      "path": "rust/lom-editor/src/content_panel.rs",
+      "sha256": "e8134c095e4525338cd05359f95f7d1c6fca3875c56d7cd73e5a255cca01314a"
+    },
+    {
+      "path": "rust/lom-editor/src/flow_graph.rs",
+      "sha256": "af76bf13adda7c88217d97f08db332a5f6ed1465be642aa3ae0d6ed03ce1a3d2"
+    },
+    {
+      "path": "rust/lom-editor/src/forms.rs",
+      "sha256": "1e6a717f9a5bbde49da89fa5bf1be519bf196cccade4c9c300a0d0db63dbc8dc"
+    },
+    {
+      "path": "rust/lom-editor/src/game_setup.rs",
+      "sha256": "57fcb08e0a04d2e14097ee56c0f12a2e07221f9939b717370dacdeea0f88734a"
+    },
+    {
+      "path": "rust/lom-editor/src/help.rs",
+      "sha256": "c92010e58e503b1e5a72b064010aff74ab53f33057f47045fc6ea34a1c822638"
+    },
+    {
+      "path": "rust/lom-editor/src/i18n.rs",
+      "sha256": "14f052d2620a0ae5c57f0d2798b44a3776791b18385e71dbd9493da6e83d77d3"
+    },
+    {
+      "path": "rust/lom-editor/src/macos_window.rs",
+      "sha256": "26b98c2413a04be7d36fdd1c9971f89ba2380804db2b3b440201b87103626dc1"
+    },
+    {
+      "path": "rust/lom-editor/src/main.rs",
+      "sha256": "7660b757d969dc8221a31a0479e862a445787d9f8254e760620939efb68db2ea"
+    },
+    {
+      "path": "rust/lom-editor/src/manifest_panel.rs",
+      "sha256": "9ccb5d76efe12122fc9c8839c7ee6e120ac19f070d9dd32d248983147256d051"
+    },
+    {
+      "path": "rust/lom-editor/src/persistence.rs",
+      "sha256": "99b6374cbc8c3d317dd9b8087bab7cf22fb09fc889ee7b1645403103cc13df1b"
+    },
+    {
+      "path": "rust/lom-editor/src/preview.rs",
+      "sha256": "c24cc178ae625a4717ce83e91e80348ab71d0782293abbe37a728919c6de7fe5"
+    },
+    {
+      "path": "rust/lom-editor/src/scenario_panel.rs",
+      "sha256": "05fe6af7b6857483b1b15864673c90f9cfec6a20328dbd7ddd14983e7c424dce"
+    },
+    {
+      "path": "rust/lom-editor/src/scenario_quick.rs",
+      "sha256": "52aea43f8e43b1c764aabf277390c72e74d69c5bac95980854b0d58ff5bc299c"
+    },
+    {
+      "path": "rust/lom-editor/src/shell.rs",
+      "sha256": "bd379a1094e34eb172e69f6804772004e7acf90f0f35e496fd6e9f54c6348ea2"
+    },
+    {
+      "path": "rust/lom-editor/src/tool_report.rs",
+      "sha256": "ff81d63c4109b93d66bea9c20cbdfb70c72df0800e190c91fef32d32fda0228f"
+    },
+    {
+      "path": "rust/lom-editor/src/tools_panel.rs",
+      "sha256": "d2080347417cfd874cdfa87234d0b4114fde98d3962efcf513e7b584ff1cd269"
+    },
+    {
+      "path": "rust/lom-editor/src/workspace.rs",
+      "sha256": "a89d92dcefbc4ca1ad9848cf4c4a9ef519347d2068f99e97245d7467cd5052d8"
+    },
+    {
+      "path": "rust/lomc/Cargo.toml",
+      "sha256": "00b90a8c0ce93b5642622f866646a43ea492ca0d695e23f5ab5b872cb8e76687"
+    },
+    {
+      "path": "rust/lomc/examples/build_showcase3.rs",
+      "sha256": "74976077701e84ab2143ada1b92f84f0add0fdf400f33d3a293fd9b47a1ed86e"
+    },
+    {
+      "path": "rust/lomc/src/main.rs",
+      "sha256": "4428eac55c82a68876d8fefae9448b65af5203569e051b3a45e4f6f466402e5e"
+    },
+    {
+      "path": "rust/lomc/tests/cli.rs",
+      "sha256": "60e50f8a115f86ef1ab57566d12539d9db997a653ad834ec92d5825f0c92b43d"
+    },
+    {
+      "path": "samples/event-addon/README.md",
+      "sha256": "1d131bc521201ebb234db2072a770290ab8b42b06093efa4bd238b258baba4d4"
+    },
+    {
+      "path": "samples/event-addon/manifest.json",
+      "sha256": "680094cab9f9244a257956beab392e2933a93d8cd3a7683a01a5ee049d120e3a"
+    },
+    {
+      "path": "samples/event-addon/scenario.json",
+      "sha256": "747a279d2c3ea7cfb31da79b2acb2e397c405891637fc501215c01db71a8dfe7"
+    },
+    {
+      "path": "samples/event-addon/story/delivery.json",
+      "sha256": "6e773054809ffa8eb030d13c281366288ef2c999addd137981f0b50dce6baf70"
+    },
+    {
+      "path": "samples/event-addon/story/meeting.json",
+      "sha256": "afeec15e5983775d882f7acb28301c8006fb4e3c2eed3c25a60a99bf3d2c8f41"
+    },
+    {
+      "path": "samples/event-addon/story/ordinary.json",
+      "sha256": "e588d49bde90f2a7fb4581683fa4dce84fe2738c0ef0f416c35a4102971cbe78"
+    },
+    {
+      "path": "samples/event-addon/story/practice.json",
+      "sha256": "3a2eb20b236626732862e1085a72ed0f7b4c700dbd4b04233420f1c28e130d8c"
+    },
+    {
+      "path": "samples/event-sandbox/README.md",
+      "sha256": "e3d67395bfe7c6dc170b9165f53949d9c53934990ad6763d371dc7774539acbb"
+    },
+    {
+      "path": "samples/event-sandbox/manifest.json",
+      "sha256": "071988efdfaea14517501b6a176314e18b7aa9dc1c9d34b9b81ddf26a5d73cd0"
+    },
+    {
+      "path": "samples/event-sandbox/scenario.json",
+      "sha256": "e8588c5fd218e9c0c0e4b110fd8f32307b8306218834e89d389d18e871bb381b"
+    },
+    {
+      "path": "samples/event-sandbox/story/delivery.json",
+      "sha256": "6e773054809ffa8eb030d13c281366288ef2c999addd137981f0b50dce6baf70"
+    },
+    {
+      "path": "samples/event-sandbox/story/main.json",
+      "sha256": "21f76635039f7361cc1c9153873b0904a9b5db2188f186fb805387ca7f263756"
+    },
+    {
+      "path": "samples/event-sandbox/story/meeting.json",
+      "sha256": "afeec15e5983775d882f7acb28301c8006fb4e3c2eed3c25a60a99bf3d2c8f41"
+    },
+    {
+      "path": "samples/event-sandbox/story/ordinary.json",
+      "sha256": "e588d49bde90f2a7fb4581683fa4dce84fe2738c0ef0f416c35a4102971cbe78"
+    },
+    {
+      "path": "samples/event-sandbox/story/practice.json",
+      "sha256": "3a2eb20b236626732862e1085a72ed0f7b4c700dbd4b04233420f1c28e130d8c"
+    },
+    {
+      "path": "samples/showcase3/README.md",
+      "sha256": "63fa1cad60171562a3c8248b2945b4dec338832d72494a7e47753aabfc44826a"
+    },
+    {
+      "path": "samples/showcase3/assets/user/audio/showcase.lantern_chime/content.json",
+      "sha256": "986345a924a9f45e6cd12790ab4cc743ec9c176ae9338e455e25bf8a2a2fdadc"
+    },
+    {
+      "path": "samples/showcase3/assets/user/audio/showcase.lantern_chime/lantern_chime.wav",
+      "sha256": "b130d8b3c7158b9051f7c71ca2393890746f48b345cce10dbe9fbf4124be490a"
+    },
+    {
+      "path": "samples/showcase3/assets/user/audio/showcase.lantern_theme/content.json",
+      "sha256": "cb5a62fac5e102fcffe82e6d193c6b9882fdb9889d45519233b806a2ce1d01a5"
+    },
+    {
+      "path": "samples/showcase3/assets/user/audio/showcase.lantern_theme/lantern_theme.wav",
+      "sha256": "cf4b088b91980315d991d790d908d6d3d6c6824bcee15012610778d4e1c293d9"
+    },
+    {
+      "path": "samples/showcase3/assets/user/audio/showcase.lin_greeting/content.json",
+      "sha256": "7c614890f908808c02205b18afa7dd297d2520a9c970064d247a90e366ba8937"
+    },
+    {
+      "path": "samples/showcase3/assets/user/audio/showcase.lin_greeting/lin_greeting.wav",
+      "sha256": "946fd29ee855bb2f13df33e243954baa0a66a8231b50dfca487073310533dd6d"
+    },
+    {
+      "path": "samples/showcase3/assets/user/character/showcase.lin_deng/content.json",
+      "sha256": "2c814310ec240f9e4b43ed2b282b3e53dc0c119b130ef3742658deb14257f40a"
+    },
+    {
+      "path": "samples/showcase3/assets/user/character/showcase.lin_deng/happy.png",
+      "sha256": "84c9fa1c521862a508f6b17f83d393ff285673795daed94ac9ff5fe6bd6ed157"
+    },
+    {
+      "path": "samples/showcase3/assets/user/character/showcase.lin_deng/normal.png",
+      "sha256": "71b3892db1212b9aa080fe938eab29c5abaa2ff4f851df7d13b9de3fe660b379"
+    },
+    {
+      "path": "samples/showcase3/assets/user/image/showcase.courier_station/content.json",
+      "sha256": "d043d869950141a5433705e8d73207c74f91911f34dd2905f338b145d0979787"
+    },
+    {
+      "path": "samples/showcase3/assets/user/image/showcase.courier_station/courier_station.png",
+      "sha256": "8c461d6dd0d63dd20c19e2bea4f61598a1796cbad10d2eefa8c49da725dccea0"
+    },
+    {
+      "path": "samples/showcase3/assets/user/image/showcase.departure_cg/content.json",
+      "sha256": "82265490f7573c2f8da9e246f561326c15adf619b76883cd819db385f3a6579b"
+    },
+    {
+      "path": "samples/showcase3/assets/user/image/showcase.departure_cg/departure_cg.png",
+      "sha256": "2c7e28af085fef568c1adde69569a3d14d3417b56ae8a73078a730e4dbb17540"
+    },
+    {
+      "path": "samples/showcase3/assets/user/image/showcase.lantern_overlay/content.json",
+      "sha256": "d3b4581c0f68313bfe8fcef1486cf2c596dc440e5bf8e086974eb5cb70d47468"
+    },
+    {
+      "path": "samples/showcase3/assets/user/image/showcase.lantern_overlay/lantern_overlay.png",
+      "sha256": "8673e79cfbc8e513aa6a2dac8288a9798c9f16cf38f9596a24b604cd07909738"
+    },
+    {
+      "path": "samples/showcase3/manifest.json",
+      "sha256": "3f9b56e8eeb34dbdde8dc77c17ae9fc8fdb2b3fc5d15a05304f9f93b828b971a"
+    },
+    {
+      "path": "samples/showcase3/source.json",
+      "sha256": "3e1fed918ab21e4ff92957c15435ac6c527de01cc37684e61692ea11103e0706"
+    },
+    {
+      "path": "samples/showcase3/story/battle_demo.json",
+      "sha256": "db18ebf80833fdab857683cb93c6e7bb269284731976fdb3dc0f156369917f70"
+    },
+    {
+      "path": "samples/showcase3/story/combat_demo.json",
+      "sha256": "28aa11d13fee173143eba3dfd483bab9dd5206a507e294744d45a52ddbec081a"
+    },
+    {
+      "path": "samples/showcase3/story/event_presentation.json",
+      "sha256": "84160aa3aeac2cbb3aea08de99f99345c446337b29a9bb898ec7a026ca01100f"
+    },
+    {
+      "path": "samples/showcase3/story/finale.json",
+      "sha256": "1e87c10502fa17a13ed5af71e54b7efc9e6f2c8f3c04b925fe2df7fc1959a105"
+    },
+    {
+      "path": "samples/showcase3/story/gameplay.json",
+      "sha256": "d4f96eab0e4e1888cc88b6d4d7dcccfd7d971cda150721983211f0ed127d9709"
+    },
+    {
+      "path": "samples/showcase3/story/main.json",
+      "sha256": "3978be406b82f2448fda9c8eaa4f2f7e3a87e00e1fc62deefec8738dd204d157"
+    }
+  ],
+  "hash_scope": "Hashes identify the original imported files, before LoMScenarioKit modifications.",
+  "modifications": {
+    "date": "2026-10-26",
+    "description": "Native editor review panel, shared revision/history storage, agent JSON CLI and LoMScenarioAddon export. AC UI/server code not copied.",
+    "license": "GPL-3.0-only with repository game-linking exception; upstream MIT notices retained."
+  }
+}
