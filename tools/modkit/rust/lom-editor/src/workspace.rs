@@ -7,6 +7,65 @@ mod shared_authoring_tests {
     use super::*;
     use lom_core::{review::Actor, workspace_store as store};
     #[test]
+    fn recovery_saves_to_original_folder_but_rejects_real_external_changes() {
+        for external_change in [false, true] {
+            let temp = tempfile::tempdir().unwrap();
+            let source = temp.path().join("project");
+            let mut project = lom_core::scenario_addon::new_project("復旧");
+            let mut extra = project.stories["main"].clone();
+            extra["id"] = json!("extra");
+            project.stories.insert("extra".into(), extra);
+            let original_revision =
+                store::save(&mut project, &source, None, Actor::Human, "作者", "初回").unwrap();
+            let cc = eframe::CreationContext::_new_kittest(egui::Context::default());
+            let mut writer = App::new(&cc, Some(source.clone()), None);
+            writer.recovery_candidates.clear();
+            writer.recovery_dir = temp.path().join("4294967295-1");
+            writer.project.stories.get_mut("main").unwrap()["nodes"][0]["text"] =
+                json!("未保存の本文");
+            writer.project.stories.remove("extra");
+            writer.track();
+            writer.last_recovery = Instant::now() - Duration::from_secs(31);
+            writer.autosave();
+            let session = lom_core::load_json(writer.recovery_dir.join("session.json")).unwrap();
+            assert_eq!(session["disk_revision"], original_revision);
+            if external_change {
+                let (mut agent, revision) = store::read(&source).unwrap();
+                agent.stories.get_mut("main").unwrap()["title"] = json!("外部の編集");
+                store::save(
+                    &mut agent,
+                    &source,
+                    Some(&revision),
+                    Actor::Agent,
+                    "Codex",
+                    "変更",
+                )
+                .unwrap();
+            }
+            let mut recovered = App::new(&cc, None, None);
+            recovered.recovery_candidates.clear();
+            recovered.recovery_dir = temp.path().join("reader-cache");
+            recovered.recover(&writer.recovery_dir);
+            assert!(recovered.error.is_none(), "{:?}", recovered.error);
+            assert_eq!(
+                recovered.disk_revision.as_deref(),
+                Some(original_revision.as_str())
+            );
+            recovered.last_sync = Instant::now() - Duration::from_secs(3);
+            recovered.sync_external();
+            assert_eq!(recovered.sync_conflict, external_change);
+            assert_eq!(recovered.save(false), !external_change);
+            let (disk, _) = store::read(&source).unwrap();
+            if external_change {
+                assert_eq!(disk.stories["main"]["title"], "外部の編集");
+                assert!(disk.stories.contains_key("extra"));
+            } else {
+                assert_eq!(disk.stories["main"]["nodes"][0]["text"], "未保存の本文");
+                assert!(!disk.stories.contains_key("extra"));
+            }
+        }
+    }
+    #[test]
     fn gui_reads_agent_saves_keeps_dirty_edits_and_blocks_stale_save() {
         let directory = tempfile::tempdir().unwrap();
         let mut project = lom_core::scenario_addon::new_project("共有編集");
@@ -1263,6 +1322,9 @@ impl App {
                     project.has_manifest = has_manifest;
                 }
                 self.install(project);
+                // The recovery document contains unsaved changes. Its content hash
+                // must never become the expected revision of the original folder.
+                self.disk_revision = session["disk_revision"].as_str().map(str::to_owned);
                 self.saved = Snapshot {
                     manifest: json!({}),
                     scenario: None,
@@ -1270,6 +1332,18 @@ impl App {
                     paths: BTreeMap::new(),
                     assets: std::sync::Arc::new(BTreeMap::new()),
                 };
+                if let Some(source) = self.project.source.as_deref().filter(|p| p.is_dir()) {
+                    match lom_core::workspace_store::read(source) {
+                        Ok((baseline, revision))
+                            if self.disk_revision.as_deref() == Some(revision.as_str()) =>
+                        {
+                            // Restore ownership information too, so chapters/assets
+                            // deleted in the recovered edit remain deleted on save.
+                            self.saved = snapshot(&baseline);
+                        }
+                        _ => self.sync_conflict = true,
+                    }
+                }
                 self.current = session["current"]
                     .as_str()
                     .filter(|id| self.project.stories.contains_key(*id))
@@ -1348,7 +1422,7 @@ impl App {
                     self.recovery_assets.remove(&name);
                 }
             }
-            let session = json!({"source":self.project.source,"paths":self.project.paths,"story_subdir":self.project.story_subdir,"has_manifest":self.project.has_manifest,"current":self.current,"selected":self.selected});
+            let session = json!({"source":self.project.source,"paths":self.project.paths,"story_subdir":self.project.story_subdir,"has_manifest":self.project.has_manifest,"current":self.current,"selected":self.selected,"disk_revision":self.disk_revision});
             lom_core::project::atomic_write(
                 &self.recovery_dir.join("session.json"),
                 &lom_core::stable_json(&session)?,
