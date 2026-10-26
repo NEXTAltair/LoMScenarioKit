@@ -42,6 +42,10 @@ def main():
                 page.locator('#new-button').click()
                 page.locator('#event-title').fill('港での出会い')
                 page.locator('[data-type="narration"] .row-text').fill('旅人は港へ向かった。')
+                page.locator('[data-type="narration"] [data-action="type"]').select_option('dialogue')
+                converted = page.locator('[data-type="dialogue"]').first
+                expect(converted.locator('[data-field="speaker"]')).to_have_value('旅人')
+                converted.locator('[data-action="type"]').select_option('narration')
                 page.locator('[data-type="dialogue"] .row-text').fill('ここが港か。')
                 page.locator('#event-verdict').select_option('fix')
                 page.locator('#save-button').click()

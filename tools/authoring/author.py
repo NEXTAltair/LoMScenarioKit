@@ -142,7 +142,14 @@ def run(argv):
     else:
         store = project.open_store(root)
         snapshot = store.read()
-        event = identify(snapshot['document'], options['event']) if options.get('event') else None
+        event = None
+        if options.get('event'):
+            target_document = snapshot['document']
+            if command == 'restore':
+                target_document = store.entry(options['entry']).get('snapshot')
+                if target_document is None:
+                    raise Invalid('復元できる台本の履歴ではありません。')
+            event = identify(target_document, options['event'])
         next_actions = [action(root, 'check', '保存済みの台本を検査する')]
         if command == 'show':
             data = snapshot

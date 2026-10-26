@@ -386,7 +386,7 @@
     const field=ev.target;if(field.dataset.action!=='type')return;
     const r=findRow(field.closest('[data-row]').dataset.row), next=field.value;
     const apply=()=>mutation(()=>{
-      const replacement=M.row(next,r.speaker||'趙活');replacement.id=r.id;replacement.text=r.text;
+      const replacement=M.row(next,r.speaker||config.speakers?.[0]||'');replacement.id=r.id;replacement.text=r.text;
       active().rows[active().rows.indexOf(r)]=replacement;
     },r.id);
     if(r.type==='choice' && r.options.some(o=>o.text||o.target||o.condition)){

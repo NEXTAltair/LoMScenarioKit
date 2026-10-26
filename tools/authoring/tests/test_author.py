@@ -106,6 +106,24 @@ class AuthorTest(unittest.TestCase):
         self.assertTrue(graph['nodes'][1]['reachable'])
         self.assertEqual([issue['code'] for issue in project.inspect(event)], ['TARGET_NOT_FOUND'])
 
+    def test_restore_deleted_manuscript_by_historical_uid_or_source_id(self):
+        self.command('init', '--title', '復元')
+        created = self.command('new', '--title', '消した台本', '--source-id', 'SCENE_A', '--revision', '0')['data']
+        uid, entry = created['event']['uid'], created['revision']
+        self.command('new', '--title', '残す台本', '--revision', str(entry))
+        edit = self.root / 'delete.json'
+        for ref in (uid, 'SCENE_A'):
+            before = self.command('show')['data']
+            survivor = next(e for e in before['document']['events'] if e['uid'] != uid)
+            before['document']['events'] = [survivor]
+            edit.write_text(json.dumps(before))
+            deleted = self.command('save', '--input', str(edit))['data']
+            self.command('restore', '--event', ref, '--entry', str(entry), '--revision', str(deleted['revision']))
+            after = self.command('show')['data']['document']['events']
+            self.assertEqual(next(e for e in after if e['uid'] == uid), created['event'])
+            self.assertEqual(next(e for e in after if e['uid'] != uid), survivor)
+            self.assertEqual(self.command('history')['data'][0]['kind'], 'restore')
+
 
 if __name__ == '__main__':
     unittest.main()
