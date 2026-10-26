@@ -137,6 +137,8 @@ my-story/
 
 バックアップは `.authoring/` を含むフォルダ全体をコピーします。資料は閲覧専用で、コメント・章の復元履歴に資料や素材の内容は含めません。履歴はmanifestからつながる保存だけを表示します。保存ロックとrevisionは、このGUI・agent CLI同士の更新を調整します。複数ファイルを保存中の強制終了まで、フォルダ全体の原子的な更新を保証するものではありません。
 
+章の保存ファイル名には、管理用の `manifest.json` と `scenario.json` を使えません。新規の章IDにも `manifest` と `scenario` を避けてください。既存の章が別のファイル名で保存されている場合は、その名前を保持します。
+
 従来の `lomc edit/pack` などは互換用に残っていますが、共同編集では `lomc agent ...` を使ってください。別のエディターから直接JSONを変更した場合もGUIは変更を検出しますが、共通のロックや保存履歴は使われません。
 
 `revision` は制作データと素材の内容から計算する保存版の識別子、`node` は章内のノードID、`parent` は返信先の親コメントIDです。不具合は[Issue](https://github.com/NEXTAltair/LoMScenarioKit/issues)に、操作とJSONエラーを添えて報告してください。

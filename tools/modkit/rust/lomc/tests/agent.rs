@@ -224,3 +224,37 @@ fn localized_project_stays_editable_but_check_and_export_reject_it() {
         document["stories"]["main"]["localization"]
     );
 }
+
+#[test]
+fn adding_metadata_named_chapters_to_a_flat_import_fails_without_changing_the_project() {
+    for id in ["scenario", "manifest"] {
+        let temp = tempfile::tempdir().unwrap();
+        let root = temp.path();
+        let original = lom_core::project::Project::new().stories["main"].to_string();
+        std::fs::write(root.join("chapter.json"), &original).unwrap();
+        let checkout = agent("checkout", root, json!({}), 0);
+        let mut document = checkout["data"]["document"].clone();
+        let mut chapter = document["stories"]["main"].clone();
+        chapter["id"] = json!(id);
+        document["stories"][id] = chapter;
+        let rejected = agent(
+            "save",
+            root,
+            json!({"revision":checkout["data"]["revision"],"document":document}),
+            1,
+        );
+        assert!(rejected["issues"].to_string().contains("予約ファイル名"));
+        let after = agent("checkout", root, json!({}), 0);
+        assert_eq!(after["data"], checkout["data"]);
+        assert_eq!(
+            std::fs::read_to_string(root.join("chapter.json")).unwrap(),
+            original
+        );
+        assert!(!root.join("manifest.json").exists());
+        assert!(!root.join("scenario.json").exists());
+        assert_eq!(
+            agent("history", root, json!({}), 0)["data"]["result"],
+            json!([])
+        );
+    }
+}

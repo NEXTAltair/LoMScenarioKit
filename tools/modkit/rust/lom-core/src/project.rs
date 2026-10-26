@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-26.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Lossless project documents. Opening is transactional; writes preserve file ownership.
 use crate::{load_json, package, stable_json};
 use anyhow::{ensure, Context, Result};
@@ -284,6 +286,11 @@ impl Project {
             ensure!(
                 !raw.contains('/') && filename.extension().and_then(|s| s.to_str()) == Some("json"),
                 "章节文件名无效"
+            );
+            // The folder reader skips metadata names in both flat and story/ layouts.
+            ensure!(
+                !["manifest.json", "scenario.json"].contains(&raw.to_ascii_lowercase().as_str()),
+                "章 {id}: {raw} は管理用の予約ファイル名です。別の章ID・ファイル名を指定してください"
             );
             ensure!(names.insert(raw.to_lowercase()), "章节文件名冲突: {raw}");
             let path = if self.story_subdir {
@@ -609,5 +616,40 @@ mod tests {
             load_json(dir.path().join("manifest.json")).unwrap(),
             p.manifest
         );
+    }
+
+    #[test]
+    fn folder_save_rejects_metadata_filenames_before_writing_anything() {
+        for subdir in [false, true] {
+            for filename in [
+                "manifest.json",
+                "scenario.json",
+                "Manifest.json",
+                "Scenario.json",
+            ] {
+                let dir = tempfile::tempdir().unwrap();
+                let target = dir.path().join("new-project");
+                let mut project = Project::new();
+                project.story_subdir = subdir;
+                project.paths.insert("main".into(), filename.into());
+                let error = project.save_to(&target).unwrap_err().to_string();
+                assert!(error.contains("予約ファイル名"), "{error}");
+                assert!(error.contains(filename), "{error}");
+                assert!(!target.exists());
+            }
+        }
+        // The chapter ID itself is valid when its existing filename is unambiguous.
+        let dir = tempfile::tempdir().unwrap();
+        let mut project = Project::new();
+        project.story_subdir = false;
+        let mut chapter = project.stories.remove("main").unwrap();
+        chapter["id"] = json!("scenario");
+        project.stories.insert("scenario".into(), chapter);
+        project.manifest["entry"] = json!("scenario");
+        project
+            .paths
+            .insert("scenario".into(), "chapter-scenario.json".into());
+        project.save_to(dir.path()).unwrap();
+        assert_eq!(Project::open(dir.path()).unwrap().stories, project.stories);
     }
 }
