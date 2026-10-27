@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Everyday event authoring. Edits only the conditions the controls represent.
 use crate::{forms::Catalog, i18n::tr};
 use eframe::egui;
@@ -40,7 +42,13 @@ impl Names {
                     {
                         let code = end["event_result"].as_str().unwrap_or("completed");
                         if let Some(text) = option["text"].as_str() {
-                            labels.insert(code.to_owned(), format!("选择「{text}」后"));
+                            labels.insert(
+                                code.to_owned(),
+                                crate::i18n::text(
+                                    "选择「{text}」后",
+                                    &[("text", format!("{text}"))],
+                                ),
+                            );
                         }
                     }
                 }
@@ -55,8 +63,8 @@ impl Names {
             let name = task["name"]
                 .as_str()
                 .filter(|name| !name.is_empty() && *name != id)
-                .unwrap_or("未命名任务")
-                .to_owned();
+                .map(str::to_owned)
+                .unwrap_or_else(|| tr("未命名任务"));
             result.tasks.push((id.clone(), name));
             result.states.insert(
                 id,
@@ -153,7 +161,7 @@ fn named_choice(
             .selected_text(label(items, &selected, missing))
             .show_ui(ui, |ui| {
                 for (id, name) in items {
-                    ui.selectable_value(&mut selected, id.clone(), tr(name));
+                    ui.selectable_value(&mut selected, id.clone(), name);
                 }
             });
     });
@@ -260,17 +268,17 @@ impl SimpleWhen {
     fn date(&self) -> String {
         let mut s = String::new();
         if let Some(n) = self.year {
-            s += &format!("第{n}年");
+            s += &crate::i18n::text("第{n}年", &[("n", format!("{n}"))]);
         }
         if let Some(n) = self.month {
-            s += &format!("{n}月");
+            s += &crate::i18n::text("{n}月", &[("n", format!("{n}"))]);
         }
         if let Some(n) = self.stage {
-            s += match n {
+            s += &tr(match n {
                 1 => "上旬",
                 2 => "中旬",
                 _ => "下旬",
-            };
+            });
         }
         if s.is_empty() {
             tr("时间不限")
@@ -283,8 +291,8 @@ fn date_part(ui: &mut egui::Ui, key: &str, value: &mut Option<i64>, none: &str, 
     let before = *value;
     let name = |n: i64| -> String {
         match key {
-            "year" => format!("第{n}年"),
-            "month" => format!("{n}月"),
+            "year" => crate::i18n::text("第{n}年", &[("n", format!("{n}"))]),
+            "month" => crate::i18n::text("{n}月", &[("n", format!("{n}"))]),
             _ => tr(match n {
                 1 => "上旬",
                 2 => "中旬",
@@ -328,7 +336,13 @@ pub fn dates(ui: &mut egui::Ui, when: &mut Value, show_task: bool, names: &Names
     ui.small(tr("每月分上旬、中旬、下旬，游戏没有单独的“几号”。"));
     if show_task && !names.tasks.is_empty() {
         let title = match &simple.task {
-            Some((id, state)) => format!("前置任务：{} · {}", names.task(id), state_name(state)),
+            Some((id, state)) => crate::i18n::text(
+                "前置任务：{arg0} · {arg1}",
+                &[
+                    ("arg0", format!("{}", names.task(id))),
+                    ("arg1", format!("{}", state_name(state))),
+                ],
+            ),
             None => tr("前置任务（可选）"),
         };
         let mut title_job = egui::text::LayoutJob::simple(
@@ -357,9 +371,9 @@ pub fn dates(ui: &mut egui::Ui, when: &mut Value, show_task: bool, names: &Names
         response.header_response.on_hover_text(title);
     }
     if !simple.other.is_empty() {
-        ui.small(format!(
-            "另有 {} 项高级条件；修改日期会保留它们。",
-            simple.other.len()
+        ui.small(crate::i18n::text(
+            "另有 {arg0} 项高级条件；修改日期会保留它们。",
+            &[("arg0", format!("{}", simple.other.len()))],
         ));
     }
     if simple != before {
@@ -486,7 +500,10 @@ pub fn event(
         ui.add_space(5.0);
         let story = names.story(e["script"].as_str().unwrap_or(""));
         if start {
-            ui.label(format!("开场时播放《{story}》。"));
+            ui.label(crate::i18n::text(
+                "开场时播放《{story}》。",
+                &[("story", format!("{story}"))],
+            ));
         } else {
             let chance = e["chance"].as_f64().unwrap_or(100.0);
             let repeat = if e["once"] == false {
@@ -494,8 +511,15 @@ pub fn event(
             } else {
                 "成功播放后不再发生"
             };
-            ui.label(format!(
-                "{date}，{mode}以 {chance}% 概率播放《{story}》，{repeat}。"
+            ui.label(crate::i18n::text(
+                "{date}，{mode}以 {chance}% 概率播放《{story}》，{repeat}。",
+                &[
+                    ("date", format!("{date}")),
+                    ("mode", format!("{mode}")),
+                    ("chance", format!("{chance}")),
+                    ("story", format!("{story}")),
+                    ("repeat", format!("{repeat}")),
+                ],
             ));
         }
     });
@@ -612,7 +636,10 @@ pub fn results(ui: &mut egui::Ui, e: &mut Value, names: &Names) {
                                 ui,
                                 &mut effects["tasks"],
                                 &id,
-                                &format!("{}变成", names.task(&id)),
+                                &crate::i18n::text(
+                                    "{arg0}变成",
+                                    &[("arg0", format!("{}", names.task(&id)))],
+                                ),
                                 &states,
                             );
                             if ui.small_button(tr("不更新这个任务")).clicked() {
@@ -622,8 +649,9 @@ pub fn results(ui: &mut egui::Ui, e: &mut Value, names: &Names) {
                     }
                     let actions = effects["actions"].as_array().map_or(0, Vec::len);
                     if actions > 0 {
-                        ui.small(format!(
-                            "另有 {actions} 项奖励或其他结果动作，可在高级设置中修改。"
+                        ui.small(crate::i18n::text(
+                            "另有 {actions} 项奖励或其他结果动作，可在高级设置中修改。",
+                            &[("actions", format!("{actions}"))],
                         ));
                     }
                 });

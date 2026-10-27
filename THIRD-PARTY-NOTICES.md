@@ -31,6 +31,17 @@ BepInEx、Harmony、Mono.Cecil、およびゲームに含まれる Unity・Wwise
 
 `tools/modkit/` は [mohui666/lom_modkit](https://github.com/mohui666/lom_modkit) のコミット `f7c20f8d37e0a03cb2ec0ca26a6b6261911d1e00` から、Rustエディター・core・CLI・メタデータ・互換テスト用サンプルを取り込んでいます。元のMIT表示は [tools/modkit/LICENSE](tools/modkit/LICENSE)、取得時のファイルとハッシュは [UPSTREAM.json](tools/modkit/UPSTREAM.json) に保持しています。LoMScenarioKitでの追加・改変には、本リポジトリのGPL-3.0-onlyと追加許諾を適用します。
 
+同じコミットから、プレビュー素材抽出ツール、Unityアセットの読み取り処理、ビルド用スクリプト・フック・依存定義、関連テストも取り込んでいます。UnityPyとPyInstallerのビルド用バージョンは`tools/modkit/tools/requirements-preview-extractor.txt`に固定しています。生成した抽出ツールには、Python本体・依存ライブラリのライセンスとPyInstallerのbootloader exceptionを`asset-extractor/third-party-licenses/`へ収録します。ゲームから抽出した画像はエディター配布物に含めません。
+
 互換経路に同梱するUnity Doorstop 4.3.0にはLGPL-2.1が適用されます。[元の表示](tools/modkit/editor/assets/doorstop/README.md)、ライセンス全文、対応するソースZIPを同じディレクトリへ保持しています。Addon制作プロジェクトではDoorstop/Hostの導入処理は使いません。
 
 ACからは資料・判定・引用付きコメント・履歴の機能を参考にしました。ACのHTML/CSSとWebサーバーのコードは取り込んでいません。
+
+## 制作エディターのフォント
+
+Noto Sans CJK Regular 2.004を改変せず同梱しています。Copyright 2014–2021 Adobe (http://www.adobe.com/)。フォントにはSIL Open Font License 1.1が適用されます。
+
+- ライセンス全文: [OFL.txt](tools/modkit/rust/lom-editor/assets/fonts/OFL.txt)
+- 取得元・固定コミット・SHA-256: [フォントの記録](tools/modkit/rust/lom-editor/assets/fonts/README.md)
+
+フォントはエディターに埋め込み、対応するソースZIPにも原ファイルと表記を含めます。

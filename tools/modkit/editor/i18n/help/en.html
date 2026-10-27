@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>LoMScenarioKit · Help</title>
+<h2 id="start">Create your first story</h2>
+<p>Finish a short scene before adding more characters and backgrounds. Arrange steps on the left, edit in the middle, and preview on the right. A node is one step in the story.</p>
+<h3>Start with one line</h3><ol><li>Create a project from the File menu.</li><li>Select a dialogue step and edit its text. Narration is a useful starting point.</li><li>Return the preview to the beginning and press Play.</li><li>Save the project to a folder. Run the checks before exporting.</li></ol>
+<aside>Keep the project folder for continued editing. Export creates files for the game; it is separate from saving your work.</aside>
+<h2 id="characters">Show characters and write dialogue</h2>
+<ol><li>Add Show character before the dialogue.</li><li>Choose a character, appearance, expression, position, and facing.</li><li>Add Dialogue and select the same character.</li><li>Use Hide character when the character leaves.</li></ol>
+<p>Dialogue and inner voice use a speaker. Narration does not need one. Imported voice lines are optional. Preview portraits require your locally extracted game assets.</p>
+<h2 id="parallel">Run several actions together</h2>
+<p>A Parallel actions group starts its actions together and continues when they all finish.</p>
+<ol><li>Add a Parallel actions group.</li><li>Add two Hide character actions, choosing a different character for each.</li><li>Set both durations to 0.5 seconds and play the preview. Both characters fade out together.</li></ol>
+<aside>Music, sounds, and looping effects count as complete when they start. Add Wait to keep the group active longer. Dialogue, choices, battles, jumps, and raw Lua belong outside the group.</aside>
+<h2 id="transition">Prepare a scene behind a black screen</h2>
+<ol><li>Add a Transition using Fade in to cover the screen.</li><li>Change the background.</li><li>Show the characters with zero fade and movement duration. Use a parallel group for several characters.</li><li>Add a Transition using Fade out to reveal the scene.</li></ol>
+<pre>Cover screen → Change background and place characters → Reveal screen → Dialogue</pre>
+<aside>Fade in and Fade out describe the black overlay appearing and disappearing. Editor timing is a preview; check the actual result in the game.</aside>
+<h2 id="assets">Load preview images and your own assets</h2>
+<p>Open Game preview assets under Assets and choose Extract game assets. Select your own game folder containing Mortal_Data. Portraits, expressions, and backgrounds are extracted to a local cache and loaded automatically.</p>
+<p>For an existing extracted library, choose the whole folder containing preview_map.json and assets. An ordinary image folder is not a preview library.</p>
+<p>Select Character, then Appearance, then Expression. Only expressions available for that appearance are listed. An unavailable expression returns to the normal expression when appearance changes. Hide the old character before showing a different base-game character appearance.</p>
+<h3>Import your own content</h3><ol><li>Open Project assets under Assets.</li><li>Import an image, character, or audio file.</li><li>Select the imported content in a step’s form.</li></ol>
+<aside>Local game preview images are not automatically included in exported projects. Game character and item names use their canonical names where no English game-name translation is supplied.</aside>
+<h2 id="flow">Choices, jumps, and endings</h2>
+<p>Without a jump, steps play in their listed order. Choices and conditional branches change the destination.</p>
+<ol><li>Create the dialogue that follows each choice.</li><li>Add a Choice node and set each option’s text and destination.</li><li>Use F7 to check the flowchart, then test each route.</li></ol>
+<h3>Ending a chapter</h3><ul><li>Leave Next chapter empty to return to free mode.</li><li>Select a next chapter to continue playing that chapter.</li></ul>
+<pre>Standalone scene: Dialogue → End (Next chapter empty)
+Continuing story: Dialogue → End (Next chapter selected)</pre>
+<aside>A flag records an event such as meeting a character. Conditional branches can check that record later.</aside>
+<h2 id="checks">Read check results</h2>
+<p>Read the conclusion first, then follow issues back to the affected steps. Expand Technical details to inspect the original report.</p>
+<ul><li>Status OK: the check found no issue.</li><li>Needs correction: fix the listed fields or story links.</li><li>Check in game: offline analysis cannot determine the result; this is not a pass.</li></ul>
+<p>F6 checks the current chapter. Use Release checks and packaging to check the whole project. Long operations can be hidden while you continue editing; reopen their progress from the bottom of the window.</p>
+<h2 id="preview">Editor preview and game playtesting</h2>
+<p>The right-hand preview shows dialogue, positions, parallel actions, and black-screen transitions without starting the game.</p>
+<ul><li>Beginning returns to the chapter’s first step.</li><li>Pause can be resumed; selecting a different step stops playback.</li><li>F7 opens the flowchart.</li></ul>
+<p>On Windows, Play or F5 validates the project and creates a separate temporary package for game testing. Configure the game under Game and Mods. Mac does not support game playtesting.</p>
+<aside>Check audio, filters, combat, and final timing in the game. Offline previews cannot reproduce every game effect.</aside>
+<h2 id="terms">Common terms</h2>
+<p>Form-based authoring does not require programming.</p>
+<ul><li>Node: one story step.</li><li>Flag: a record of whether an event happened.</li><li>Conditional branch: choose a destination using a record or number.</li><li>Asset library: images or other resources available to the editor.</li><li>Project package: an exported .lommod file.</li><li>Host: the component that loads a Mod into the game.</li><li>API: an interface used by scripts.</li><li>Lua: code the editor generates from your steps; normally you do not write it yourself.</li></ul>
+<h2 id="settings">Save, languages, and shortcuts</h2>
+<p>Open Settings with ⌘, on Mac or Ctrl+, on Windows/Linux. Choose Japanese, Simplified Chinese, Traditional Chinese, Korean, or English. The interface changes immediately and the choice is saved for the next launch.</p>
+<p>Story translations are edited separately under Languages. Changing the interface language does not rewrite dialogue, names, comments, or IDs. Story translation languages remain those supported by the game runtime.</p>
+<ul><li>⌘S / Ctrl+S: save.</li><li>F1: help.</li><li>F6: check current chapter.</li><li>F7: flowchart.</li><li>F5: Windows game playtesting.</li><li>Esc: close help or a dialog.</li></ul>
+</html>

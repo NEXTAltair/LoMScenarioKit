@@ -116,7 +116,7 @@ pub fn show(ui: &mut egui::Ui, manifest: &mut Value, catalog: &Catalog, stories:
                         }
                     });
                     if t["type"] != "position" {
-                        forms::value_editor(ui, "触发规则", t, 0);
+                        forms::value_editor(ui, &crate::i18n::tr("触发规则"), t, 0);
                         return;
                     }
                     for (key, label, kind, optional) in [

@@ -323,7 +323,7 @@
   "form.intro_missing": "紹介カードなし",
   "form.intro_no_character": "（カスタムキャラがまだない）",
 
-  "help.say": "人物の台詞、内心独白、旁白を書きます。旁白モードでは人物は不要です。ユーザーコンテンツ庫のボイスを任意で結びつけられます。",
+  "help.say": "人物の台詞、心の声、ナレーションを書きます。ナレーションでは人物の指定は不要です。ユーザーコンテンツ庫のボイスを任意で結びつけられます。",
   "help.show": "人物立ち絵を画面に出します。先に登場させてから台詞を出すと安定します。",
   "help.hide": "指定した人物を画面から退場させます。",
   "help.scene": "ゲームの背景を選びます。プレビュー素材を読み込むと右側で確認できます。",
@@ -431,9 +431,9 @@
   "enum.endgame": "結果パネル",
 
   "mode.character": "会話",
-  "mode.think": "内心独白",
-  "mode.narrative": "旁白",
-  "mode.center": "中央旁白",
+  "mode.think": "心の声",
+  "mode.narrative": "ナレーション",
+  "mode.center": "中央にナレーション",
   "facing.left": "左向き",
   "facing.right": "右向き",
 
@@ -467,7 +467,7 @@
   "summary.items": "{n}項",
   "summary.seconds": "{n}秒",
   "summary.end": "終了",
-  "summary.think_short": "内心",
+  "summary.think_short": "心の声",
   "summary.dice_meta": "{name}（ダイス{max}・{bands}帯）",
 
   "export.title": "Mod を書き出す",

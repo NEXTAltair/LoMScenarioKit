@@ -126,12 +126,20 @@ class ReleaseTests(unittest.TestCase):
     def test_source_archive_contains_native_build_inputs_but_no_build_or_authoring_state(self):
         included = ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "LICENSE",
                     "rust/lom-editor/src/main.rs", "editor/i18n/help/ja.html",
+                    "editor/i18n/help/en.html", "editor/i18n/locales/en.json",
+                    "editor/i18n/terms/en.json", "rust/lom-editor/data/ui-translations.json",
+                    "tools/preview_asset_worker.py", "tools/_probe_assets.py",
+                    "tools/requirements-preview-extractor.txt", "scripts/build_asset_extractor.py",
+                    "scripts/pyinstaller-hooks/hook-archspec.py",
+                    "rust/lom-editor/assets/fonts/NotoSansCJK-Regular.ttc",
+                    "rust/lom-editor/assets/fonts/OFL.txt", "rust/lom-editor/assets/fonts/README.md",
                     "editor/assets/combo_arrow.svg", "editor/assets/lom_editor.icns",
                     "editor/assets/doorstop/win-x64-doorstop.dll",
                     "editor/assets/doorstop/win-x86-doorstop.dll",
                     "editor/assets/doorstop/LICENSE.UnityDoorstop",
                     "editor/assets/doorstop/UnityDoorstop-4.3.0-source.zip"]
-        excluded = ["target/debug/output.json", ".authoring/history/private.json",
+        excluded = ["target/debug/output.json", "target/debug/asset-extractor/private.json",
+                    "target/asset-extractor-build/venv-3.12/dependency.py", ".authoring/history/private.json",
                     "editor/assets/unrelated.dll"]
         for rel in included + excluded:
             self.write(self.root / "tools/modkit" / rel, "fixture")

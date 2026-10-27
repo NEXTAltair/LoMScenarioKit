@@ -1,5 +1,8 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Layout and drawing for the editor's actual intra-chapter control-flow edges.
 use super::{character_display_name, edges, text};
+use crate::i18n::tr;
 use eframe::egui::{self, Color32, FontId, Pos2, Rect, Stroke, Vec2};
 use lom_core::project::Project;
 use serde_json::Value;
@@ -14,6 +17,7 @@ struct Link {
     to: Option<usize>,
     target: String,
     label: String,
+    display_label: String,
     points: Vec<Pos2>,
     label_at: Pos2,
     label_width: f32,
@@ -152,7 +156,9 @@ fn layout(story: &Value) -> Layout {
     let mut links = Vec::new();
     let mut back_lane = 0;
     let mut long_lane = 0;
-    for (from, target, label) in raw {
+    for ((from, target, label), (_, _, display_label)) in
+        raw.into_iter().zip(super::localized_edges(story))
+    {
         let Some(&a) = indices.get(from.as_str()) else {
             continue;
         };
@@ -257,6 +263,7 @@ fn layout(story: &Value) -> Layout {
             to,
             target,
             label,
+            display_label,
             points,
             label_at,
             label_width,
@@ -306,10 +313,13 @@ impl Default for ViewState {
 
 fn summary(project: &Project, node: &Value) -> String {
     if text(node, "type") == "end" && !text(node, "next_script").is_empty() {
-        return format!("→ 章节 {}", text(node, "next_script"));
+        return crate::i18n::text(
+            "→ 章节 {arg0}",
+            &[("arg0", format!("{}", text(node, "next_script")))],
+        );
     }
     if text(node, "type") == "raw" {
-        return "Lua 逻辑 · 结果未知".into();
+        return tr("Lua 逻辑 · 结果未知");
     }
     if !text(node, "text").is_empty() {
         return text(node, "text").replace(['\n', '\r'], " ");
@@ -324,7 +334,7 @@ fn summary(project: &Project, node: &Value) -> String {
     }
     for key in ["options", "cases", "bands"] {
         if let Some(rows) = node[key].as_array() {
-            return format!("{} 条分支", rows.len());
+            return crate::i18n::text("{arg0} 条分支", &[("arg0", format!("{}", rows.len()))]);
         }
     }
     String::new()
@@ -359,23 +369,29 @@ pub(super) fn show(
     let selected_id = nodes.get(selected).map(|node| text(node, "id").to_owned());
     let mut locate = selected_id != state.selected;
     ui.horizontal_wrapped(|ui| {
-        if ui.button("−").on_hover_text("缩小流程图").clicked() {
+        if ui.button("−").on_hover_text(tr("缩小流程图")).clicked() {
             state.zoom = (state.zoom - 0.1).max(0.35);
             locate = true;
         }
         ui.label(format!("{:.0}%", state.zoom * 100.0));
-        if ui.button("＋").on_hover_text("放大流程图").clicked() {
+        if ui.button("＋").on_hover_text(tr("放大流程图")).clicked() {
             state.zoom = (state.zoom + 0.1).min(1.75);
             locate = true;
         }
-        if ui.button("适应宽度").clicked() {
+        if ui.button(tr("适应宽度")).clicked() {
             state.zoom = (ui.max_rect().width() / layout.size.x).clamp(0.35, 1.2);
             locate = true;
         }
-        if ui.button("定位选中").clicked() {
+        if ui.button(tr("定位选中")).clicked() {
             locate = true;
         }
-        ui.weak(format!("{} 步 · {} 连接", nodes.len(), layout.links.len()));
+        ui.weak(crate::i18n::text(
+            "{arg0} 步 · {arg1} 连接",
+            &[
+                ("arg0", format!("{}", nodes.len())),
+                ("arg1", format!("{}", layout.links.len())),
+            ],
+        ));
     });
     if layout.links.iter().any(|link| link.to.is_none()) {
         let missing: BTreeSet<_> = layout
@@ -386,9 +402,12 @@ pub(super) fn show(
             .collect();
         ui.colored_label(
             Color32::DARK_RED,
-            format!(
-                "缺失目标：{}",
-                missing.into_iter().collect::<Vec<_>>().join("、")
+            crate::i18n::text(
+                "缺失目标：{arg0}",
+                &[(
+                    "arg0",
+                    format!("{}", missing.into_iter().collect::<Vec<_>>().join("、")),
+                )],
             ),
         );
     }
@@ -447,9 +466,9 @@ pub(super) fn show(
                 if (link.label != "下一步" && !plain_forward) || link.backward || link.to.is_none()
                 {
                     let label = if link.to.is_none() {
-                        format!("缺失：{}", link.target)
+                        crate::i18n::text("缺失：{arg0}", &[("arg0", format!("{}", link.target))])
                     } else {
-                        link.label.clone()
+                        link.display_label.clone()
                     };
                     labels.push((link, label, color));
                 }
@@ -493,7 +512,7 @@ pub(super) fn show(
                     {
                         kind.to_owned()
                     } else {
-                        format!("{kind} · 未支持")
+                        crate::i18n::text("{kind} · 未支持", &[("kind", format!("{kind}"))])
                     }
                 } else {
                     translated
@@ -502,7 +521,11 @@ pub(super) fn show(
                     "{:02} {}{}",
                     index + 1,
                     kind,
-                    if reached { "" } else { " · 不可达" }
+                    if reached {
+                        String::new()
+                    } else {
+                        format!(" · {}", tr("不可达"))
+                    }
                 );
                 response.widget_info(|| {
                     egui::WidgetInfo::labeled(
@@ -779,7 +802,7 @@ mod tests {
         );
         let controls = nodes
             .iter()
-            .find(|(_, node)| node.label() == Some("定位选中"))
+            .find(|(_, node)| node.label() == Some(tr("定位选中").as_str()))
             .unwrap()
             .1
             .bounds()

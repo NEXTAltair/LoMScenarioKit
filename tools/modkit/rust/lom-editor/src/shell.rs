@@ -1,4 +1,4 @@
-// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-26.
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
 // GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Shared Rust window shell. Platform chrome is isolated from authoring state.
 use eframe::egui::{self, Color32, Vec2};
@@ -97,92 +97,37 @@ pub fn viewport() -> egui::ViewportBuilder {
         .with_titlebar_shown(true)
         .with_title("LoMScenarioKit")
 }
-fn append_system_font(fonts: &mut egui::FontDefinitions, name: &str, paths: &[&str]) {
-    for path in paths {
-        if let Ok(bytes) = std::fs::read(path) {
-            fonts
-                .font_data
-                .insert(name.into(), egui::FontData::from_owned(bytes).into());
-            // Keep egui's Latin fonts first; these fonts supply missing scripts only.
-            for family in [egui::FontFamily::Proportional, egui::FontFamily::Monospace] {
-                fonts.families.entry(family).or_default().push(name.into());
-            }
-            break;
-        }
-    }
-}
-fn font_definitions() -> egui::FontDefinitions {
+/// The unmodified Noto collection shares outlines between all CJK faces.
+/// Face indices are fixed by the pinned Sans 2.004 asset (see assets/fonts/README.md).
+fn font_definitions(locale: &str) -> egui::FontDefinitions {
     let mut fonts = egui::FontDefinitions::default();
-    #[cfg(target_os = "macos")]
-    {
-        append_system_font(
-            &mut fonts,
-            "system-chinese",
-            &[
-                "/System/Library/Fonts/PingFang.ttc",
-                "/System/Library/Fonts/STHeiti Light.ttc",
-                "/System/Library/Fonts/STHeiti Medium.ttc",
-                "/System/Library/Fonts/Hiragino Sans GB.ttc",
-            ],
-        );
-        append_system_font(
-            &mut fonts,
-            "system-japanese",
-            &["/System/Library/Fonts/Hiragino Sans GB.ttc"],
-        );
-        append_system_font(
-            &mut fonts,
-            "system-korean",
-            &[
-                "/System/Library/Fonts/AppleSDGothicNeo.ttc",
-                "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
-            ],
-        );
-    }
-    #[cfg(target_os = "windows")]
-    {
-        append_system_font(
-            &mut fonts,
-            "system-chinese",
-            &["C:/Windows/Fonts/msyh.ttc", "C:/Windows/Fonts/msyh.ttf"],
-        );
-        append_system_font(
-            &mut fonts,
-            "system-japanese",
-            &[
-                "C:/Windows/Fonts/YuGothM.ttc",
-                "C:/Windows/Fonts/meiryo.ttc",
-            ],
-        );
-        append_system_font(
-            &mut fonts,
-            "system-korean",
-            &["C:/Windows/Fonts/malgun.ttf", "C:/Windows/Fonts/gulim.ttc"],
-        );
-    }
-    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
-    {
-        append_system_font(
-            &mut fonts,
-            "system-cjk",
-            &[
-                "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-                "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
-                "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
-                "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf",
-                "/usr/share/fonts/opentype/unifont/unifont_jp.otf",
-            ],
-        );
-        append_system_font(
-            &mut fonts,
-            "system-korean",
-            &["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
-        );
-    }
+    let index = match locale {
+        "ko" => 1,
+        "chs" => 2,
+        "cht" => 3,
+        _ => 0,
+    };
+    let mut data =
+        egui::FontData::from_static(include_bytes!("../assets/fonts/NotoSansCJK-Regular.ttc"));
+    data.index = index;
+    fonts.font_data.insert("noto-sans-cjk".into(), data.into());
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .insert(0, "noto-sans-cjk".into());
+    fonts
+        .families
+        .entry(egui::FontFamily::Monospace)
+        .or_default()
+        .push("noto-sans-cjk".into());
     fonts
 }
+pub fn update_fonts(ctx: &egui::Context) {
+    ctx.set_fonts(font_definitions(crate::i18n::locale()));
+}
 pub fn style(ctx: &egui::Context) {
-    ctx.set_fonts(font_definitions());
+    update_fonts(ctx);
     let mut s = (*ctx.style()).clone();
     s.visuals = egui::Visuals::light();
     s.visuals.panel_fill = Color32::TRANSPARENT;
@@ -221,7 +166,7 @@ pub fn style(ctx: &egui::Context) {
     s.visuals.widgets.noninteractive.bg_stroke.color = Color32::from_black_alpha(17);
     s.spacing.button_padding = Vec2::new(11.0, 7.0);
     s.text_styles
-        .insert(egui::TextStyle::Body, egui::FontId::proportional(13.0));
+        .insert(egui::TextStyle::Body, egui::FontId::proportional(14.0));
     s.text_styles
         .insert(egui::TextStyle::Button, egui::FontId::proportional(14.0));
     s.text_styles
@@ -276,54 +221,34 @@ mod button_style_tests {
     }
 }
 
-#[cfg(all(test, target_os = "macos"))]
-mod tests {
+#[cfg(test)]
+mod font_tests {
     use super::*;
 
     #[test]
-    fn system_fallbacks_render_every_supported_language_without_replacing_latin_fonts() {
-        let original = egui::Context::default();
-        let configured = egui::Context::default();
-        style(&configured);
-        for family in [egui::FontFamily::Proportional, egui::FontFamily::Monospace] {
-            let font = egui::FontId::new(14.0, family);
-            let mut original_widths = Vec::new();
-            let _ = original.run(Default::default(), |ctx| {
+    fn bundled_fonts_render_every_ui_language_without_system_fonts() {
+        for (locale, index, text) in [
+            ("ja", 0, "日本語ひらがなカタカナ"),
+            ("ko", 1, "한국어 편집기"),
+            ("chs", 2, "简体中文编辑器"),
+            ("cht", 3, "繁體中文編輯器"),
+            ("en", 0, "Scenario editor 0123"),
+        ] {
+            let fonts = font_definitions(locale);
+            assert_eq!(fonts.font_data["noto-sans-cjk"].index, index);
+            let ctx = egui::Context::default();
+            ctx.set_fonts(fonts);
+            let _ = ctx.run(Default::default(), |ctx| {
                 ctx.fonts_mut(|fonts| {
-                    original_widths = "LoM Modkit 0123 / JSON"
-                        .chars()
-                        .map(|c| fonts.glyph_width(&font, c))
-                        .collect();
-                });
-            });
-            let _ = configured.run(Default::default(), |ctx| {
-                ctx.fonts_mut(|fonts| {
-                    for text in [
-                        "简体中文编辑器",
-                        "繁體中文編輯器",
-                        "日本語ひらがなカタカナ",
-                        "한국어",
-                    ] {
+                    for family in [egui::FontFamily::Proportional, egui::FontFamily::Monospace] {
+                        let font = egui::FontId::new(14.0, family);
                         for character in text.chars() {
-                            assert!(
-                                fonts.has_glyph(&font, character),
-                                "Missing {character:?} from {:?}",
-                                font.family
-                            );
+                            assert!(fonts.has_glyph(&font, character), "{locale}: {character}");
                         }
-                        // Exercise font selection and glyph rasterization, not just file loading.
-                        let galley =
-                            fonts.layout_no_wrap(text.into(), font.clone(), Color32::BLACK);
-                        assert!(!galley.is_empty());
+                        assert!(!fonts
+                            .layout_no_wrap(text.into(), font, Color32::BLACK)
+                            .is_empty());
                     }
-                    let actual_widths: Vec<_> = "LoM Modkit 0123 / JSON"
-                        .chars()
-                        .map(|c| fonts.glyph_width(&font, c))
-                        .collect();
-                    assert_eq!(
-                        actual_widths, original_widths,
-                        "System fallback must not replace Latin glyphs"
-                    );
                 });
             });
         }

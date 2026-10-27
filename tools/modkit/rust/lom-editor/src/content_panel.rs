@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 use crate::i18n::tr;
 use eframe::egui;
 use lom_core::{content_edit, editing, project::Project};
@@ -67,7 +69,10 @@ impl ContentPanel {
                 Ok(applied) => changed = applied,
                 Err(error) => {
                     *selection = self.key.clone();
-                    self.message = format!("修改尚未完成：{error}");
+                    self.message = crate::i18n::text(
+                        "修改尚未完成：{error}",
+                        &[("error", format!("{error}"))],
+                    );
                     return false;
                 }
             }
@@ -177,7 +182,7 @@ impl ContentPanel {
                 o.remove("id");
                 o.remove("type");
             });
-            if crate::forms::value_editor(ui, "内容属性", &mut values, 0) {
+            if crate::forms::value_editor(ui, &crate::i18n::tr("内容属性"), &mut values, 0) {
                 values["id"] = self.draft["id"].clone();
                 values["type"] = self.draft["type"].clone();
                 self.draft = values;
@@ -289,7 +294,10 @@ impl ContentPanel {
         if !ui.ctx().wants_keyboard_input() || !self.files.is_empty() {
             match self.apply_pending(project) {
                 Ok(applied) => changed |= applied,
-                Err(error) => self.message = format!("修改尚未完成：{error}"),
+                Err(error) => {
+                    self.message =
+                        crate::i18n::text("修改尚未完成：{error}", &[("error", format!("{error}"))])
+                }
             }
         }
         ui.horizontal_wrapped(|ui| {
@@ -313,16 +321,19 @@ impl ContentPanel {
             &symbol,
             None,
         );
-        ui.collapsing(format!("{} 处内容引用", refs.len()), |ui| {
-            for r in refs {
-                ui.label(format!(
-                    "{}/{} · {}",
-                    r.story_id,
-                    r.node_id.unwrap_or_default(),
-                    r.field
-                ));
-            }
-        });
+        ui.collapsing(
+            crate::i18n::text("{arg0} 处内容引用", &[("arg0", format!("{}", refs.len()))]),
+            |ui| {
+                for r in refs {
+                    ui.label(format!(
+                        "{}/{} · {}",
+                        r.story_id,
+                        r.node_id.unwrap_or_default(),
+                        r.field
+                    ));
+                }
+            },
+        );
         if kind != "audio" {
             let file = if kind == "character" {
                 match self.slot {
@@ -380,10 +391,16 @@ impl ContentPanel {
             {
                 self.message = content_edit::store_shared(&root, project, key, self.replace_shared)
                     .map(|b| {
-                        format!(
-                            "已保存到共享库；备份：{}",
-                            b.map(|p| p.display().to_string())
-                                .unwrap_or_else(|| "首次创建".into())
+                        crate::i18n::text(
+                            "已保存到共享库；备份：{arg0}",
+                            &[(
+                                "arg0",
+                                format!(
+                                    "{}",
+                                    b.map(|p| p.display().to_string())
+                                        .unwrap_or_else(|| "首次创建".into())
+                                ),
+                            )],
                         )
                     })
                     .unwrap_or_else(|e| e.to_string());
@@ -391,7 +408,12 @@ impl ContentPanel {
             if ui.button(tr("从共享库移入回收目录")).clicked() {
                 self.message =
                     content_edit::remove_shared(&root, self.draft["id"].as_str().unwrap_or(""))
-                        .map(|p| format!("已保留于 {}", p.display()))
+                        .map(|p| {
+                            crate::i18n::text(
+                                "已保留于 {arg0}",
+                                &[("arg0", format!("{}", p.display()))],
+                            )
+                        })
                         .unwrap_or_else(|e| e.to_string());
             }
         });

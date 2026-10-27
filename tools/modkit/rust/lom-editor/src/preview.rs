@@ -1,3 +1,6 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
+use crate::i18n::tr;
 use eframe::egui::{self, Color32, FontId, Pos2, Rect, Stroke, TextureHandle, Vec2};
 use lom_core::project::Project;
 use serde_json::{json, Value};
@@ -10,6 +13,19 @@ use std::{
 mod flow_graph;
 
 pub fn edges(story: &Value) -> Vec<(String, String, String)> {
+    edges_with_labels(story, false)
+}
+fn localized_edges(story: &Value) -> Vec<(String, String, String)> {
+    edges_with_labels(story, true)
+}
+fn edges_with_labels(story: &Value, localized: bool) -> Vec<(String, String, String)> {
+    let translate = |source: &str| {
+        if localized {
+            tr(source)
+        } else {
+            source.to_owned()
+        }
+    };
     let mut out = Vec::new();
     for (index, node) in story["nodes"].as_array().into_iter().flatten().enumerate() {
         let id = text(node, "id");
@@ -23,7 +39,7 @@ pub fn edges(story: &Value) -> Vec<(String, String, String)> {
                 ("failure", "失败"),
             ] {
                 if node[key].as_str() == Some(&target) {
-                    labels.push(label.to_owned());
+                    labels.push(translate(label));
                 }
             }
             for key in ["options", "cases", "bands"] {
@@ -34,17 +50,30 @@ pub fn edges(story: &Value) -> Vec<(String, String, String)> {
                                 "cases" => {
                                     let source = node["source"].as_str().unwrap_or("mod");
                                     match (source, row["value"].as_i64()) {
-                                        ("mod" | "condition", Some(1)) => "条件成立（1）".into(),
-                                        ("mod" | "condition", Some(2)) => "条件不成立（2）".into(),
-                                        _ => format!(
-                                            "条件 {} {}",
-                                            if source == "game" {
+                                        ("mod" | "condition", Some(1)) => {
+                                            translate("条件成立（1）")
+                                        }
+                                        ("mod" | "condition", Some(2)) => {
+                                            translate("条件不成立（2）")
+                                        }
+                                        _ => {
+                                            let op = if source == "game" {
                                                 "="
                                             } else {
                                                 row["op"].as_str().unwrap_or(">=")
-                                            },
-                                            row["value"]
-                                        ),
+                                            };
+                                            if localized {
+                                                crate::i18n::text(
+                                                    "条件 {arg0} {arg1}",
+                                                    &[
+                                                        ("arg0", op.into()),
+                                                        ("arg1", row["value"].to_string()),
+                                                    ],
+                                                )
+                                            } else {
+                                                format!("条件 {op} {}", row["value"])
+                                            }
+                                        }
                                     }
                                 }
                                 _ => row["text"]
@@ -54,13 +83,17 @@ pub fn edges(story: &Value) -> Vec<(String, String, String)> {
                                     .unwrap_or_else(|| {
                                         format!(
                                             "{} {}",
-                                            if key == "bands" { "区间" } else { "选项" },
+                                            translate(if key == "bands" {
+                                                "区间"
+                                            } else {
+                                                "选项"
+                                            }),
                                             i + 1
                                         )
                                     }),
                             };
                             if let Some(outcome) = jump.strip_prefix("goto_") {
-                                label.push_str(&format!(" · {outcome}"));
+                                label.push_str(&format!(" · {}", translate(outcome)));
                             }
                             if !labels.contains(&label) {
                                 labels.push(label);
@@ -73,7 +106,7 @@ pub fn edges(story: &Value) -> Vec<(String, String, String)> {
                 id.to_owned(),
                 target,
                 if labels.is_empty() {
-                    "下一步".into()
+                    translate("下一步")
                 } else {
                     labels.join(" / ")
                 },
@@ -465,17 +498,8 @@ impl Preview {
         // Never touch the compilation-time Documents checkout during app startup.
         let library = if let Some(root) = std::env::var_os("LOM_MODKIT_ROOT") {
             PathBuf::from(root).join("data")
-        } else if let Some(appdata) = std::env::var_os("APPDATA") {
-            PathBuf::from(appdata).join("lom_modkit/game-previews")
         } else {
-            let home = std::env::var_os("HOME")
-                .map(PathBuf::from)
-                .unwrap_or_default();
-            if cfg!(target_os = "macos") {
-                home.join("Library/Application Support/lom_modkit/game-previews")
-            } else {
-                home.join(".local/share/lom_modkit/game-previews")
-            }
+            crate::workspace::user_root().join("game-previews")
         };
         let mapping: Value = serde_json::from_str(include_str!("../../../data/preview_map.json"))
             .expect("embedded preview mapping");
@@ -831,7 +855,7 @@ impl Preview {
                     paint_text(
                         &painter,
                         art,
-                        "原版结局插图占位\n游戏内由原版面板显示",
+                        &tr("原版结局插图占位\n游戏内由原版面板显示"),
                         rect.height() * 0.035,
                         Color32::from_rgb(80, 64, 45),
                     );
@@ -926,10 +950,12 @@ impl Preview {
                 paint_text(
                     &painter,
                     relative(rect, 0.28, 0.84, 0.6, 0.10),
-                    &format!(
-                        "死亡编号 {} · 完成后 {}",
-                        text(node, "death_id"),
-                        text(node, "next")
+                    &crate::i18n::text(
+                        "死亡编号 {arg0} · 完成后 {arg1}",
+                        &[
+                            ("arg0", format!("{}", text(node, "death_id"))),
+                            ("arg1", format!("{}", text(node, "next"))),
+                        ],
                     ),
                     rect.height() * 0.028,
                     Color32::GRAY,
@@ -972,7 +998,7 @@ impl Preview {
             ui.painter().text(
                 outer.left_bottom() + Vec2::new(8.0, -6.0),
                 egui::Align2::LEFT_BOTTOM,
-                "此步骤从入口不可达",
+                &tr("此步骤从入口不可达"),
                 FontId::proportional(11.0),
                 Color32::LIGHT_RED,
             );
@@ -1150,7 +1176,7 @@ fn card_data(project: &Project, node: &Value) -> Option<CardData> {
         card.kind = "ending";
         card.title = text(node, "title").into();
         if card.title.is_empty() {
-            card.title = "自定义结局标题".into();
+            card.title = tr("自定义结局标题");
         }
         card.body = text(node, "desc").into();
         card.image = text(node, "image").into();
@@ -1176,13 +1202,13 @@ fn card_data(project: &Project, node: &Value) -> Option<CardData> {
                 card.name = text(node, "name").into();
                 card.body = text(node, "text").into();
                 card.image = text(node, "image").into();
-                card.placeholder = "自定义人物\n未选择人物图片".into();
+                card.placeholder = tr("自定义人物\n未选择人物图片");
             }
             "character" => {
                 let id = text(node, "character").trim_start_matches("user:");
                 card.name = text(node, "character").into();
-                card.body = "还没有介绍卡。请在内容库填写角色介绍。".into();
-                card.placeholder = "自定义角色\n未设置介绍图".into();
+                card.body = tr("还没有介绍卡。请在内容库填写角色介绍。");
+                card.placeholder = tr("自定义角色\n未设置介绍图");
                 for (path, bytes) in &project.assets {
                     if !path.ends_with("/content.json") {
                         continue;
@@ -1225,15 +1251,15 @@ fn card_data(project: &Project, node: &Value) -> Option<CardData> {
                 card.title = entry
                     .and_then(|v| v["title"].as_str())
                     .filter(|s| !s.is_empty())
-                    .unwrap_or("原版人物资料")
-                    .into();
+                    .map(str::to_owned)
+                    .unwrap_or_else(|| tr("原版人物资料"));
                 card.name = entry.and_then(|v| v["name"].as_str()).unwrap_or(id).into();
                 card.body = entry
                     .and_then(|v| v["intro"].as_str())
                     .filter(|s| !s.is_empty())
-                    .unwrap_or("未提取到该人物的原版介绍正文。")
-                    .into();
-                card.placeholder = "游戏内显示\n原版关系头像".into();
+                    .map(str::to_owned)
+                    .unwrap_or_else(|| tr("未提取到该人物的原版介绍正文。"));
+                card.placeholder = tr("游戏内显示\n原版关系头像");
             }
         }
     } else {

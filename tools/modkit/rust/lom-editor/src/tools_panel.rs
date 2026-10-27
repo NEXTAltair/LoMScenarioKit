@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Auxiliary native workflows share the same in-memory project as authoring.
 use eframe::egui;
 use lom_core::{content_library, game_tools, project::Project, release};
@@ -74,7 +76,8 @@ pub struct ToolsPanel {
 }
 impl Default for ToolsPanel {
     fn default() -> Self {
-        let settings = lom_core::load_json(settings_path()).unwrap_or(json!({}));
+        let settings =
+            load_tool_settings(&settings_path(), &legacy_settings_path()).unwrap_or(json!({}));
         Self {
             page: ToolPage::default(),
             export_requested: false,
@@ -177,16 +180,14 @@ impl ToolsPanel {
             return Ok("试玩已准备：C# 宿主刚刚更新，请完整退出并重新启动游戏。".into());
         }
         game_tools::launch_game()?;
-        Ok(format!("试玩请求已发送：{script}/{node}"))
+        Ok(crate::i18n::text(
+            "试玩请求已发送：{script}/{node}",
+            &[("script", format!("{script}")), ("node", format!("{node}"))],
+        ))
     }
     fn save_setting(&mut self, key: &str, value: Value) -> bool {
         let path = settings_path();
-        let result = (|| {
-            let mut settings = lom_core::load_json(&path).unwrap_or(json!({}));
-            anyhow::ensure!(settings.is_object(), "设置文件不是对象");
-            settings[key] = value;
-            lom_core::project::atomic_write(&path, &lom_core::stable_json(&settings)?)
-        })();
+        let result = save_tool_setting(&path, &legacy_settings_path(), key, value);
         if let Err(e) = result {
             self.result::<Value>("操作未完成", Err(e));
             false
@@ -275,9 +276,7 @@ impl ToolsPanel {
         }
         self.game = path;
         self.game_loaded = false;
-        if self.save_setting("game_dir", json!(self.game)) {
-            self.start_extraction();
-        }
+        self.start_extraction();
     }
     pub fn start_extraction(&mut self) {
         if self.job.is_some() {
@@ -294,7 +293,7 @@ impl ToolsPanel {
         };
         if crate::asset_extraction::validate_game(&self.game).is_err() {
             let Some(path) = rfd::FileDialog::new()
-                .set_title("选择包含 Mortal_Data 的游戏目录")
+                .set_title(crate::i18n::tr("选择包含 Mortal_Data 的游戏目录"))
                 .pick_folder()
             else {
                 return;
@@ -305,9 +304,9 @@ impl ToolsPanel {
             }
             self.game = path;
             self.game_loaded = false;
-            if !self.save_setting("game_dir", json!(self.game)) {
-                return;
-            }
+        }
+        if !self.save_setting("game_dir", json!(self.game)) {
+            return;
         }
         let game = self.game.clone();
         let cache = settings_path().parent().unwrap().join("game-previews");
@@ -854,7 +853,9 @@ impl ToolsPanel {
                     .clicked()
                 {
                     if let Some(paths) = rfd::FileDialog::new()
-                        .set_title("选择 Save_universe.dat；将自动保留原始备份")
+                        .set_title(crate::i18n::tr(
+                            "选择 Save_universe.dat；将自动保留原始备份",
+                        ))
                         .add_filter("Universe", &["dat"])
                         .pick_files()
                     {
@@ -862,9 +863,9 @@ impl ToolsPanel {
                     }
                 }
                 if !self.read_reset.is_empty() {
-                    ui.label(
+                    ui.label(tr(
                         "只清理当前作品及临时试玩包的已读文本记录，保留其它存档内容。先建立备份。",
-                    );
+                    ));
                     for path in &self.read_reset {
                         ui.label(path.display().to_string());
                     }
@@ -938,7 +939,7 @@ impl ToolsPanel {
                         .clicked()
                     {
                         if let Some(path) = rfd::FileDialog::new()
-                            .set_title("选择包含 Mortal_Data 的游戏目录")
+                            .set_title(crate::i18n::tr("选择包含 Mortal_Data 的游戏目录"))
                             .pick_folder()
                         {
                             match crate::asset_extraction::validate_game(&path) {
@@ -1022,7 +1023,7 @@ impl ToolsPanel {
                     }
                     if ui.button(crate::i18n::tr("生成发布目录")).clicked() {
                         if let Some(path) = rfd::FileDialog::new()
-                            .set_title("发布包、校验和与安装说明的输出目录")
+                            .set_title(crate::i18n::tr("发布包、校验和与安装说明的输出目录"))
                             .pick_folder()
                         {
                             self.result(
@@ -1064,7 +1065,7 @@ impl ToolsPanel {
                 );
                 if ui.button(crate::i18n::tr("选择 FFmpeg 程序")).clicked() {
                     if let Some(path) = rfd::FileDialog::new()
-                        .set_title("选择 ffmpeg 可执行程序")
+                        .set_title(crate::i18n::tr("选择 ffmpeg 可执行程序"))
                         .pick_file()
                     {
                         self.ffmpeg = Some(path.clone());
@@ -1228,14 +1229,19 @@ impl ToolsPanel {
                     }
                 }
                 if let Some(info) = &self.pending_info {
-                    ui.label(format!(
-                        "{} · {} · 作者：{} · 许可：{}",
-                        info.name, info.version, info.author, info.license
+                    ui.label(crate::i18n::text(
+                        "{arg0} · {arg1} · 作者：{arg2} · 许可：{arg3}",
+                        &[
+                            ("arg0", format!("{}", info.name)),
+                            ("arg1", format!("{}", info.version)),
+                            ("arg2", format!("{}", info.author)),
+                            ("arg3", format!("{}", info.license)),
+                        ],
                     ));
                     if !info.missing_dependencies.is_empty() {
-                        ui.label(format!(
-                            "缺少依赖：{}",
-                            info.missing_dependencies.join("、")
+                        ui.label(crate::i18n::text(
+                            "缺少依赖：{arg0}",
+                            &[("arg0", format!("{}", info.missing_dependencies.join("、")))],
                         ));
                     }
                     let permitted = info.collision_type.is_none();
@@ -1430,10 +1436,35 @@ pub(crate) fn steam_launch_fix(root: &std::path::Path) -> anyhow::Result<Vec<Str
     }
 }
 fn settings_path() -> PathBuf {
+    crate::workspace::user_root().join("settings.json")
+}
+fn legacy_settings_path() -> PathBuf {
     lom_core::content::default_repository_root()
         .parent()
         .unwrap()
         .join("settings.json")
+}
+fn load_tool_settings(path: &std::path::Path, legacy: &std::path::Path) -> anyhow::Result<Value> {
+    // Migrate only when our settings do not exist; a damaged current file must
+    // not be silently replaced by the reference editor's settings.
+    if path.exists() {
+        lom_core::load_json(path)
+    } else if legacy.exists() {
+        lom_core::load_json(legacy)
+    } else {
+        Ok(json!({}))
+    }
+}
+fn save_tool_setting(
+    path: &std::path::Path,
+    legacy: &std::path::Path,
+    key: &str,
+    value: Value,
+) -> anyhow::Result<()> {
+    let mut settings = load_tool_settings(path, legacy)?;
+    anyhow::ensure!(settings.is_object(), "设置文件不是对象");
+    settings[key] = value;
+    lom_core::project::atomic_write(path, &lom_core::stable_json(&settings)?)
 }
 fn prepare_preview(project: &Project, script: &str, node: &str) -> anyhow::Result<Project> {
     let mut preview = project.clone();
@@ -1454,7 +1485,7 @@ fn prepare_preview(project: &Project, script: &str, node: &str) -> anyhow::Resul
         .and_then(|n| n["id"].as_str())
         .unwrap_or(node));
     story["nodes"].as_array_mut().unwrap().extend(prelude);
-    preview.manifest = json!({"format":3,"package_format":3,"story_schema":2,"content_schema":1,"id":game_tools::PREVIEW_ID,"campaign_id":game_tools::PREVIEW_ID,"name":format!("编辑器临时试玩：{script}"),"version":"0.0.0-preview","author":"lom_modkit","description":format!("从 {script}/{node} 开始的临时测试包"),"entry":script,"campaign":{"new_game":true,"disable_official_events":true}});
+    preview.manifest = json!({"format":3,"package_format":3,"story_schema":2,"content_schema":1,"id":game_tools::PREVIEW_ID,"campaign_id":game_tools::PREVIEW_ID,"name":crate::i18n::text("编辑器临时试玩：{script}", &[("script", format!("{script}"))]),"version":"0.0.0-preview","author":"lom_modkit","description":crate::i18n::text("从 {script}/{node} 开始的临时测试包", &[("script", format!("{script}")), ("node", format!("{node}"))]),"entry":script,"campaign":{"new_game":true,"disable_official_events":true}});
     Ok(preview)
 }
 fn copy_content_to_project(
@@ -1561,6 +1592,25 @@ fn show_report(ui: &mut egui::Ui, value: &Value, depth: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn tool_settings_migrate_without_modifying_legacy_or_replacing_damaged_current_settings() {
+        let dir = tempfile::tempdir().unwrap();
+        let legacy = dir.path().join("reference/settings.json");
+        let current = dir.path().join("ours/settings.json");
+        let original = br#"{"game_dir":"old game","ffmpeg":"keep tool","custom":true}"#;
+        std::fs::create_dir_all(legacy.parent().unwrap()).unwrap();
+        std::fs::write(&legacy, original).unwrap();
+        save_tool_setting(&current, &legacy, "game_dir", json!("chosen game")).unwrap();
+        let saved = lom_core::load_json(&current).unwrap();
+        assert_eq!(saved["game_dir"], "chosen game");
+        assert_eq!(saved["ffmpeg"], "keep tool");
+        assert_eq!(saved["custom"], true);
+        assert_eq!(std::fs::read(&legacy).unwrap(), original);
+        std::fs::write(&current, b"{damaged").unwrap();
+        assert!(save_tool_setting(&current, &legacy, "game_dir", json!("another game")).is_err());
+        assert_eq!(std::fs::read(&current).unwrap(), b"{damaged");
+        assert_eq!(std::fs::read(&legacy).unwrap(), original);
+    }
     #[cfg(windows)]
     #[test]
     fn windows_game_tools_work_with_an_unusable_system_temp() {

@@ -10,7 +10,7 @@ LoMScenarioKitの制作エディターは、lom_modkitの既存Rust GUIを基盤
 
 ## 起動する
 
-Rust 1.89以降とCargoが必要です。確認環境はRust 1.93.1、Linux/X11です。LinuxではC/C++ビルド環境、OpenGLとウィンドウ環境、日本語を表示できるフォントも必要です。Windows向けのゲーム導入作業はエディターの起動には不要です。
+ソースから起動する場合はRust 1.89以降、Cargo、Python 3.12以降が必要です。確認環境はRust 1.93.1、Python 3.12、Linux/X11です。LinuxではC/C++ビルド環境、OpenGLとウィンドウ環境が必要です。表示用のNoto Sans CJKは同梱しているため、追加のフォント設定は不要です。Windows向けのゲーム導入作業はエディターの起動には不要です。
 
 Linux・macOS・WSLでは、リポジトリのルートで実行します。
 
@@ -18,7 +18,11 @@ Linux・macOS・WSLでは、リポジトリのルートで実行します。
 ./editor
 ```
 
-WSLではX11とCPU描画を自動で選びます。`WAYLAND_DISPLAY` / `WAYLAND_SOCKET` を外し、未指定なら `LIBGL_ALWAYS_SOFTWARE=true` と `GALLIUM_DRIVER=llvmpipe` を設定します。WSL以外の描画設定は変更しません。Rustのビルドは必要に応じて自動で行います。
+初回は素材抽出ツールの依存をダウンロードし、専用のPython環境で実行ファイルを作ります。処理中は準備メッセージが出ます。準備済みなら再ビルドせず起動します。環境と成果物はCargoの`target/`内に保存し、システムのPython環境にはインストールしません。Pythonの場所を指定する場合は `EXTRACTOR_PYTHON=/path/to/python3.12 ./editor` とします。失敗時の詳細は`target/asset-extractor-build/build.log`に残ります。
+
+WSLではX11とCPU描画を自動で選びます。`WAYLAND_DISPLAY` / `WAYLAND_SOCKET` を外し、未指定なら `LIBGL_ALWAYS_SOFTWARE=true`、`GALLIUM_DRIVER=llvmpipe`、`XCURSOR_SIZE=24` を設定します。WSL以外の描画設定は変更しません。Rustのビルドは必要に応じて自動で行います。ポインターの大きさを変える場合は `XCURSOR_SIZE=32 ./editor` のように指定できます。
+
+表示言語は設定（`Ctrl+,`、macOSは`⌘,`）で、日本語・簡体字・繁体字・韓国語・英語に切り替えられます。切り替えはその場で反映され、次回起動時にも保持されます。台詞・作品名・人物名・コメント本文は書き換えません。英語表示で訳が用意されていないゲーム固有名は原表記を使います。表示言語の追加によって、ゲーム側のシナリオ翻訳対応言語が増えるわけではありません。
 
 章・選択肢・フラグ・分岐を含むサンプルも開けます。自作の作品にはサンプルのコピーを使ってください。
 
@@ -32,6 +36,10 @@ WSLではX11とCPU描画を自動で選びます。`WAYLAND_DISPLAY` / `WAYLAND_
 ```sh
 cargo run --locked --manifest-path tools/modkit/Cargo.toml -p lom-editor
 ```
+
+`cargo run`を直接使う場合は、`python tools/build_editor.py --prepare-extractor --print-target`で抽出ツールを準備し、表示されたターゲットを`cargo run`の`--target`に指定してください。
+
+エディターと抽出ツールを同じ環境で動かすため、起動・配布スクリプトはRustコンパイラーのホストターゲットを明示します。Cargoの`build.target`や`CARGO_BUILD_TARGET`より、この指定を優先します。両方を`target/<ホストターゲット>/<debugまたはrelease>/`へ配置します。`CARGO_TARGET_DIR`などの出力先設定は引き継ぎます。
 
 既存のMortalModHost制作フォルダ・JSON・`.lommod` も読み込めます。新規プロジェクトはLoMScenarioAddon向けです。互換用のMortalModHostプロジェクトはファイルメニューから作成できます。両形式のランタイムや書き出し先は異なります。
 
@@ -51,6 +59,31 @@ cargo run --locked --manifest-path tools/modkit/Cargo.toml -p lom-editor
 コメントは投稿時の引用を保持します。本文を変更・削除しても引用は残り、人間とエージェントの投稿を区別できます。返信は親の引用を引き継ぎます。「解決済み」は指摘を消す操作ではありません。
 
 入力中のコメントは「コメントを追加」、設定は「設定を反映」を押した後、ファイルメニューから保存してください。履歴から復元した章も、保存するまでは未確定です。復元時には現在のコメント・判定と、ほかの章を保持します。
+
+## ゲームの立ち絵・背景をプレビューする
+
+1. 「ファイル → ゲームからプレビュー素材を抽出…」を開きます。
+2. 初回は`Mortal_Data`を含むゲームのインストールフォルダーを選びます。WSLではWindowsのドライブを`/mnt/c/`などから開きます。
+3. 抽出の進捗が表示されます。ウィンドウを閉じて編集を続けることも、抽出をキャンセルすることもできます。
+4. 完了すると素材が自動で読み込まれ、次回起動にも引き継がれます。「人物登場」で人物・表情、「公式背景切替」で背景を選ぶと、右側で表示を確認できます。
+
+抽出するのは立ち絵・表情・背景で、画像は原則長辺1024pxに縮小します。音声はこのプレビュー抽出の対象ではありません。ゲーム内では素材IDを使って本体の素材を読み込みます。
+
+画像はWindowsでは`%APPDATA%/LoMScenarioKit/game-previews/`、Linux・WSLでは`~/.local/share/LoMScenarioKit/game-previews/`、macOSでは`~/Library/Application Support/LoMScenarioKit/game-previews/`へ保存します。ゲーム本体は読み取り専用で扱い、抽出画像を作品や配布物へ自動で追加しません。以前の素材フォルダーも上書きしません。
+
+抽出済みの場合は「ファイル → プレビュー素材フォルダーを選択…」で、`preview_map.json`と`assets/`を含むフォルダーを指定できます。
+
+## エディターの配布フォルダーを作る
+
+配布先と同じOS・CPUで、Python 3.12以降を使って実行します。
+
+```sh
+python3.12 tools/build_editor.py --output-dir dist/LoMScenarioKit-editor
+```
+
+Windowsでは`py -3.12 tools/build_editor.py --output-dir dist/LoMScenarioKit-editor`です。Rustのreleaseビルドと抽出ツールの準備を行い、エディター、JSON CLI、抽出ツール、ライセンス、文書、再ビルド用ソースZIPを新しいフォルダーへまとめます。既存の出力先は上書きしません。ビルドしたOSと互換性のある環境で使用してください。
+
+利用者はフォルダー内の`lom-editor`（Windowsでは`lom-editor.exe`）を起動します。`asset-extractor/`を含むフォルダー全体を渡してください。配布版の実行にはPython・Cargoのインストールは不要です。ゲーム本体や抽出済み画像は配布フォルダーに含めません。
 
 ## JSON CLIで編集する
 
