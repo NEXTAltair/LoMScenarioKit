@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Offline help: one article at a time, with the same field names as the editor.
 use crate::i18n::{self, tr};
 use eframe::egui::{self, Color32, RichText};
@@ -73,7 +75,7 @@ fn parse(html: &str) -> Vec<Article> {
         .collect()
 }
 fn articles() -> &'static [Article] {
-    static GUIDES: OnceLock<[Vec<Article>; 4]> = OnceLock::new();
+    static GUIDES: OnceLock<[Vec<Article>; 5]> = OnceLock::new();
     let guides = GUIDES.get_or_init(|| i18n::LOCALES.map(|locale| parse(i18n::help_html(locale))));
     &guides[i18n::LOCALES
         .iter()

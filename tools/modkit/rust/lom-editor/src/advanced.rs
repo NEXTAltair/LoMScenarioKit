@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Advanced authoring workflows with explicit navigation and transactional edits.
 use crate::i18n::tr;
 use eframe::egui;
@@ -125,7 +127,10 @@ impl Advanced {
     fn select_tests(&mut self, project: &mut Project, sid: &str) -> bool {
         if self.tests_story != sid {
             if let Err(error) = self.apply_pending(project) {
-                self.error = format!("测试输入尚未完成：{error}");
+                self.error = crate::i18n::text(
+                    "测试输入尚未完成：{error}",
+                    &[("error", format!("{error}"))],
+                );
                 return false;
             }
             self.load_tests(project, sid);
@@ -200,7 +205,10 @@ impl Advanced {
                     &self.query,
                     &self.category,
                 );
-                ui.label(format!("{} 个匹配", hits.len()));
+                ui.label(crate::i18n::text(
+                    "{arg0} 个匹配",
+                    &[("arg0", format!("{}", hits.len()))],
+                ));
                 let (location, refs) = rows(ui, &hits);
                 nav = location;
                 if let Some(h) = refs {
@@ -248,12 +256,14 @@ impl Advanced {
                             display_label(s["kind"].as_str().unwrap_or("")),
                             s["name"].as_str().unwrap_or("")
                         ));
-                        ui.label(format!(
-                            "读取 {} · 写入 {} · 未使用 {} · 可能先读后写 {}",
-                            s["reads"],
-                            s["writes"],
-                            tri(&s["unused"]),
-                            tri(&s["possibly_read_before_write"])
+                        ui.label(crate::i18n::text(
+                            "读取 {arg0} · 写入 {arg1} · 未使用 {arg2} · 可能先读后写 {arg3}",
+                            &[
+                                ("arg0", format!("{}", s["reads"])),
+                                ("arg1", format!("{}", s["writes"])),
+                                ("arg2", format!("{}", tri(&s["unused"]))),
+                                ("arg3", format!("{}", tri(&s["possibly_read_before_write"]))),
+                            ],
                         ));
                         for u in s["uses"].as_array().into_iter().flatten() {
                             let sid = u["story"].as_str().unwrap_or("");
@@ -424,9 +434,13 @@ impl Advanced {
                     }
                 }
                 if let Some((_, before, plan)) = &self.proposal {
-                    ui.label(format!(
-                        "{} → {} · {} 个节点",
-                        plan.source_story, plan.target_story, plan.count
+                    ui.label(crate::i18n::text(
+                        "{arg0} → {arg1} · {arg2} 个节点",
+                        &[
+                            ("arg0", format!("{}", plan.source_story)),
+                            ("arg1", format!("{}", plan.target_story)),
+                            ("arg2", format!("{}", plan.count)),
+                        ],
                     ));
                     for w in &plan.warnings {
                         ui.colored_label(ui.visuals().warn_fg_color, w);
@@ -483,7 +497,10 @@ impl Advanced {
                 {
                     self.results = Value::Null;
                     if let Err(error) = self.apply_pending(project) {
-                        self.error = format!("测试输入尚未完成：{error}");
+                        self.error = crate::i18n::text(
+                            "测试输入尚未完成：{error}",
+                            &[("error", format!("{error}"))],
+                        );
                     }
                 }
                 let mut run = false;

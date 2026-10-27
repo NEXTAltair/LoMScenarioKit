@@ -1,3 +1,5 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 use crate::i18n::tr;
 use eframe::egui::{self, Color32, RichText, Ui};
 use serde_json::{json, Value};
@@ -193,7 +195,17 @@ impl Catalog {
     ) -> Vec<(String, String)> {
         let mut options = self.raw_options(kind, node, nodes, stories);
         for (id, name) in &mut options {
-            if kind.starts_with("enum:") || ["mode", "facing", "branch_source"].contains(&kind) {
+            if let Some(set) = kind.strip_prefix("enum:") {
+                let specific = format!("enum.{set}.{id}");
+                let label = crate::i18n::key(&specific);
+                *name = if label != specific {
+                    label
+                } else if name == "设置" {
+                    crate::i18n::key("enum.set")
+                } else {
+                    tr(name)
+                };
+            } else if ["mode", "facing", "branch_source"].contains(&kind) {
                 *name = tr(name);
             } else if kind == "portrait"
                 && !node["character"]
@@ -493,7 +505,7 @@ impl Catalog {
         if !allow_goto && node.get("goto").is_some() {
             ui.colored_label(
                 Color32::from_rgb(255, 107, 97),
-                "此节点由自己的分支决定流程，不允许额外 goto。",
+                tr("此节点由自己的分支决定流程，不允许额外 goto。"),
             );
             if ui.button(tr("移除非法 goto 字段")).clicked() {
                 node.as_object_mut().unwrap().remove("goto");
@@ -1443,7 +1455,7 @@ fn array_editor(
     node_ids: &[String],
 ) -> bool {
     let Some(array) = value.as_array_mut() else {
-        return value_editor(ui, "内容", value, 0);
+        return value_editor(ui, &crate::i18n::tr("内容"), value, 0);
     };
     let mut changed = false;
     let mut remove = None;
@@ -1452,7 +1464,10 @@ fn array_editor(
         ui.push_id(i, |ui| {
             egui::Frame::group(ui.style()).show(ui, |ui| {
                 ui.horizontal(|ui| {
-                    ui.strong(format!("第 {} 项", i + 1));
+                    ui.strong(crate::i18n::text(
+                        "第 {arg0} 项",
+                        &[("arg0", format!("{}", i + 1))],
+                    ));
                     if ui.small_button("↑").clicked() && i > 0 {
                         swap = Some((i, i - 1));
                     }
@@ -1544,7 +1559,7 @@ fn array_editor(
                     });
                     ui.data_mut(|d| d.insert_temp(key_id, key));
                 } else {
-                    changed |= value_editor(ui, "值", &mut array[i], 1);
+                    changed |= value_editor(ui, &crate::i18n::tr("值"), &mut array[i], 1);
                 }
             });
         });
@@ -1628,39 +1643,51 @@ pub fn value_editor(ui: &mut Ui, label: &str, value: &mut Value, depth: usize) -
             }
         }
         Value::Array(a) => {
-            ui.collapsing(format!("{} · {} 项", label, a.len()), |ui| {
-                let mut remove = None;
-                for (i, v) in a.iter_mut().enumerate() {
-                    ui.push_id(i, |ui| {
-                        ui.horizontal(|ui| {
-                            ui.label(format!("第 {} 项", i + 1));
-                            if ui.small_button(tr("删除")).clicked() {
-                                remove = Some(i);
-                            }
+            ui.collapsing(
+                crate::i18n::text(
+                    "{arg0} · {arg1} 项",
+                    &[
+                        ("arg0", format!("{}", label)),
+                        ("arg1", format!("{}", a.len())),
+                    ],
+                ),
+                |ui| {
+                    let mut remove = None;
+                    for (i, v) in a.iter_mut().enumerate() {
+                        ui.push_id(i, |ui| {
+                            ui.horizontal(|ui| {
+                                ui.label(crate::i18n::text(
+                                    "第 {arg0} 项",
+                                    &[("arg0", format!("{}", i + 1))],
+                                ));
+                                if ui.small_button(tr("删除")).clicked() {
+                                    remove = Some(i);
+                                }
+                            });
+                            changed |= value_editor(ui, &crate::i18n::tr("内容"), v, depth + 1);
+                            ui.separator();
                         });
-                        changed |= value_editor(ui, "内容", v, depth + 1);
-                        ui.separator();
+                    }
+                    if let Some(i) = remove {
+                        a.remove(i);
+                        changed = true;
+                    }
+                    ui.horizontal(|ui| {
+                        if ui.button(tr("＋ 文本")).clicked() {
+                            a.push(json!(""));
+                            changed = true;
+                        }
+                        if ui.button(tr("＋ 对象")).clicked() {
+                            a.push(json!({}));
+                            changed = true;
+                        }
+                        if ui.button(tr("＋ 同类项")).clicked() {
+                            a.push(a.last().cloned().unwrap_or(json!({})));
+                            changed = true;
+                        }
                     });
-                }
-                if let Some(i) = remove {
-                    a.remove(i);
-                    changed = true;
-                }
-                ui.horizontal(|ui| {
-                    if ui.button(tr("＋ 文本")).clicked() {
-                        a.push(json!(""));
-                        changed = true;
-                    }
-                    if ui.button(tr("＋ 对象")).clicked() {
-                        a.push(json!({}));
-                        changed = true;
-                    }
-                    if ui.button(tr("＋ 同类项")).clicked() {
-                        a.push(a.last().cloned().unwrap_or(json!({})));
-                        changed = true;
-                    }
-                });
-            });
+                },
+            );
         }
         Value::Object(o) => {
             egui::CollapsingHeader::new(label)
@@ -1694,12 +1721,12 @@ pub fn value_editor(ui: &mut Ui, label: &str, value: &mut Value, depth: usize) -
                     ui.add(egui::TextEdit::singleline(&mut key).hint_text(tr("新字段名")));
                     ui.horizontal(|ui| {
                         egui::ComboBox::from_id_salt("value-type")
-                            .selected_text(["文本", "数字", "布尔", "对象", "列表"][ty])
+                            .selected_text(tr(["文本", "数字", "布尔", "对象", "列表"][ty]))
                             .show_ui(ui, |ui| {
                                 for (i, n) in
                                     ["文本", "数字", "布尔", "对象", "列表"].iter().enumerate()
                                 {
-                                    ui.selectable_value(&mut ty, i, *n);
+                                    ui.selectable_value(&mut ty, i, tr(n));
                                 }
                             });
                         if ui.button(tr("添加字段")).clicked()
@@ -1728,7 +1755,10 @@ pub fn value_editor(ui: &mut Ui, label: &str, value: &mut Value, depth: usize) -
         }
         Value::Null => {
             ui.horizontal(|ui| {
-                ui.label(format!("{label}：空值"));
+                ui.label(crate::i18n::text(
+                    "{label}：空值",
+                    &[("label", format!("{label}"))],
+                ));
                 if ui.button(tr("设为文本")).clicked() {
                     *value = json!("");
                     changed = true;

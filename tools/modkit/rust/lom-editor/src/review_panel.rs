@@ -1,5 +1,6 @@
-// Copyright (C) 2026 NEXTAltair
+// Copyright (C) 2026 NEXTAltair; modified 2026-10-27.
 // GPL-3.0-only with the additional permission in the repository LICENSE-GAME-EXCEPTION.txt.
+use crate::i18n::{text, tr};
 use eframe::egui::{self, RichText};
 use lom_core::{
     project::Project,
@@ -60,18 +61,18 @@ mod tests {
             )]
         };
         let output = draw(&mut panel, &mut project, vec![]);
-        draw(&mut panel, &mut project, click(output, "コメントを追加"));
+        draw(&mut panel, &mut project, click(output, &tr("添加评论")));
         let comments = review::load(&project).unwrap().comments;
         assert_eq!(comments.len(), 1);
         assert_eq!(comments[0].actor, Actor::Human);
         assert!(!panel.has_pending());
         let output = draw(&mut panel, &mut project, vec![]);
-        draw(&mut panel, &mut project, click(output, "返信"));
+        draw(&mut panel, &mut project, click(output, &tr("回复")));
         panel.text = "反映しました".into();
         let output = draw(&mut panel, &mut project, vec![]);
-        draw(&mut panel, &mut project, click(output, "コメントを追加"));
+        draw(&mut panel, &mut project, click(output, &tr("添加评论")));
         let output = draw(&mut panel, &mut project, vec![]);
-        draw(&mut panel, &mut project, click(output, "解決済みにする"));
+        draw(&mut panel, &mut project, click(output, &tr("标记为已解决")));
         let comments = review::load(&project).unwrap().comments;
         assert!(comments[0].resolved);
         assert_eq!(comments[1].parent.as_deref(), Some(comments[0].id.as_str()));
@@ -104,21 +105,26 @@ impl Panel {
         node: Option<&str>,
     ) -> Option<String> {
         let mut jump = None;
-        ui.heading("資料・添削");
+        ui.heading(tr("资料与审阅"));
         ui.horizontal_wrapped(|ui| {
-            for (index, title) in ["判定・コメント", "資料", "保存履歴", "Addon設定"]
-                .iter()
-                .enumerate()
+            for (index, title) in [
+                tr("评定与评论"),
+                tr("资料"),
+                tr("保存历史"),
+                tr("Addon 设置"),
+            ]
+            .iter()
+            .enumerate()
             {
-                ui.selectable_value(&mut self.tab, index, *title);
+                ui.selectable_value(&mut self.tab, index, title.as_str());
             }
         });
         ui.separator();
         let result = (|| -> anyhow::Result<()> {
             match self.tab {
                 0 => {
-                    ui.label(format!("章: {story}"));
-                    ui.checkbox(&mut self.node_only, "選択中のノードを対象にする");
+                    ui.label(text("章节：{story}", &[("story", story.into())]));
+                    ui.checkbox(&mut self.node_only, tr("针对选中的节点"));
                     let target = if self.node_only { node } else { None };
                     if let Some(id) = target {
                         ui.monospace(id);
@@ -127,27 +133,27 @@ impl Panel {
                     let mut verdict = review::verdict(&review, story, target);
                     let old = verdict;
                     egui::ComboBox::from_id_salt("review-verdict")
-                        .selected_text(verdict.label())
+                        .selected_text(verdict_label(verdict))
                         .show_ui(ui, |ui| {
                             for value in Verdict::ALL {
-                                ui.selectable_value(&mut verdict, value, value.label());
+                                ui.selectable_value(&mut verdict, value, verdict_label(value));
                             }
                         });
                     if verdict != old {
                         review::set_verdict(project, story, target, verdict)?;
                     }
-                    ui.label("指摘と引用は本文と別に保存されます。変更後は画面上部の保存を押してください。");
+                    ui.label(tr("评论与引用单独保存。修改后，请按顶部的保存按钮。"));
                     if self.name.is_empty() {
-                        self.name = "作者".into();
+                        self.name = tr("作者");
                     }
                     ui.horizontal(|ui| {
-                        ui.label("名前");
+                        ui.label(tr("姓名"));
                         ui.text_edit_singleline(&mut self.name);
                     });
                     if let Some(id) = self.reply.clone() {
                         ui.horizontal(|ui| {
-                            ui.label(format!("返信先: {id}"));
-                            if ui.small_button("返信をやめる").clicked() {
+                            ui.label(text("回复对象：{id}", &[("id", id.clone())]));
+                            if ui.small_button(tr("取消回复")).clicked() {
                                 self.reply = None;
                             }
                         });
@@ -156,12 +162,12 @@ impl Panel {
                         egui::TextEdit::multiline(&mut self.text)
                             .desired_rows(3)
                             .desired_width(f32::INFINITY)
-                            .hint_text("指摘・提案・返信"),
+                            .hint_text(tr("评论、建议或回复")),
                     );
                     if ui
                         .add_enabled(
                             !self.text.trim().is_empty(),
-                            egui::Button::new("コメントを追加"),
+                            egui::Button::new(tr("添加评论")),
                         )
                         .clicked()
                     {
@@ -187,9 +193,9 @@ impl Panel {
                             ui.strong(format!(
                                 "{} · {}",
                                 if comment.actor == Actor::Human {
-                                    "人間"
+                                    tr("人工")
                                 } else {
-                                    "エージェント"
+                                    tr("智能代理")
                                 },
                                 comment.name
                             ));
@@ -199,22 +205,22 @@ impl Panel {
                                 }
                             }
                             ui.label(if comment.resolved {
-                                "解決済み"
+                                tr("已解决")
                             } else {
-                                "未解決"
+                                tr("未解决")
                             });
                         });
                         ui.label(RichText::new(&comment.quote).weak());
                         ui.label(&comment.text);
                         ui.horizontal(|ui| {
-                            if ui.small_button("返信").clicked() {
+                            if ui.small_button(tr("回复")).clicked() {
                                 self.reply = Some(comment.id.clone());
                             }
                             if ui
                                 .small_button(if comment.resolved {
-                                    "未解決に戻す"
+                                    tr("重新打开")
                                 } else {
-                                    "解決済みにする"
+                                    tr("标记为已解决")
                                 })
                                 .clicked()
                             {
@@ -234,9 +240,9 @@ impl Panel {
                                 ui.strong(format!(
                                     "{} · {}",
                                     if reply.actor == Actor::Human {
-                                        "人間"
+                                        tr("人工")
                                     } else {
-                                        "エージェント"
+                                        tr("智能代理")
                                     },
                                     reply.name
                                 ));
@@ -248,12 +254,12 @@ impl Panel {
                 1 => {
                     ui.add(
                         egui::TextEdit::singleline(&mut self.query)
-                            .hint_text("資料の見出し・本文を検索"),
+                            .hint_text(tr("搜索资料标题与正文")),
                     );
                     if let Some(root) = workspace_store::root(project) {
                         let documents = review::outline(root, &self.query)?;
                         if documents.is_empty() {
-                            ui.label("プロジェクト内の outline/ にMarkdown資料を置いてください。");
+                            ui.label(tr("请将 Markdown 资料放在项目的 outline/ 文件夹中。"));
                         }
                         for doc in &documents {
                             if ui
@@ -272,7 +278,7 @@ impl Panel {
                             ui.separator();
                             ui.label(&doc.path);
                             let mut target = None;
-                            ui.collapsing("目次", |ui| {
+                            ui.collapsing(tr("目录"), |ui| {
                                 for heading in &doc.headings {
                                     if ui
                                         .link(format!(
@@ -304,11 +310,11 @@ impl Panel {
                             }
                         }
                     } else {
-                        ui.label("資料を読むにはプロジェクトをフォルダへ保存してください。");
+                        ui.label(tr("请先将项目保存到文件夹，再查看资料。"));
                     }
                 }
                 2 => {
-                    ui.label("保存ごとの変更前後を確認できます。章の復元は未保存の編集として反映されます。");
+                    ui.label(tr("可查看每次保存的前后差异。恢复章节后，请再次保存。"));
                     if workspace_store::root(project).is_some() {
                         for entry in workspace_store::history(project, 50)? {
                             let label = format!(
@@ -333,7 +339,10 @@ impl Panel {
                             ui.separator();
                             ui.monospace(entry["id"].as_str().unwrap_or(""));
                             if ui
-                                .button(format!("この履歴から章 {story} を復元"))
+                                .button(text(
+                                    "从此记录恢复章节 {story}",
+                                    &[("story", story.into())],
+                                ))
                                 .clicked()
                             {
                                 workspace_store::restore(
@@ -342,7 +351,8 @@ impl Panel {
                                     story,
                                 )?;
                             }
-                            for (key, label) in [("before", "変更前"), ("after", "変更後")] {
+                            for (key, label) in [("before", tr("修改前")), ("after", tr("修改后"))]
+                            {
                                 ui.collapsing(label, |ui| {
                                     let mut text =
                                         serde_json::to_string_pretty(&entry[key]["stories"][story])
@@ -357,16 +367,18 @@ impl Panel {
                             }
                         }
                     } else {
-                        ui.label("プロジェクトを保存すると履歴が作成されます。");
+                        ui.label(tr("保存项目后会生成历史记录。"));
                     }
                 }
                 _ => {
                     if !lom_core::scenario_addon::enabled(project) {
-                        ui.label("このプロジェクトはMortalModHost形式です。");
+                        ui.label(tr("此项目使用 MortalModHost 格式。"));
                         return Ok(());
                     }
-                    ui.label("scenario.json の設定です。events の story は章IDを指定します。");
-                    if self.config.is_none() && ui.button("設定を編集").clicked() {
+                    ui.label(tr(
+                        "这是 scenario.json 的设置。events 中的 story 指定章节 ID。",
+                    ));
+                    if self.config.is_none() && ui.button(tr("编辑设置")).clicked() {
                         self.config = Some(serde_json::to_string_pretty(
                             &project.manifest["_editor"]["scenario_addon"],
                         )?);
@@ -380,20 +392,20 @@ impl Panel {
                         );
                     }
                     if self.config.is_some() {
-                        if ui.button("設定を反映").clicked() {
+                        if ui.button(tr("应用设置")).clicked() {
                             let value: Value =
                                 serde_json::from_str(self.config.as_deref().unwrap())?;
-                            anyhow::ensure!(value.is_object(), "設定はJSONオブジェクトが必要です");
+                            anyhow::ensure!(value.is_object(), tr("配置必须是对象"));
                             project.manifest["_editor"]["scenario_addon"] = value;
                             self.config = None;
                         }
-                        if ui.button("編集を取り消す").clicked() {
+                        if ui.button(tr("取消编辑")).clicked() {
                             self.config = None;
                         }
                     }
-                    ui.label(format!(
-                        "書き出し対応ノード: {}",
-                        lom_core::scenario_addon::SUPPORTED.join(", ")
+                    ui.label(text(
+                        "支持导出的节点：{nodes}",
+                        &[("nodes", lom_core::scenario_addon::SUPPORTED.join(", "))],
                     ));
                 }
             }
@@ -407,4 +419,14 @@ impl Panel {
         }
         jump
     }
+}
+
+fn verdict_label(verdict: Verdict) -> String {
+    tr(match verdict {
+        Verdict::Unreviewed => "未评定",
+        Verdict::Good => "良好",
+        Verdict::Fix => "需要修改",
+        Verdict::Hold => "保留或替代方案",
+        Verdict::Reject => "不采用",
+    })
 }

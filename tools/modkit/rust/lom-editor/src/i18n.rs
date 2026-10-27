@@ -1,4 +1,7 @@
-//! The existing four offline dictionaries, shared by the native widgets.
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
+//! Offline interface translations shared by the native widgets.
+//! UI locales are independent of the game’s supported story translation locales.
 use serde_json::Value;
 use std::{
     collections::BTreeMap,
@@ -8,8 +11,8 @@ use std::{
     },
 };
 static LOCALE: AtomicUsize = AtomicUsize::new(0);
-pub const LOCALES: [&str; 4] = ["chs", "cht", "ja", "ko"];
-pub const NAMES: [&str; 4] = ["简体中文", "繁體中文", "日本語", "한국어"];
+pub const LOCALES: [&str; 5] = ["chs", "cht", "ja", "ko", "en"];
+pub const NAMES: [&str; 5] = ["简体中文", "繁體中文", "日本語", "한국어", "English"];
 pub fn locale() -> &'static str {
     LOCALES[LOCALE.load(Ordering::Relaxed)]
 }
@@ -18,14 +21,15 @@ pub fn set_locale(name: &str) {
         LOCALE.store(index, Ordering::Relaxed);
     }
 }
-fn dictionaries() -> &'static [Value; 4] {
-    static DICTS: OnceLock<[Value; 4]> = OnceLock::new();
+fn dictionaries() -> &'static [Value; 5] {
+    static DICTS: OnceLock<[Value; 5]> = OnceLock::new();
     DICTS.get_or_init(|| {
         [
             serde_json::from_str(include_str!("../../../editor/i18n/locales/chs.json")).unwrap(),
             serde_json::from_str(include_str!("../../../editor/i18n/locales/cht.json")).unwrap(),
             serde_json::from_str(include_str!("../../../editor/i18n/locales/ja.json")).unwrap(),
             serde_json::from_str(include_str!("../../../editor/i18n/locales/ko.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/locales/en.json")).unwrap(),
         ]
     })
 }
@@ -51,6 +55,13 @@ pub fn tr(source: &str) -> String {
     tr_index(source, LOCALE.load(Ordering::Relaxed))
 }
 fn tr_index(source: &str, index: usize) -> String {
+    static UI: OnceLock<Value> = OnceLock::new();
+    let ui = UI.get_or_init(|| {
+        serde_json::from_str(include_str!("../data/ui-translations.json")).expect("UI translations")
+    });
+    if let Some(translated) = ui[source][index].as_str() {
+        return translated.into();
+    }
     if index == 0 {
         return source.into();
     }
@@ -101,17 +112,36 @@ fn tr_index(source: &str, index: usize) -> String {
         })
         .unwrap_or_else(|| source.into())
 }
+/// Substitute named values after translation. Values are inserted once so authored
+/// text containing a placeholder cannot be interpreted as another substitution.
+pub fn text(source: &str, values: &[(&str, String)]) -> String {
+    interpolate(&tr(source), values)
+}
+fn interpolate(template: &str, values: &[(&str, String)]) -> String {
+    static PLACEHOLDERS: OnceLock<regex::Regex> = OnceLock::new();
+    PLACEHOLDERS
+        .get_or_init(|| regex::Regex::new(r"\{([a-zA-Z_][a-zA-Z_0-9]*)\}").unwrap())
+        .replace_all(template, |captures: &regex::Captures<'_>| {
+            values
+                .iter()
+                .find(|(key, _)| *key == &captures[1])
+                .map(|(_, value)| value.clone())
+                .unwrap_or_else(|| captures[0].into())
+        })
+        .into_owned()
+}
 pub fn term(category: &str, id: &str, fallback: &str) -> String {
     term_index(category, id, fallback, LOCALE.load(Ordering::Relaxed))
 }
 fn term_index(category: &str, id: &str, fallback: &str, index: usize) -> String {
-    static TERMS: OnceLock<[Value; 4]> = OnceLock::new();
+    static TERMS: OnceLock<[Value; 5]> = OnceLock::new();
     let tables = TERMS.get_or_init(|| {
         [
             serde_json::from_str(include_str!("../../../editor/i18n/terms/chs.json")).unwrap(),
             serde_json::from_str(include_str!("../../../editor/i18n/terms/cht.json")).unwrap(),
             serde_json::from_str(include_str!("../../../editor/i18n/terms/ja.json")).unwrap(),
             serde_json::from_str(include_str!("../../../editor/i18n/terms/ko.json")).unwrap(),
+            serde_json::from_str(include_str!("../../../editor/i18n/terms/en.json")).unwrap(),
         ]
     });
     if id.starts_with("user:") {
@@ -126,6 +156,7 @@ fn term_index(category: &str, id: &str, fallback: &str, index: usize) -> String 
 }
 pub fn help_html(locale: &str) -> &'static str {
     match locale {
+        "en" => include_str!("../../../editor/i18n/help/en.html"),
         "cht" => include_str!("../../../editor/i18n/help/cht.html"),
         "ja" => include_str!("../../../editor/i18n/help/ja.html"),
         "ko" => include_str!("../../../editor/i18n/help/ko.html"),
@@ -152,7 +183,7 @@ pub fn help_text() -> String {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn four_dictionaries_and_help_are_embedded() {
+    fn five_dictionaries_and_help_are_embedded() {
         for value in super::dictionaries() {
             assert!(value["app.title"].is_string());
             assert!(value["node.say"].is_string());
@@ -178,7 +209,7 @@ mod native_tests {
     fn important_menus_and_all_node_labels_translate_in_three_locales() {
         let native: serde_json::Value =
             serde_json::from_str(include_str!("../data/native-translations.json")).unwrap();
-        for index in 1..4 {
+        for index in 1..super::LOCALES.len() {
             for label in [
                 "新建项目",
                 "打开目录…",
@@ -266,7 +297,7 @@ mod term_tests {
             };
             for (id, name) in entries {
                 if name.is_ascii() {
-                    for locale in 0..4 {
+                    for locale in 0..super::LOCALES.len() {
                         let translated = super::term_index(category, &id, &name, locale);
                         assert!(!translated.is_empty());
                         assert_ne!(
@@ -286,7 +317,7 @@ mod term_tests {
             .flat_map(|row| row["portraits"].as_array().unwrap().iter())
         {
             let id = portrait.as_str().unwrap();
-            for locale in 0..4 {
+            for locale in 0..super::LOCALES.len() {
                 assert_ne!(
                     super::term_index("portraits", id, id, locale),
                     id,
@@ -319,5 +350,109 @@ mod term_tests {
             super::term_index("characters", "future_hero", "Future hero", 1),
             "Future hero"
         );
+    }
+}
+
+#[cfg(test)]
+mod coverage_tests {
+    use super::*;
+    use std::collections::BTreeSet;
+
+    fn placeholders(text: &str) -> BTreeSet<String> {
+        regex::Regex::new(r"\{[a-zA-Z_][a-zA-Z_0-9]*\}")
+            .unwrap()
+            .find_iter(text)
+            .map(|m| m.as_str().into())
+            .collect()
+    }
+
+    #[test]
+    fn english_dictionary_and_native_messages_are_complete() {
+        let all = dictionaries();
+        for (key, source) in all[0].as_object().unwrap() {
+            let english = all[4][key]
+                .as_str()
+                .unwrap_or_else(|| panic!("Missing English: {key}"));
+            assert!(!english.is_empty(), "{key}");
+            assert_eq!(
+                placeholders(source.as_str().unwrap()),
+                placeholders(english),
+                "{key}"
+            );
+        }
+        let native: Value =
+            serde_json::from_str(include_str!("../data/native-translations.json")).unwrap();
+        let ui: Value = serde_json::from_str(include_str!("../data/ui-translations.json")).unwrap();
+        for (table, count) in [(&native, 4), (&ui, 5)] {
+            for (source, row) in table.as_object().unwrap() {
+                assert_eq!(row.as_array().unwrap().len(), count, "{source}");
+                for translation in row.as_array().unwrap() {
+                    let translation = translation.as_str().unwrap();
+                    assert!(!translation.trim().is_empty(), "{source}");
+                    assert_eq!(placeholders(source), placeholders(translation), "{source}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn schema_options_and_new_panels_have_english_labels() {
+        let schema: Value = serde_json::from_str(include_str!("../data/authoring.json")).unwrap();
+        let mut labels: Vec<&str> = schema["ENUM_SETS_SRC"]
+            .as_object()
+            .unwrap()
+            .values()
+            .flat_map(|rows| rows.as_array().unwrap())
+            .map(|row| row[1].as_str().unwrap())
+            .collect();
+        labels.extend(
+            schema["MODE_CN_SRC"]
+                .as_object()
+                .unwrap()
+                .values()
+                .map(|v| v.as_str().unwrap()),
+        );
+        labels.extend([
+            "资料与审阅",
+            "评定与评论",
+            "保存历史",
+            "Addon 设置",
+            "事件名称",
+            "任务进度",
+            "发生时间",
+            "前置任务（可选）",
+            "选择共同字段",
+            "剧情安排",
+        ]);
+        for source in labels {
+            let translated = tr_index(source, 4);
+            assert!(
+                !translated
+                    .chars()
+                    .any(|c| ('\u{3400}'..='\u{9fff}').contains(&c)),
+                "Untranslated UI option: {source} → {translated}"
+            );
+        }
+        assert_eq!(tr_index("旁白", 2), "ナレーション");
+        assert_eq!(tr_index("内心独白", 2), "心の声");
+    }
+
+    #[test]
+    fn translated_templates_preserve_inserted_authored_text() {
+        let template = tr_index("前置任务：{arg0} · {arg1}", 4);
+        let title = "{arg1} / 物語 / 이야기 / قصة";
+        assert_eq!(
+            interpolate(
+                &template,
+                &[("arg0", title.into()), ("arg1", "Active".into())]
+            ),
+            format!("Prerequisite quest: {title} · Active")
+        );
+        for index in 0..LOCALES.len() {
+            assert_eq!(
+                term_index("characters", "user:mine.hero", title, index),
+                title
+            );
+        }
     }
 }

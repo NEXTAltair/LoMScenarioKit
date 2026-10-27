@@ -1,0 +1,3222 @@
+{
+  "下一旬": [
+    "下一旬",
+    "下一旬",
+    "次の旬",
+    "다음 순",
+    "Next ten-day period"
+  ],
+  "下一月": [
+    "下一月",
+    "下一月",
+    "翌月",
+    "다음 달",
+    "Next month"
+  ],
+  "不推进": [
+    "不推进",
+    "不推進",
+    "時間を進めない",
+    "시간을 진행하지 않음",
+    "Do not advance time"
+  ],
+  "全部重置": [
+    "全部重置",
+    "全部重設",
+    "すべてリセット",
+    "모두 초기화",
+    "Reset all"
+  ],
+  "凝聚力": [
+    "凝聚力",
+    "凝聚力",
+    "結束力",
+    "결속력",
+    "Cohesion"
+  ],
+  "原版数值旗标": [
+    "原版数值旗标",
+    "原版數值旗標",
+    "本編の数値フラグ",
+    "원작 수치 플래그",
+    "Base-game numeric flag"
+  ],
+  "显示 / 替换": [
+    "显示 / 替换",
+    "顯示 / 替換",
+    "表示・差し替え",
+    "표시 / 교체",
+    "Show / replace"
+  ],
+  "淡出并清除": [
+    "淡出并清除",
+    "淡出並清除",
+    "フェードアウトして消去",
+    "페이드 아웃 후 지우기",
+    "Fade out and clear"
+  ],
+  "立即设置": [
+    "立即设置",
+    "立即設定",
+    "すぐに設定",
+    "즉시 설정",
+    "Set immediately"
+  ],
+  "设置等级": [
+    "设置等级",
+    "設定等級",
+    "レベルを設定",
+    "레벨 설정",
+    "Set level"
+  ],
+  "门派等级": [
+    "门派等级",
+    "門派等級",
+    "門派レベル",
+    "문파 레벨",
+    "Sect level"
+  ],
+  "阵营人数": [
+    "阵营人数",
+    "陣營人數",
+    "陣営の人数",
+    "진영 인원수",
+    "Faction size"
+  ],
+  "一次性": [
+    "一次性",
+    "一次性",
+    "一度だけ",
+    "한 번만",
+    "Once"
+  ],
+  "一段剧情包含对话、选项和画面演出。": [
+    "一段剧情包含对话、选项和画面演出。",
+    "一段劇情包含對話、選項和畫面演出。",
+    "章には台詞、選択肢、画面演出を追加できます。",
+    "한 장에는 대사, 선택지, 화면 연출을 넣을 수 있습니다.",
+    "A chapter contains dialogue, choices, and visual effects."
+  ],
+  "不更新这个任务": [
+    "不更新这个任务",
+    "不更新這個任務",
+    "このクエストを更新しない",
+    "이 퀘스트를 갱신하지 않음",
+    "Do not update this quest"
+  ],
+  "不要求任务": [
+    "不要求任务",
+    "不要求任務",
+    "クエストを条件にしない",
+    "퀘스트 조건 없음",
+    "No quest required"
+  ],
+  "事件": [
+    "事件",
+    "事件",
+    "イベント",
+    "이벤트",
+    "Events"
+  ],
+  "从左侧“添加步骤”开始创作。": [
+    "从左侧“添加步骤”开始创作。",
+    "從左側「新增步驟」開始創作。",
+    "左の「ステップを追加」から作り始められます。",
+    "왼쪽의 “단계 추가”에서 작성을 시작하세요.",
+    "Start with “Add step” on the left."
+  ],
+  "任务进度（可选）": [
+    "任务进度（可选）",
+    "任務進度（可選）",
+    "クエスト進行（任意）",
+    "퀘스트 진행 (선택)",
+    "Quest progress (optional)"
+  ],
+  "作品概览": [
+    "作品概览",
+    "作品概覽",
+    "作品の概要",
+    "작품 개요",
+    "Project overview"
+  ],
+  "作品模式：原版附加剧情": [
+    "作品模式：原版附加剧情",
+    "作品模式：原版附加劇情",
+    "作品の種類：本編への追加シナリオ",
+    "작품 유형: 원작 추가 시나리오",
+    "Project type: base-game scenario addon"
+  ],
+  "作品模式：自由剧本": [
+    "作品模式：自由剧本",
+    "作品模式：自由劇本",
+    "作品の種類：独立シナリオ",
+    "작품 유형: 독립 시나리오",
+    "Project type: standalone scenario"
+  ],
+  "作品设置…": [
+    "作品设置…",
+    "作品設定…",
+    "作品設定…",
+    "작품 설정…",
+    "Project settings…"
+  ],
+  "修复 Steam 启动": [
+    "修复 Steam 启动",
+    "修復 Steam 啟動",
+    "Steam起動を修復",
+    "Steam 실행 복구",
+    "Repair Steam launch"
+  ],
+  "修复宿主安装": [
+    "修复宿主安装",
+    "修復宿主安裝",
+    "ホストのインストールを修復",
+    "호스트 설치 복구",
+    "Repair host installation"
+  ],
+  "关联事件": [
+    "关联事件",
+    "關聯事件",
+    "関連イベント",
+    "관련 이벤트",
+    "Related events"
+  ],
+  "关联任务": [
+    "关联任务",
+    "關聯任務",
+    "関連クエスト",
+    "관련 퀘스트",
+    "Related quest"
+  ],
+  "其他字段": [
+    "其他字段",
+    "其他欄位",
+    "その他の項目",
+    "기타 필드",
+    "Other fields"
+  ],
+  "内容库已有同 ID 内容；请换用空目录或更改来源内容 ID，避免覆盖。": [
+    "内容库已有同 ID 内容；请换用空目录或更改来源内容 ID，避免覆盖。",
+    "內容庫已有相同 ID；請改用空目錄或更改來源內容 ID，避免覆寫。",
+    "同じIDの素材があります。上書きを避けるため、空のフォルダを使うか、元の素材IDを変更してください。",
+    "같은 ID의 콘텐츠가 있습니다. 덮어쓰기를 피하려면 빈 폴더를 쓰거나 원본 콘텐츠 ID를 변경하세요.",
+    "The library already contains this ID. Use an empty folder or change the source ID to avoid overwriting it."
+  ],
+  "分区": [
+    "分区",
+    "分區",
+    "セクション",
+    "구역",
+    "Section"
+  ],
+  "删除任务推进": [
+    "删除任务推进",
+    "刪除任務推進",
+    "クエスト進行を削除",
+    "퀘스트 진행 삭제",
+    "Remove quest update"
+  ],
+  "删除修正": [
+    "删除修正",
+    "刪除修正",
+    "補正を削除",
+    "보정 삭제",
+    "Remove modifier"
+  ],
+  "删除动作": [
+    "删除动作",
+    "刪除動作",
+    "アクションを削除",
+    "동작 삭제",
+    "Remove action"
+  ],
+  "删除变量结果": [
+    "删除变量结果",
+    "刪除變數結果",
+    "変数の更新を削除",
+    "변수 결과 삭제",
+    "Remove variable result"
+  ],
+  "删除条件": [
+    "删除条件",
+    "刪除條件",
+    "条件を削除",
+    "조건 삭제",
+    "Remove condition"
+  ],
+  "删除结果": [
+    "删除结果",
+    "刪除結果",
+    "結果を削除",
+    "결과 삭제",
+    "Remove result"
+  ],
+  "删除转换": [
+    "删除转换",
+    "刪除轉換",
+    "遷移を削除",
+    "전환 삭제",
+    "Remove transition"
+  ],
+  "前往所选地点时": [
+    "前往所选地点时",
+    "前往所選地點時",
+    "選んだ場所へ移動したとき",
+    "선택한 장소로 이동할 때",
+    "When visiting the selected location"
+  ],
+  "前置任务（可选）": [
+    "前置任务（可选）",
+    "前置任務（可選）",
+    "前提クエスト（任意）",
+    "선행 퀘스트 (선택)",
+    "Prerequisite quest (optional)"
+  ],
+  "剧情内容": [
+    "剧情内容",
+    "劇情內容",
+    "シナリオ本文",
+    "시나리오 내용",
+    "Story content"
+  ],
+  "剧情安排": [
+    "剧情安排",
+    "劇情安排",
+    "シナリオの進行",
+    "시나리오 진행",
+    "Story scheduling"
+  ],
+  "剧情结束后做什么（可选）": [
+    "剧情结束后做什么（可选）",
+    "劇情結束後做什麼（可選）",
+    "終了後の処理（任意）",
+    "종료 후 동작 (선택)",
+    "Actions after the story (optional)"
+  ],
+  "加入权重事件池": [
+    "加入权重事件池",
+    "加入權重事件池",
+    "重み付き抽選に加える",
+    "가중치 이벤트 풀에 추가",
+    "Add to weighted event pool"
+  ],
+  "去某地点时": [
+    "去某地点时",
+    "前往某地點時",
+    "指定の場所へ移動したとき",
+    "지정한 장소로 이동할 때",
+    "When visiting a location"
+  ],
+  "发现上次未正常关闭时留下的副本。恢复后可检查并另行保存，不会覆盖原项目。": [
+    "发现上次未正常关闭时留下的副本。恢复后可检查并另行保存，不会覆盖原项目。",
+    "發現上次未正常關閉時留下的副本。復原後可檢查並另行儲存，不會覆寫原專案。",
+    "前回の終了時に残った復元用コピーがあります。復元後に内容を確認して別名で保存できます。元のプロジェクトは上書きされません。",
+    "비정상 종료 시 남은 복사본이 있습니다. 복구 후 확인하고 별도로 저장할 수 있습니다. 원본은 덮어쓰지 않습니다.",
+    "A recovery copy remains from an interrupted session. Review it and save separately; the original project will not be overwritten."
+  ],
+  "发生时间": [
+    "发生时间",
+    "發生時間",
+    "発生時期",
+    "발생 시기",
+    "Timing"
+  ],
+  "发生概率（%）": [
+    "发生概率（%）",
+    "發生機率（%）",
+    "発生確率（%）",
+    "발생 확률 (%)",
+    "Probability (%)"
+  ],
+  "只替换台词、标题与描述文本；不会改动 ID、引用、路径或 Lua。": [
+    "只替换台词、标题与描述文本；不会改动 ID、引用、路径或 Lua。",
+    "只替換台詞、標題與描述文字；不會變更 ID、引用、路徑或 Lua。",
+    "台詞・タイトル・説明文を置換します。ID、参照、パス、Luaは変更しません。",
+    "대사, 제목, 설명만 치환합니다. ID, 참조, 경로, Lua는 변경하지 않습니다.",
+    "Replace dialogue, titles, and descriptions. IDs, references, paths, and Lua stay unchanged."
+  ],
+  "可以重复发生": [
+    "可以重复发生",
+    "可以重複發生",
+    "繰り返し発生する",
+    "반복 발생 허용",
+    "Allow repeated occurrences"
+  ],
+  "可接取": [
+    "可接取",
+    "可接取",
+    "受注可能",
+    "수락 가능",
+    "Available"
+  ],
+  "可选字段，如 upper / cost": [
+    "可选字段，如 upper / cost",
+    "可選欄位，例如 upper / cost",
+    "任意の項目（upper / cost など）",
+    "선택 필드 (upper / cost 등)",
+    "Optional fields, such as upper / cost"
+  ],
+  "可重复": [
+    "可重复",
+    "可重複",
+    "繰り返し可能",
+    "반복 가능",
+    "Repeatable"
+  ],
+  "同池候选按有效权重抽取一项；权重不是百分比。": [
+    "同池候选按有效权重抽取一项；权重不是百分比。",
+    "同池候選依有效權重抽取一項；權重不是百分比。",
+    "同じグループから重みに応じて1件を選びます。重みは百分率ではありません。",
+    "같은 풀에서 유효 가중치에 따라 하나를 선택합니다. 가중치는 백분율이 아닙니다.",
+    "One candidate is drawn from the pool using effective weights. Weights are not percentages."
+  ],
+  "安排时间、地点和发生概率": [
+    "安排时间、地点和发生概率",
+    "安排時間、地點和發生機率",
+    "時期・場所・発生確率を設定",
+    "시기, 장소, 발생 확률 설정",
+    "Set timing, location, and probability"
+  ],
+  "官方角色": [
+    "官方角色",
+    "官方角色",
+    "本編のキャラクター",
+    "원작 캐릭터",
+    "Base-game character"
+  ],
+  "尚未选择剧情": [
+    "尚未选择剧情",
+    "尚未選擇劇情",
+    "シナリオ未選択",
+    "시나리오 미선택",
+    "No story selected"
+  ],
+  "嵌套过深，请在项目源文件中检查": [
+    "嵌套过深，请在项目源文件中检查",
+    "巢狀層級過深，請檢查專案原始檔",
+    "入れ子が深すぎます。プロジェクトのソースファイルを確認してください。",
+    "중첩이 너무 깊습니다. 프로젝트 원본 파일을 확인하세요.",
+    "Nesting is too deep. Check the project source file."
+  ],
+  "已取消": [
+    "已取消",
+    "已取消",
+    "キャンセル済み",
+    "취소됨",
+    "Cancelled"
+  ],
+  "已拒绝": [
+    "已拒绝",
+    "已拒絕",
+    "拒否済み",
+    "거절됨",
+    "Rejected"
+  ],
+  "已接取": [
+    "已接取",
+    "已接取",
+    "受注済み",
+    "수락함",
+    "Accepted"
+  ],
+  "开场时": [
+    "开场时",
+    "開場時",
+    "開始時",
+    "시작할 때",
+    "At the opening"
+  ],
+  "当前是兼容旧版的作品。文件菜单可新建原版附加剧情或自由剧本。": [
+    "当前是兼容旧版的作品。文件菜单可新建原版附加剧情或自由剧本。",
+    "目前是相容舊版的作品。檔案選單可新增原版附加劇情或自由劇本。",
+    "旧形式のプロジェクトです。ファイルメニューから追加シナリオや独立シナリオを新規作成できます。",
+    "이전 형식의 작품입니다. 파일 메뉴에서 추가 시나리오나 독립 시나리오를 만들 수 있습니다.",
+    "This project uses the legacy format. Create an addon or standalone scenario from the File menu."
+  ],
+  "恢复创作副本": [
+    "恢复创作副本",
+    "復原創作副本",
+    "編集内容を復元",
+    "작업 복사본 복구",
+    "Recover your work"
+  ],
+  "我方总人数": [
+    "我方总人数",
+    "我方總人數",
+    "味方の総人数",
+    "아군 총인원",
+    "Total allies"
+  ],
+  "所属分区": [
+    "所属分区",
+    "所屬分區",
+    "所属セクション",
+    "소속 구역",
+    "Section"
+  ],
+  "按高级条件": [
+    "按高级条件",
+    "依進階條件",
+    "詳細条件に従う",
+    "고급 조건에 따름",
+    "Use advanced conditions"
+  ],
+  "播放剧情": [
+    "播放剧情",
+    "播放劇情",
+    "シナリオを再生",
+    "시나리오 재생",
+    "Play story"
+  ],
+  "敌方总人数": [
+    "敌方总人数",
+    "敵方總人數",
+    "敵の総人数",
+    "적군 총인원",
+    "Total enemies"
+  ],
+  "数值、物品与其他结果动作": [
+    "数值、物品与其他结果动作",
+    "數值、物品與其他結果動作",
+    "数値・アイテムなどの結果処理",
+    "수치, 아이템 및 기타 결과 동작",
+    "Stats, items, and other result actions"
+  ],
+  "时间不限": [
+    "时间不限",
+    "時間不限",
+    "時期を指定しない",
+    "시기 제한 없음",
+    "Any time"
+  ],
+  "时间到了自动发生": [
+    "时间到了自动发生",
+    "時間到了自動發生",
+    "指定時期に自動発生",
+    "지정 시기에 자동 발생",
+    "Trigger automatically at the set time"
+  ],
+  "时间到来时": [
+    "时间到来时",
+    "時間到來時",
+    "指定時期になったとき",
+    "지정 시기가 되었을 때",
+    "When the set time arrives"
+  ],
+  "未关联任务，只播放剧情即可。": [
+    "未关联任务，只播放剧情即可。",
+    "未關聯任務，只需播放劇情。",
+    "関連クエストはありません。シナリオの再生だけを行います。",
+    "연결된 퀘스트가 없습니다. 시나리오만 재생합니다.",
+    "No linked quest. Only the story will play."
+  ],
+  "未抽中也会消耗本周期的判定；下个周期可以再试。": [
+    "未抽中也会消耗本周期的判定；下个周期可以再试。",
+    "未抽中也會消耗本週期的判定；下個週期可再試。",
+    "抽選に外れた場合も今期の判定を消費します。次の周期で再判定します。",
+    "추첨되지 않아도 이번 주기의 판정은 소모됩니다. 다음 주기에 다시 시도합니다.",
+    "A failed draw still consumes this period’s attempt. It can try again next period."
+  ],
+  "条件嵌套超过 12 层": [
+    "条件嵌套超过 12 层",
+    "條件巢狀超過 12 層",
+    "条件の入れ子が12段を超えています",
+    "조건 중첩이 12단계를 넘었습니다",
+    "Condition nesting exceeds 12 levels"
+  ],
+  "条件必须是对象": [
+    "条件必须是对象",
+    "條件必須是物件",
+    "条件はJSONオブジェクトで指定してください",
+    "조건은 JSON 객체여야 합니다",
+    "A condition must be a JSON object"
+  ],
+  "条件权重修正": [
+    "条件权重修正",
+    "條件權重修正",
+    "条件による重み補正",
+    "조건별 가중치 보정",
+    "Conditional weight modifiers"
+  ],
+  "正常结束后": [
+    "正常结束后",
+    "正常結束後",
+    "正常終了後",
+    "정상 종료 후",
+    "After normal completion"
+  ],
+  "此事件会与同组事件随机选一件，具体权重在高级设置中。": [
+    "此事件会与同组事件随机选一件，具体权重在高级设置中。",
+    "此事件會與同組事件隨機選一件，權重請見進階設定。",
+    "同じグループのイベントから1件を抽選します。重みは詳細設定で変更できます。",
+    "같은 그룹의 이벤트 중 하나를 무작위로 선택합니다. 가중치는 고급 설정에서 조정하세요.",
+    "One event is drawn from this group. Adjust its weight in advanced settings."
+  ],
+  "此处已有复杂条件，请在高级设置中调整。": [
+    "此处已有复杂条件，请在高级设置中调整。",
+    "此處已有複雜條件，請在進階設定中調整。",
+    "複雑な条件が設定されています。詳細設定で変更してください。",
+    "복잡한 조건이 설정되어 있습니다. 고급 설정에서 조정하세요.",
+    "Complex conditions are already set. Edit them in advanced settings."
+  ],
+  "此设置适用于整部作品。事件的时间、地点与任务进度在左侧“剧情安排”中设置。": [
+    "此设置适用于整部作品。事件的时间、地点与任务进度在左侧“剧情安排”中设置。",
+    "此設定適用於整部作品。事件時間、地點與任務進度請在左側「劇情安排」設定。",
+    "作品全体の設定です。イベントの時期・場所・クエスト進行は、左の「シナリオの進行」で設定します。",
+    "작품 전체의 설정입니다. 이벤트 시기, 장소, 퀘스트 진행은 왼쪽의 “시나리오 진행”에서 설정하세요.",
+    "These settings apply to the whole project. Set event timing, locations, and quest progress under Story scheduling on the left."
+  ],
+  "每旬": [
+    "每旬",
+    "每旬",
+    "毎旬",
+    "매 순",
+    "Every ten-day period"
+  ],
+  "每月": [
+    "每月",
+    "每月",
+    "毎月",
+    "매월",
+    "Every month"
+  ],
+  "每月分上旬、中旬、下旬，游戏没有单独的“几号”。": [
+    "每月分上旬、中旬、下旬，游戏没有单独的“几号”。",
+    "每月分上旬、中旬、下旬，遊戲沒有獨立的「幾號」。",
+    "1か月は上旬・中旬・下旬に分かれます。日単位の指定はありません。",
+    "한 달은 상순, 중순, 하순으로 나뉩니다. 개별 날짜는 지정할 수 없습니다.",
+    "Each month has early, middle, and late periods. Individual days are not used."
+  ],
+  "每次行动": [
+    "每次行动",
+    "每次行動",
+    "行動ごと",
+    "매 행동",
+    "Every action"
+  ],
+  "没有关联任务。这个事件可以独立发生。": [
+    "没有关联任务。这个事件可以独立发生。",
+    "沒有關聯任務。此事件可獨立發生。",
+    "関連クエストはありません。このイベントは単独で発生できます。",
+    "연결된 퀘스트가 없습니다. 이 이벤트는 단독으로 발생할 수 있습니다.",
+    "No linked quest. This event can occur on its own."
+  ],
+  "添加事件": [
+    "添加事件",
+    "新增事件",
+    "イベントを追加",
+    "이벤트 추가",
+    "Add event"
+  ],
+  "添加任务推进": [
+    "添加任务推进",
+    "新增任務推進",
+    "クエスト進行を追加",
+    "퀘스트 진행 추가",
+    "Add quest update"
+  ],
+  "添加变量结果": [
+    "添加变量结果",
+    "新增變數結果",
+    "変数の更新を追加",
+    "변수 결과 추가",
+    "Add variable result"
+  ],
+  "添加权重修正": [
+    "添加权重修正",
+    "新增權重修正",
+    "重み補正を追加",
+    "가중치 보정 추가",
+    "Add weight modifier"
+  ],
+  "添加条件": [
+    "添加条件",
+    "新增條件",
+    "条件を追加",
+    "조건 추가",
+    "Add condition"
+  ],
+  "添加条件转换": [
+    "添加条件转换",
+    "新增條件轉換",
+    "条件付き遷移を追加",
+    "조건부 전환 추가",
+    "Add conditional transition"
+  ],
+  "添加演出结果": [
+    "添加演出结果",
+    "新增演出結果",
+    "演出の結果を追加",
+    "연출 결과 추가",
+    "Add presentation result"
+  ],
+  "添加结果动作": [
+    "添加结果动作",
+    "新增結果動作",
+    "結果アクションを追加",
+    "결과 동작 추가",
+    "Add result action"
+  ],
+  "添加自动变化（可选）": [
+    "添加自动变化（可选）",
+    "新增自動變化（可選）",
+    "自動遷移を追加（任意）",
+    "자동 전환 추가 (선택)",
+    "Add automatic transition (optional)"
+  ],
+  "演出结果与任务推进": [
+    "演出结果与任务推进",
+    "演出結果與任務推進",
+    "演出の結果とクエスト進行",
+    "연출 결과 및 퀘스트 진행",
+    "Presentation results and quest updates"
+  ],
+  "状态（逗号分隔）": [
+    "状态（逗号分隔）",
+    "狀態（逗號分隔）",
+    "状態（カンマ区切り）",
+    "상태 (쉼표로 구분)",
+    "States (comma-separated)"
+  ],
+  "由事件结束后的结果更新进度；不必设置自动变化。": [
+    "由事件结束后的结果更新进度；不必设置自动变化。",
+    "由事件結束後的結果更新進度；不必設定自動變化。",
+    "イベント終了時の結果で進行を更新します。自動遷移の設定は不要です。",
+    "이벤트 종료 결과로 진행을 갱신합니다. 자동 전환은 설정하지 않아도 됩니다.",
+    "Progress is updated by event results. Automatic transitions are optional."
+  ],
+  "确认备份并重置已读记录": [
+    "确认备份并重置已读记录",
+    "確認備份並重設已讀紀錄",
+    "バックアップして既読記録をリセット",
+    "백업 후 읽음 기록 초기화",
+    "Back up and reset read history"
+  ],
+  "移除这条变化": [
+    "移除这条变化",
+    "移除此變化",
+    "この遷移を削除",
+    "이 전환 삭제",
+    "Remove this transition"
+  ],
+  "结果必须是对象": [
+    "结果必须是对象",
+    "結果必須是物件",
+    "結果はJSONオブジェクトで指定してください",
+    "결과는 JSON 객체여야 합니다",
+    "A result must be a JSON object"
+  ],
+  "结果配置必须为对象": [
+    "结果配置必须为对象",
+    "結果設定必須是物件",
+    "結果の設定はJSONオブジェクトで指定してください",
+    "결과 설정은 JSON 객체여야 합니다",
+    "Result settings must be a JSON object"
+  ],
+  "编辑这段剧情": [
+    "编辑这段剧情",
+    "編輯這段劇情",
+    "この章を編集",
+    "이 장 편집",
+    "Edit this chapter"
+  ],
+  "自定义状态": [
+    "自定义状态",
+    "自訂狀態",
+    "独自の状態",
+    "사용자 정의 상태",
+    "Custom state"
+  ],
+  "自由剧本开场": [
+    "自由剧本开场",
+    "自由劇本開場",
+    "独立シナリオの開始場面",
+    "독립 시나리오 시작 장면",
+    "Standalone scenario opening"
+  ],
+  "自由剧本开场时，播放下面这段剧情。": [
+    "自由剧本开场时，播放下面这段剧情。",
+    "自由劇本開場時，播放以下劇情。",
+    "独立シナリオの開始時に、次の章を再生します。",
+    "독립 시나리오 시작 시 아래 장을 재생합니다.",
+    "Play the following chapter when the standalone scenario starts."
+  ],
+  "自由剧本的入口由开场事件管理。": [
+    "自由剧本的入口由开场事件管理。",
+    "自由劇本的入口由開場事件管理。",
+    "独立シナリオの開始位置は、開始イベントで設定します。",
+    "독립 시나리오의 진입점은 시작 이벤트에서 설정합니다.",
+    "The opening event determines the entry point of a standalone scenario."
+  ],
+  "触发条件": [
+    "触发条件",
+    "觸發條件",
+    "発生条件",
+    "발생 조건",
+    "Trigger conditions"
+  ],
+  "让某个任务更新进度…": [
+    "让某个任务更新进度…",
+    "讓某個任務更新進度…",
+    "クエストの進行を更新…",
+    "퀘스트 진행 갱신…",
+    "Update a quest’s progress…"
+  ],
+  "跨多个事件记录接取、完成等进度": [
+    "跨多个事件记录接取、完成等进度",
+    "跨多個事件記錄接取、完成等進度",
+    "複数のイベントにまたがる受注・完了を管理",
+    "여러 이벤트에 걸친 수락, 완료 등의 진행 관리",
+    "Track acceptance and completion across events"
+  ],
+  "迁移遵循原版本规则：无法可靠升级的旧游戏节点会明确拒绝。写入前保留原始字节备份。": [
+    "迁移遵循原版本规则：无法可靠升级的旧游戏节点会明确拒绝。写入前保留原始字节备份。",
+    "遷移遵循原版本規則：無法可靠升級的舊遊戲節點會明確拒絕。寫入前保留原始位元組備份。",
+    "元のバージョンの規則に従って移行します。安全に変換できない古いノードはエラーにします。書き込み前に元のファイルをバックアップします。",
+    "원래 버전의 규칙에 따라 이전합니다. 안전하게 변환할 수 없는 구형 노드는 거부하며, 쓰기 전에 원본 파일을 백업합니다.",
+    "Migration follows the original version’s rules. Unsupported legacy nodes are rejected, and the original bytes are backed up before writing."
+  ],
+  "还没有关联事件。可在事件的前置任务或结束结果中关联。": [
+    "还没有关联事件。可在事件的前置任务或结束结果中关联。",
+    "尚無關聯事件。可在事件的前置任務或結束結果中關聯。",
+    "関連イベントはありません。イベントの前提クエストや終了時の結果から関連付けられます。",
+    "관련 이벤트가 없습니다. 이벤트의 선행 퀘스트나 종료 결과에서 연결할 수 있습니다.",
+    "No related events yet. Link this quest in an event’s prerequisites or completion results."
+  ],
+  "这些事件会检查或更新这个任务的进度。": [
+    "这些事件会检查或更新这个任务的进度。",
+    "這些事件會檢查或更新此任務的進度。",
+    "このクエストの進行を確認・更新するイベントです。",
+    "이 퀘스트의 진행을 확인하거나 갱신하는 이벤트입니다.",
+    "These events check or update this quest’s progress."
+  ],
+  "这是自由剧本的开场事件。": [
+    "这是自由剧本的开场事件。",
+    "這是自由劇本的開場事件。",
+    "独立シナリオの開始イベントです。",
+    "독립 시나리오의 시작 이벤트입니다.",
+    "This is the standalone scenario’s opening event."
+  ],
+  "这里设置整部作品的名称、作者和运行方式。": [
+    "这里设置整部作品的名称、作者和运行方式。",
+    "在此設定整部作品的名稱、作者與執行方式。",
+    "作品の名前、作者、動作方式を設定します。",
+    "작품의 이름, 제작자, 실행 방식을 설정합니다.",
+    "Set the project’s name, author, and runtime mode here."
+  ],
+  "选择 FFmpeg 程序": [
+    "选择 FFmpeg 程序",
+    "選擇 FFmpeg 程式",
+    "FFmpegを選択",
+    "FFmpeg 선택",
+    "Choose FFmpeg"
+  ],
+  "选择…": [
+    "选择…",
+    "選擇…",
+    "選択…",
+    "선택…",
+    "Choose…"
+  ],
+  "选择要重置本作品已读记录的存档": [
+    "选择要重置本作品已读记录的存档",
+    "選擇要重設本作品已讀紀錄的存檔",
+    "この作品の既読記録をリセットするセーブを選択",
+    "이 작품의 읽음 기록을 초기화할 저장 파일 선택",
+    "Choose the save whose read history should be reset"
+  ],
+  "逐句编辑翻译；人物 ID、资源路径和 Lua 保持原值。": [
+    "逐句编辑翻译；人物 ID、资源路径和 Lua 保持原值。",
+    "逐句編輯翻譯；人物 ID、資源路徑與 Lua 保持原值。",
+    "台詞ごとに翻訳を編集します。人物ID、素材パス、Luaは変更しません。",
+    "대사별로 번역을 편집합니다. 캐릭터 ID, 리소스 경로, Lua는 유지됩니다.",
+    "Edit translations line by line. Character IDs, asset paths, and Lua remain unchanged."
+  ],
+  "配置必须是对象": [
+    "配置必须是对象",
+    "設定必須是物件",
+    "設定はJSONオブジェクトで指定してください",
+    "설정은 JSON 객체여야 합니다",
+    "Settings must be a JSON object"
+  ],
+  "配置结构无效，请检查 scenario.json": [
+    "配置结构无效，请检查 scenario.json",
+    "設定結構無效，請檢查 scenario.json",
+    "設定の構造が不正です。scenario.jsonを確認してください。",
+    "설정 구조가 잘못되었습니다. scenario.json을 확인하세요.",
+    "Invalid settings structure. Check scenario.json."
+  ],
+  "高级条件": [
+    "高级条件",
+    "進階條件",
+    "詳細条件",
+    "고급 조건",
+    "Advanced conditions"
+  ],
+  "高级：作品标识": [
+    "高级：作品标识",
+    "進階：作品識別碼",
+    "詳細：作品ID",
+    "고급: 작품 ID",
+    "Advanced: project ID"
+  ],
+  "＋ 添加任务": [
+    "＋ 添加任务",
+    "＋ 新增任務",
+    "＋ クエストを追加",
+    "＋ 퀘스트 추가",
+    "＋ Add quest"
+  ],
+  "资料与审阅": [
+    "资料与审阅",
+    "資料與審閱",
+    "資料・添削",
+    "자료·검토",
+    "Reference and review"
+  ],
+  "评定与评论": [
+    "评定与评论",
+    "評定與評論",
+    "判定・コメント",
+    "평가·댓글",
+    "Verdicts and comments"
+  ],
+  "资料": [
+    "资料",
+    "資料",
+    "資料",
+    "자료",
+    "Reference"
+  ],
+  "保存历史": [
+    "保存历史",
+    "儲存歷程",
+    "保存履歴",
+    "저장 기록",
+    "Save history"
+  ],
+  "Addon 设置": [
+    "Addon 设置",
+    "Addon 設定",
+    "Addon設定",
+    "Addon 설정",
+    "Addon settings"
+  ],
+  "针对选中的节点": [
+    "针对选中的节点",
+    "針對選取的節點",
+    "選択中のノードを対象にする",
+    "선택한 노드에 적용",
+    "Apply to the selected node"
+  ],
+  "评论与引用单独保存。修改后，请按顶部的保存按钮。": [
+    "评论与引用单独保存。修改后，请按顶部的保存按钮。",
+    "評論與引用另行儲存。修改後，請按頂部的儲存按鈕。",
+    "指摘と引用は本文と別に保存されます。変更後は画面上部の保存を押してください。",
+    "댓글과 인용은 본문과 별도로 저장됩니다. 변경 후 상단의 저장 버튼을 누르세요.",
+    "Comments and quotes are stored separately from the story. Use Save at the top after editing."
+  ],
+  "作者": [
+    "作者",
+    "作者",
+    "作者",
+    "작성자",
+    "Author"
+  ],
+  "姓名": [
+    "姓名",
+    "姓名",
+    "名前",
+    "이름",
+    "Name"
+  ],
+  "取消回复": [
+    "取消回复",
+    "取消回覆",
+    "返信をやめる",
+    "답글 취소",
+    "Cancel reply"
+  ],
+  "评论、建议或回复": [
+    "评论、建议或回复",
+    "評論、建議或回覆",
+    "指摘・提案・返信",
+    "댓글·제안·답글",
+    "Comment, suggestion, or reply"
+  ],
+  "添加评论": [
+    "添加评论",
+    "新增評論",
+    "コメントを追加",
+    "댓글 추가",
+    "Add comment"
+  ],
+  "人工": [
+    "人工",
+    "人工",
+    "人間",
+    "사람",
+    "Human"
+  ],
+  "智能代理": [
+    "智能代理",
+    "智慧代理",
+    "エージェント",
+    "에이전트",
+    "Agent"
+  ],
+  "已解决": [
+    "已解决",
+    "已解決",
+    "解決済み",
+    "해결됨",
+    "Resolved"
+  ],
+  "未解决": [
+    "未解决",
+    "未解決",
+    "未解決",
+    "미해결",
+    "Unresolved"
+  ],
+  "回复": [
+    "回复",
+    "回覆",
+    "返信",
+    "답글",
+    "Reply"
+  ],
+  "重新打开": [
+    "重新打开",
+    "重新開啟",
+    "未解決に戻す",
+    "다시 열기",
+    "Reopen"
+  ],
+  "标记为已解决": [
+    "标记为已解决",
+    "標記為已解決",
+    "解決済みにする",
+    "해결됨으로 표시",
+    "Mark resolved"
+  ],
+  "搜索资料标题与正文": [
+    "搜索资料标题与正文",
+    "搜尋資料標題與內文",
+    "資料の見出し・本文を検索",
+    "자료 제목·본문 검색",
+    "Search reference headings and text"
+  ],
+  "请将 Markdown 资料放在项目的 outline/ 文件夹中。": [
+    "请将 Markdown 资料放在项目的 outline/ 文件夹中。",
+    "請將 Markdown 資料放在專案的 outline/ 資料夾中。",
+    "プロジェクト内の outline/ にMarkdown資料を置いてください。",
+    "프로젝트의 outline/ 폴더에 Markdown 자료를 넣으세요.",
+    "Place Markdown reference files in the project’s outline/ folder."
+  ],
+  "目录": [
+    "目录",
+    "目錄",
+    "目次",
+    "목차",
+    "Contents"
+  ],
+  "请先将项目保存到文件夹，再查看资料。": [
+    "请先将项目保存到文件夹，再查看资料。",
+    "請先將專案儲存到資料夾，再查看資料。",
+    "資料を読むにはプロジェクトをフォルダへ保存してください。",
+    "자료를 보려면 프로젝트를 폴더에 저장하세요.",
+    "Save the project to a folder to read reference files."
+  ],
+  "可查看每次保存的前后差异。恢复章节后，请再次保存。": [
+    "可查看每次保存的前后差异。恢复章节后，请再次保存。",
+    "可查看每次儲存的前後差異。復原章節後，請再次儲存。",
+    "保存ごとの変更前後を確認できます。章の復元は未保存の編集として反映されます。",
+    "저장 전후의 변경 사항을 확인할 수 있습니다. 장을 복구한 후 다시 저장하세요.",
+    "Compare changes before and after each save. Restored chapters become unsaved edits."
+  ],
+  "修改前": [
+    "修改前",
+    "修改前",
+    "変更前",
+    "변경 전",
+    "Before"
+  ],
+  "修改后": [
+    "修改后",
+    "修改後",
+    "変更後",
+    "변경 후",
+    "After"
+  ],
+  "保存项目后会生成历史记录。": [
+    "保存项目后会生成历史记录。",
+    "儲存專案後會產生歷程紀錄。",
+    "プロジェクトを保存すると履歴が作成されます。",
+    "프로젝트를 저장하면 기록이 생성됩니다.",
+    "History is created when you save the project."
+  ],
+  "此项目使用 MortalModHost 格式。": [
+    "此项目使用 MortalModHost 格式。",
+    "此專案使用 MortalModHost 格式。",
+    "このプロジェクトはMortalModHost形式です。",
+    "이 프로젝트는 MortalModHost 형식입니다.",
+    "This project uses the MortalModHost format."
+  ],
+  "这是 scenario.json 的设置。events 中的 story 指定章节 ID。": [
+    "这是 scenario.json 的设置。events 中的 story 指定章节 ID。",
+    "這是 scenario.json 的設定。events 中的 story 指定章節 ID。",
+    "scenario.json の設定です。events の story は章IDを指定します。",
+    "scenario.json 설정입니다. events의 story에는 장 ID를 지정합니다.",
+    "Settings for scenario.json. The story field in events specifies a chapter ID."
+  ],
+  "编辑设置": [
+    "编辑设置",
+    "編輯設定",
+    "設定を編集",
+    "설정 편집",
+    "Edit settings"
+  ],
+  "应用设置": [
+    "应用设置",
+    "套用設定",
+    "設定を反映",
+    "설정 적용",
+    "Apply settings"
+  ],
+  "取消编辑": [
+    "取消编辑",
+    "取消編輯",
+    "編集を取り消す",
+    "편집 취소",
+    "Cancel editing"
+  ],
+  "未评定": [
+    "未评定",
+    "未評定",
+    "未判定",
+    "미평가",
+    "Unreviewed"
+  ],
+  "良好": [
+    "良好",
+    "良好",
+    "良い",
+    "좋음",
+    "Good"
+  ],
+  "需要修改": [
+    "需要修改",
+    "需要修改",
+    "要修正",
+    "수정 필요",
+    "Needs changes"
+  ],
+  "保留或替代方案": [
+    "保留或替代方案",
+    "保留或替代方案",
+    "保留・別案",
+    "보류·대안",
+    "Hold / alternative"
+  ],
+  "不采用": [
+    "不采用",
+    "不採用",
+    "不採用",
+    "채택하지 않음",
+    "Reject"
+  ],
+  "章节：{story}": [
+    "章节：{story}",
+    "章節：{story}",
+    "章: {story}",
+    "장: {story}",
+    "Chapter: {story}"
+  ],
+  "回复对象：{id}": [
+    "回复对象：{id}",
+    "回覆對象：{id}",
+    "返信先: {id}",
+    "답글 대상: {id}",
+    "Replying to: {id}"
+  ],
+  "从此记录恢复章节 {story}": [
+    "从此记录恢复章节 {story}",
+    "從此紀錄復原章節 {story}",
+    "この履歴から章 {story} を復元",
+    "이 기록에서 {story} 장 복구",
+    "Restore chapter {story} from this save"
+  ],
+  "支持导出的节点：{nodes}": [
+    "支持导出的节点：{nodes}",
+    "支援匯出的節點：{nodes}",
+    "書き出し対応ノード: {nodes}",
+    "내보내기 지원 노드: {nodes}",
+    "Supported export nodes: {nodes}"
+  ],
+  "新建 LoMScenarioAddon 项目": [
+    "新建 LoMScenarioAddon 项目",
+    "新增 LoMScenarioAddon 專案",
+    "新規 LoMScenarioAddon プロジェクト",
+    "새 LoMScenarioAddon 프로젝트",
+    "New LoMScenarioAddon project"
+  ],
+  "新建 MortalModHost 项目（兼容）": [
+    "新建 MortalModHost 项目（兼容）",
+    "新增 MortalModHost 專案（相容）",
+    "新規 MortalModHost プロジェクト（互換）",
+    "새 MortalModHost 프로젝트 (호환)",
+    "New MortalModHost project (compatibility)"
+  ],
+  "导出 Addon…": [
+    "导出 Addon…",
+    "匯出 Addon…",
+    "Addonを書き出す…",
+    "Addon 내보내기…",
+    "Export Addon…"
+  ],
+  "导出 Addon": [
+    "导出 Addon",
+    "匯出 Addon",
+    "Addonを書き出す",
+    "Addon 내보내기",
+    "Export Addon"
+  ],
+  "资料、审阅与历史": [
+    "资料、审阅与历史",
+    "資料、審閱與歷程",
+    "資料・添削・履歴",
+    "자료·검토·기록",
+    "Reference, review, and history"
+  ],
+  "检测到外部更改。由于仍有未保存的编辑，已暂停自动更新和覆盖保存。": [
+    "检测到外部更改。由于仍有未保存的编辑，已暂停自动更新和覆盖保存。",
+    "偵測到外部變更。因仍有未儲存的編輯，已暫停自動更新與覆寫儲存。",
+    "外部の変更があります。未保存の編集を残しているため、自動更新・上書き保存を止めています。",
+    "외부 변경 사항이 있습니다. 저장하지 않은 편집이 있어 자동 갱신과 덮어쓰기를 중지했습니다.",
+    "External changes were detected. Automatic reload and overwrite are paused while you have unsaved edits."
+  ],
+  "重新读取磁盘上的最新版本…": [
+    "重新读取磁盘上的最新版本…",
+    "重新讀取磁碟上的最新版本…",
+    "ディスクの最新版を読み直す…",
+    "디스크의 최신 버전 다시 읽기…",
+    "Reload the latest version from disk…"
+  ],
+  "引用的节点已删除。请查看评论中的引用。": [
+    "引用的节点已删除。请查看评论中的引用。",
+    "引用的節點已刪除。請查看評論中的引用。",
+    "引用元のノードは削除されています。コメント内の引用を確認してください。",
+    "인용한 노드가 삭제되었습니다. 댓글에 남은 인용문을 확인하세요.",
+    "The quoted node has been deleted. See the quote in the comment."
+  ],
+  "尚不支持将多语言设置导出到 LoMScenarioAddon。翻译可保存到制作数据，但会阻止导出。": [
+    "尚不支持将多语言设置导出到 LoMScenarioAddon。翻译可保存到制作数据，但会阻止导出。",
+    "尚不支援將多語言設定匯出至 LoMScenarioAddon。翻譯可儲存在製作資料中，但會阻止匯出。",
+    "LoMScenarioAddonへの多言語設定の書き出しは未対応です。翻訳は制作データに保存できますが、書き出し時の検査で停止します。",
+    "LoMScenarioAddon으로 다국어 설정을 내보내는 기능은 아직 지원하지 않습니다. 번역은 작업 데이터에 저장되지만 내보내기 검사에서 중단됩니다.",
+    "LoMScenarioAddon does not yet support exporting multilingual settings. Translations can be saved in authoring data, but export validation will stop."
+  ],
+  "导出 scenario.json 和官方格式的 story/*.lua。游戏安装步骤请参阅仓库的剧本制作指南。": [
+    "导出 scenario.json 和官方格式的 story/*.lua。游戏安装步骤请参阅仓库的剧本制作指南。",
+    "匯出 scenario.json 與官方格式的 story/*.lua。遊戲安裝步驟請參閱儲存庫的劇本製作指南。",
+    "scenario.json と公式形式の story/*.lua を書き出します。ゲームへの導入はリポジトリのシナリオ制作ガイドを参照してください。",
+    "scenario.json과 공식 형식의 story/*.lua를 내보냅니다. 게임 설치 방법은 저장소의 시나리오 제작 안내를 참고하세요.",
+    "Export scenario.json and official-format story/*.lua files. See the repository’s scenario authoring guide for game installation."
+  ],
+  "查看 Addon 设置与支持的节点": [
+    "查看 Addon 设置与支持的节点",
+    "查看 Addon 設定與支援的節點",
+    "Addon設定・対応ノードを確認",
+    "Addon 설정·지원 노드 확인",
+    "View Addon settings and supported nodes"
+  ],
+  "检查导出": [
+    "检查导出",
+    "檢查匯出",
+    "書き出しを検査",
+    "내보내기 검사",
+    "Validate export"
+  ],
+  "请先添加正在输入的评论或应用 Addon 设置，再保存。": [
+    "请先添加正在输入的评论或应用 Addon 设置，再保存。",
+    "請先新增正在輸入的評論或套用 Addon 設定，再儲存。",
+    "入力中のコメントは「コメントを追加」、Addon設定は「設定を反映」を押してから保存してください。",
+    "저장하기 전에 작성 중인 댓글을 추가하거나 Addon 설정을 적용하세요.",
+    "Add your pending comment or apply the Addon settings before saving."
+  ],
+  "已读取 CLI 或外部保存的更改": [
+    "已读取 CLI 或外部保存的更改",
+    "已讀取 CLI 或外部儲存的變更",
+    "CLI・外部の保存内容を読み込みました",
+    "CLI·외부 저장 변경 사항을 읽었습니다",
+    "Loaded changes saved by the CLI or another editor"
+  ],
+  "新的导出文件夹名称": [
+    "新的导出文件夹名称",
+    "新的匯出資料夾名稱",
+    "新しい書き出し先フォルダ名",
+    "새 내보내기 폴더 이름",
+    "New export folder name"
+  ],
+  "此节点由自己的分支决定流程，不允许额外 goto。": [
+    "此节点由自己的分支决定流程，不允许额外 goto。",
+    "此節點由自身分支決定流程，不允許額外的 goto。",
+    "このノードは自身の分岐で進行を決めるため、追加のgotoは指定できません。",
+    "이 노드는 자체 분기로 흐름을 결정하므로 별도의 goto를 지정할 수 없습니다.",
+    "This node controls its own branches and cannot have an additional goto."
+  ],
+  "对话": [
+    "对话",
+    "對話",
+    "会話",
+    "대화",
+    "Dialogue"
+  ],
+  "内心独白": [
+    "内心独白",
+    "內心獨白",
+    "心の声",
+    "속마음",
+    "Inner voice"
+  ],
+  "旁白": [
+    "旁白",
+    "旁白",
+    "ナレーション",
+    "내레이션",
+    "Narration"
+  ],
+  "居中旁白": [
+    "居中旁白",
+    "置中旁白",
+    "中央にナレーション",
+    "중앙 내레이션",
+    "Centered narration"
+  ],
+  "Addonを書き出しました: {arg0}": [
+    "已导出 Addon：{arg0}",
+    "已匯出 Addon：{arg0}",
+    "Addonを書き出しました: {arg0}",
+    "Addon을 내보냈습니다: {arg0}",
+    "Exported Addon: {arg0}"
+  ],
+  "{arg0} · {arg1} · 作者：{arg2} · 许可：{arg3}": [
+    "{arg0} · {arg1} · 作者：{arg2} · 许可：{arg3}",
+    "{arg0} · {arg1} · 作者：{arg2} · 授權：{arg3}",
+    "{arg0} · {arg1} · 作者：{arg2} · ライセンス：{arg3}",
+    "{arg0} · {arg1} · 제작자: {arg2} · 라이선스: {arg3}",
+    "{arg0} · {arg1} · Author: {arg2} · License: {arg3}"
+  ],
+  "{arg0} · {arg1} 项": [
+    "{arg0} · {arg1} 项",
+    "{arg0} · {arg1} 項",
+    "{arg0} · {arg1}件",
+    "{arg0} · {arg1}개",
+    "{arg0} · {arg1} items"
+  ],
+  "{arg0} → {arg1} · {arg2} 个节点": [
+    "{arg0} → {arg1} · {arg2} 个节点",
+    "{arg0} → {arg1} · {arg2} 個節點",
+    "{arg0} → {arg1} · {arg2}ノード",
+    "{arg0} → {arg1} · 노드 {arg2}개",
+    "{arg0} → {arg1} · {arg2} nodes"
+  ],
+  "{arg0} 个事件 · {arg1} 个任务": [
+    "{arg0} 个事件 · {arg1} 个任务",
+    "{arg0} 個事件 · {arg1} 個任務",
+    "イベント{arg0}件 · クエスト{arg1}件",
+    "이벤트 {arg0}개 · 퀘스트 {arg1}개",
+    "{arg0} events · {arg1} quests"
+  ],
+  "{arg0} 个匹配": [
+    "{arg0} 个匹配",
+    "{arg0} 個符合項目",
+    "{arg0}件見つかりました",
+    "{arg0}개 일치",
+    "{arg0} matches"
+  ],
+  "{arg0} 个演出步骤": [
+    "{arg0} 个演出步骤",
+    "{arg0} 個演出步驟",
+    "演出ステップ{arg0}件",
+    "연출 단계 {arg0}개",
+    "{arg0} presentation steps"
+  ],
+  "{arg0} 处内容引用": [
+    "{arg0} 处内容引用",
+    "{arg0} 處內容引用",
+    "素材の参照{arg0}件",
+    "콘텐츠 참조 {arg0}개",
+    "{arg0} content references"
+  ],
+  "{arg0} 指向模板外部步骤 {target}；插入后请重新绑定": [
+    "{arg0} 指向模板外部步骤 {target}；插入后请重新绑定",
+    "{arg0} 指向範本外部步驟 {target}；插入後請重新綁定",
+    "{arg0}はテンプレート外の{target}を参照しています。挿入後に参照先を設定してください。",
+    "{arg0}이 템플릿 외부 단계 {target}을 참조합니다. 삽입 후 다시 연결하세요.",
+    "{arg0} references step {target} outside the template. Rebind it after insertion."
+  ],
+  "{arg0} 条分支": [
+    "{arg0} 条分支",
+    "{arg0} 條分支",
+    "分岐{arg0}件",
+    "분기 {arg0}개",
+    "{arg0} branches"
+  ],
+  "{arg0} 步 · {arg1} 连接": [
+    "{arg0} 步 · {arg1} 连接",
+    "{arg0} 步 · {arg1} 連線",
+    "{arg0}ステップ · 接続{arg1}件",
+    "{arg0}단계 · 연결 {arg1}개",
+    "{arg0} steps · {arg1} connections"
+  ],
+  "{arg0} 段剧情": [
+    "{arg0} 段剧情",
+    "{arg0} 段劇情",
+    "{arg0}章",
+    "{arg0}개 장",
+    "{arg0} chapters"
+  ],
+  "{arg0}变成": [
+    "{arg0}变成",
+    "{arg0}變成",
+    "{arg0}の変更先",
+    "{arg0}의 변경 상태",
+    "Set {arg0} to"
+  ],
+  "{date}，{mode}以 {chance}% 概率播放《{story}》，{repeat}。": [
+    "{date}，{mode}以 {chance}% 概率播放《{story}》，{repeat}。",
+    "{date}，{mode}以 {chance}% 機率播放《{story}》，{repeat}。",
+    "{date}、{mode}「{story}」を{chance}%の確率で再生。{repeat}。",
+    "{date}, {mode} “{story}”를 {chance}% 확률로 재생. {repeat}.",
+    "{date}: {mode}, play “{story}” with {chance}% probability; {repeat}."
+  ],
+  "{kind} · 未支持": [
+    "{kind} · 未支持",
+    "{kind} · 尚未支援",
+    "{kind} · 未対応",
+    "{kind} · 미지원",
+    "{kind} · Unsupported"
+  ],
+  "{kind} · 添加后可在属性页查看全部字段": [
+    "{kind} · 添加后可在属性页查看全部字段",
+    "{kind} · 新增後可在屬性頁查看所有欄位",
+    "{kind} · 追加するとプロパティですべての項目を確認できます",
+    "{kind} · 추가 후 속성에서 모든 필드를 확인할 수 있습니다",
+    "{kind} · Add it to view all fields in Properties"
+  ],
+  "{label}：空值": [
+    "{label}：空值",
+    "{label}：空值",
+    "{label}：値なし",
+    "{label}: 값 없음",
+    "{label}: null"
+  ],
+  "{name} · {arg0} 步": [
+    "{name} · {arg0} 步",
+    "{name} · {arg0} 步",
+    "{name} · {arg0}ステップ",
+    "{name} · {arg0}단계",
+    "{name} · {arg0} steps"
+  ],
+  "{n}月": [
+    "{n}月",
+    "{n}月",
+    "{n}月",
+    "{n}월",
+    "Month {n}"
+  ],
+  "→ 章节 {arg0}": [
+    "→ 章节 {arg0}",
+    "→ 章節 {arg0}",
+    "→ 章 {arg0}",
+    "→ 장 {arg0}",
+    "→ Chapter {arg0}"
+  ],
+  "从 {script}/{node} 开始的临时测试包": [
+    "从 {script}/{node} 开始的临时测试包",
+    "從 {script}/{node} 開始的暫時測試套件",
+    "{script}/{node}から開始する一時テストパッケージ",
+    "{script}/{node}에서 시작하는 임시 테스트 패키지",
+    "Temporary test package starting at {script}/{node}"
+  ],
+  "保存失败；修改仍保留在编辑器中。\n{e}": [
+    "保存失败；修改仍保留在编辑器中。\n{e}",
+    "儲存失敗；修改仍保留在編輯器中。\n{e}",
+    "保存できませんでした。編集内容はエディターに残っています。\n{e}",
+    "저장하지 못했습니다. 편집 내용은 에디터에 남아 있습니다.\n{e}",
+    "Save failed. Your edits remain in the editor.\n{e}"
+  ],
+  "修改尚未完成：{error}": [
+    "修改尚未完成：{error}",
+    "修改尚未完成：{error}",
+    "編集を完了できませんでした：{error}",
+    "편집을 완료하지 못했습니다: {error}",
+    "Could not finish editing: {error}"
+  ],
+  "全部包内资源 · {arg0} 个": [
+    "全部包内资源 · {arg0} 个",
+    "所有套件內資源 · {arg0} 個",
+    "パッケージ内の全素材 · {arg0}件",
+    "패키지 내 전체 리소스 · {arg0}개",
+    "All package assets · {arg0} items"
+  ],
+  "分区/分组修改未应用：{e}": [
+    "分区/分组修改未应用：{e}",
+    "區段／群組修改未套用：{e}",
+    "セクション・グループの変更を適用できませんでした：{e}",
+    "구역·그룹 변경을 적용하지 못했습니다: {e}",
+    "Could not apply section/group changes: {e}"
+  ],
+  "分区「{title}」的起止步骤不存在": [
+    "分区「{title}」的起止步骤不存在",
+    "區段「{title}」的起訖步驟不存在",
+    "セクション「{title}」の開始・終了ステップがありません",
+    "구역 “{title}”의 시작·종료 단계가 없습니다",
+    "Section “{title}” refers to missing boundary steps"
+  ],
+  "分组「{name}」起止步骤不存在": [
+    "分组「{name}」起止步骤不存在",
+    "群組「{name}」起訖步驟不存在",
+    "グループ「{name}」の開始・終了ステップがありません",
+    "그룹 “{name}”의 시작·종료 단계가 없습니다",
+    "Group “{name}” refers to missing boundary steps"
+  ],
+  "前置任务：{arg0} · {arg1}": [
+    "前置任务：{arg0} · {arg1}",
+    "前置任務：{arg0} · {arg1}",
+    "前提クエスト：{arg0} · {arg1}",
+    "선행 퀘스트: {arg0} · {arg1}",
+    "Prerequisite quest: {arg0} · {arg1}"
+  ],
+  "副本 {arg0}": [
+    "副本 {arg0}",
+    "副本 {arg0}",
+    "コピー {arg0}",
+    "복사본 {arg0}",
+    "Copy {arg0}"
+  ],
+  "另有 {actions} 项奖励或其他结果动作，可在高级设置中修改。": [
+    "另有 {actions} 项奖励或其他结果动作，可在高级设置中修改。",
+    "另有 {actions} 項獎勵或其他結果動作，可在進階設定中修改。",
+    "ほかに{actions}件の報酬・結果アクションがあります。詳細設定で変更できます。",
+    "보상이나 기타 결과 동작이 {actions}개 더 있습니다. 고급 설정에서 변경할 수 있습니다.",
+    "There are {actions} additional rewards or result actions. Edit them in advanced settings."
+  ],
+  "另有 {arg0} 项高级条件；修改日期会保留它们。": [
+    "另有 {arg0} 项高级条件；修改日期会保留它们。",
+    "另有 {arg0} 項進階條件；修改日期時會保留。",
+    "ほかに{arg0}件の詳細条件があります。日付を変更しても保持されます。",
+    "고급 조건이 {arg0}개 더 있습니다. 날짜를 변경해도 유지됩니다.",
+    "There are {arg0} additional advanced conditions. Changing the date preserves them."
+  ],
+  "外部の保存内容を確認できません: {error}": [
+    "无法检查外部保存的更改：{error}",
+    "無法檢查外部儲存的內容：{error}",
+    "外部の保存内容を確認できません: {error}",
+    "외부 저장 내용을 확인할 수 없습니다: {error}",
+    "Could not check external changes: {error}"
+  ],
+  "外部引用 {s} 会保留，请确认目标章节中存在该 ID": [
+    "外部引用 {s} 会保留，请确认目标章节中存在该 ID",
+    "外部引用 {s} 會保留，請確認目標章節中存在該 ID",
+    "外部参照{s}は保持されます。移動先の章にこのIDがあるか確認してください。",
+    "외부 참조 {s}는 유지됩니다. 대상 장에 이 ID가 있는지 확인하세요.",
+    "External reference {s} will be preserved. Check that this ID exists in the destination chapter."
+  ],
+  "导出失败\n{e}": [
+    "导出失败\n{e}",
+    "匯出失敗\n{e}",
+    "書き出せませんでした\n{e}",
+    "내보내지 못했습니다\n{e}",
+    "Export failed\n{e}"
+  ],
+  "已保存全部 {arg0} 个章节 · {arg1}": [
+    "已保存全部 {arg0} 个章节 · {arg1}",
+    "已儲存全部 {arg0} 個章節 · {arg1}",
+    "全{arg0}章を保存しました · {arg1}",
+    "전체 {arg0}개 장을 저장했습니다 · {arg1}",
+    "Saved all {arg0} chapters · {arg1}"
+  ],
+  "已保存到共享库；备份：{arg0}": [
+    "已保存到共享库；备份：{arg0}",
+    "已儲存至共用庫；備份：{arg0}",
+    "共有ライブラリに保存しました。バックアップ：{arg0}",
+    "공유 라이브러리에 저장했습니다. 백업: {arg0}",
+    "Saved to the shared library. Backup: {arg0}"
+  ],
+  "已保留于 {arg0}": [
+    "已保留于 {arg0}",
+    "已保留於 {arg0}",
+    "{arg0}に保存済み",
+    "{arg0}에 보관됨",
+    "Preserved at {arg0}"
+  ],
+  "已复制 {arg0} 个节点，可切换章节后粘贴": [
+    "已复制 {arg0} 个节点，可切换章节后粘贴",
+    "已複製 {arg0} 個節點，可切換章節後貼上",
+    "{arg0}ノードをコピーしました。別の章にも貼り付けられます。",
+    "노드 {arg0}개를 복사했습니다. 다른 장에도 붙여넣을 수 있습니다.",
+    "Copied {arg0} nodes. You can paste them into another chapter."
+  ],
+  "已导出 {arg0}": [
+    "已导出 {arg0}",
+    "已匯出 {arg0}",
+    "{arg0}を書き出しました",
+    "{arg0}을 내보냈습니다",
+    "Exported {arg0}"
+  ],
+  "已批改 {arg0} 个步骤，可撤销": [
+    "已批改 {arg0} 个步骤，可撤销",
+    "已批改 {arg0} 個步驟，可復原",
+    "{arg0}ステップを一括変更しました。元に戻せます。",
+    "{arg0}개 단계를 일괄 수정했습니다. 실행 취소할 수 있습니다.",
+    "Updated {arg0} steps. This can be undone."
+  ],
+  "已替换 {count} 处文本，可撤销": [
+    "已替换 {count} 处文本，可撤销",
+    "已替換 {count} 處文字，可復原",
+    "{count}か所を置換しました。元に戻せます。",
+    "{count}곳의 텍스트를 치환했습니다. 실행 취소할 수 있습니다.",
+    "Replaced text in {count} places. This can be undone."
+  ],
+  "已载入 {arg0} 个章节": [
+    "已载入 {arg0} 个章节",
+    "已載入 {arg0} 個章節",
+    "{arg0}章を読み込みました",
+    "{arg0}개 장을 불러왔습니다",
+    "Loaded {arg0} chapters"
+  ],
+  "已选中 {arg0} 个步骤。左侧 Shift 连选，⌘/Ctrl 多选。": [
+    "已选中 {arg0} 个步骤。左侧 Shift 连选，⌘/Ctrl 多选。",
+    "已選取 {arg0} 個步驟。左側 Shift 連選，⌘/Ctrl 多選。",
+    "{arg0}ステップを選択中。左側でShiftを押すと範囲選択、⌘/Ctrlで複数選択できます。",
+    "{arg0}개 단계를 선택했습니다. 왼쪽에서 Shift로 범위 선택, ⌘/Ctrl로 여러 항목을 선택합니다.",
+    "{arg0} steps selected. Use Shift for a range or ⌘/Ctrl for multiple selections on the left."
+  ],
+  "开场时播放《{story}》。": [
+    "开场时播放《{story}》。",
+    "開場時播放《{story}》。",
+    "開始時に「{story}」を再生します。",
+    "시작 시 “{story}”를 재생합니다.",
+    "Play “{story}” at the opening."
+  ],
+  "恢复副本已保存其他修改；尚未包含未完成的素材输入：{error}": [
+    "恢复副本已保存其他修改；尚未包含未完成的素材输入：{error}",
+    "復原副本已儲存其他修改；尚未包含未完成的素材輸入：{error}",
+    "ほかの編集内容は復元用コピーに保存しました。入力途中の素材は含まれていません：{error}",
+    "다른 편집 내용은 복구 복사본에 저장했습니다. 미완성 리소스 입력은 포함되지 않았습니다: {error}",
+    "Other edits were saved in the recovery copy. Unfinished asset input is not included: {error}"
+  ],
+  "打开失败\n{e}": [
+    "打开失败\n{e}",
+    "開啟失敗\n{e}",
+    "開けませんでした\n{e}",
+    "열지 못했습니다\n{e}",
+    "Could not open\n{e}"
+  ],
+  "无法打开 {arg0}\n{e}": [
+    "无法打开 {arg0}\n{e}",
+    "無法開啟 {arg0}\n{e}",
+    "{arg0}を開けませんでした\n{e}",
+    "{arg0}을 열 수 없습니다\n{e}",
+    "Could not open {arg0}\n{e}"
+  ],
+  "書き出しに失敗しました\n{error}": [
+    "导出失败\n{error}",
+    "匯出失敗\n{error}",
+    "書き出しに失敗しました\n{error}",
+    "내보내지 못했습니다\n{error}",
+    "Export failed\n{error}"
+  ],
+  "条件 {arg0} {arg1}": [
+    "条件 {arg0} {arg1}",
+    "條件 {arg0} {arg1}",
+    "条件 {arg0} {arg1}",
+    "조건 {arg0} {arg1}",
+    "Condition {arg0} {arg1}"
+  ],
+  "検査成功: {arg0} ファイルを書き出せます": [
+    "检查通过：可导出 {arg0} 个文件",
+    "檢查通過：可匯出 {arg0} 個檔案",
+    "検査成功: {arg0} ファイルを書き出せます",
+    "검사 통과: 파일 {arg0}개를 내보낼 수 있습니다",
+    "Validation passed: {arg0} files can be exported"
+  ],
+  "死亡编号 {arg0} · 完成后 {arg1}": [
+    "死亡编号 {arg0} · 完成后 {arg1}",
+    "死亡編號 {arg0} · 完成後 {arg1}",
+    "死亡ID {arg0} · 終了後 {arg1}",
+    "사망 ID {arg0} · 완료 후 {arg1}",
+    "Death ID {arg0} · After completion: {arg1}"
+  ],
+  "测试{arg0}": [
+    "测试{arg0}",
+    "測試{arg0}",
+    "テスト{arg0}",
+    "테스트{arg0}",
+    "Test {arg0}"
+  ],
+  "测试输入尚未完成：{error}": [
+    "测试输入尚未完成：{error}",
+    "測試輸入尚未完成：{error}",
+    "テストの入力が完了していません：{error}",
+    "테스트 입력이 완료되지 않았습니다: {error}",
+    "Test input is incomplete: {error}"
+  ],
+  "第 {arg0} 项": [
+    "第 {arg0} 项",
+    "第 {arg0} 項",
+    "項目 {arg0}",
+    "항목 {arg0}",
+    "Item {arg0}"
+  ],
+  "第{n}年": [
+    "第{n}年",
+    "第{n}年",
+    "{n}年目",
+    "{n}년 차",
+    "Year {n}"
+  ],
+  "素材已载入，但无法记住素材位置：{error}": [
+    "素材已载入，但无法记住素材位置：{error}",
+    "素材已載入，但無法記住素材位置：{error}",
+    "素材は読み込めましたが、保存場所を記録できませんでした：{error}",
+    "리소스를 불러왔지만 위치를 저장하지 못했습니다: {error}",
+    "Assets were loaded, but their location could not be remembered: {error}"
+  ],
+  "编译未通过：\n{e}": [
+    "编译未通过：\n{e}",
+    "編譯未通過：\n{e}",
+    "コンパイルできませんでした：\n{e}",
+    "컴파일하지 못했습니다:\n{e}",
+    "Compilation failed:\n{e}"
+  ],
+  "编辑器临时试玩：{script}": [
+    "编辑器临时试玩：{script}",
+    "編輯器暫時試玩：{script}",
+    "エディターの一時テスト：{script}",
+    "에디터 임시 테스트: {script}",
+    "Temporary editor preview: {script}"
+  ],
+  "缺失目标：{arg0}": [
+    "缺失目标：{arg0}",
+    "缺少目標：{arg0}",
+    "参照先がありません：{arg0}",
+    "대상이 없습니다: {arg0}",
+    "Missing targets: {arg0}"
+  ],
+  "缺失：{arg0}": [
+    "缺失：{arg0}",
+    "缺少：{arg0}",
+    "見つかりません：{arg0}",
+    "없음: {arg0}",
+    "Missing: {arg0}"
+  ],
+  "缺少依赖：{arg0}": [
+    "缺少依赖：{arg0}",
+    "缺少相依項目：{arg0}",
+    "依存素材がありません：{arg0}",
+    "의존 콘텐츠가 없습니다: {arg0}",
+    "Missing dependencies: {arg0}"
+  ],
+  "脱敏诊断包已保存：{arg0}": [
+    "脱敏诊断包已保存：{arg0}",
+    "去識別化診斷套件已儲存：{arg0}",
+    "個人情報を除いた診断パッケージを保存しました：{arg0}",
+    "개인정보를 제거한 진단 패키지를 저장했습니다: {arg0}",
+    "Saved the redacted diagnostic bundle: {arg0}"
+  ],
+  "自动恢复副本写入失败：{e}": [
+    "自动恢复副本写入失败：{e}",
+    "自動復原副本寫入失敗：{e}",
+    "自動復元用コピーを保存できませんでした：{e}",
+    "자동 복구 복사본을 저장하지 못했습니다: {e}",
+    "Could not write the recovery copy: {e}"
+  ],
+  "试玩请求已发送：{script}/{node}": [
+    "试玩请求已发送：{script}/{node}",
+    "試玩要求已送出：{script}/{node}",
+    "テストプレイを要求しました：{script}/{node}",
+    "테스트 플레이를 요청했습니다: {script}/{node}",
+    "Preview requested: {script}/{node}"
+  ],
+  "读取 {arg0} · 写入 {arg1} · 未使用 {arg2} · 可能先读后写 {arg3}": [
+    "读取 {arg0} · 写入 {arg1} · 未使用 {arg2} · 可能先读后写 {arg3}",
+    "讀取 {arg0} · 寫入 {arg1} · 未使用 {arg2} · 可能先讀後寫 {arg3}",
+    "読み取り {arg0} · 書き込み {arg1} · 未使用 {arg2} · 書き込み前の読み取りの可能性 {arg3}",
+    "읽기 {arg0} · 쓰기 {arg1} · 미사용 {arg2} · 쓰기 전 읽기 가능성 {arg3}",
+    "Reads {arg0} · Writes {arg1} · Unused {arg2} · Possible read before write {arg3}"
+  ],
+  "选择「{text}」后": [
+    "选择「{text}」后",
+    "選擇「{text}」後",
+    "「{text}」を選んだ後",
+    "“{text}” 선택 후",
+    "After choosing “{text}”"
+  ],
+  "错误：{arg0}": [
+    "错误：{arg0}",
+    "錯誤：{arg0}",
+    "エラー：{arg0}",
+    "오류: {arg0}",
+    "Error: {arg0}"
+  ],
+  "项目已处理；最近列表保存失败：{e}": [
+    "项目已处理；最近列表保存失败：{e}",
+    "專案已處理；最近清單儲存失敗：{e}",
+    "プロジェクトは処理できましたが、最近使った項目を保存できませんでした：{e}",
+    "프로젝트는 처리했지만 최근 목록을 저장하지 못했습니다: {e}",
+    "The project was processed, but the recent list could not be saved: {e}"
+  ],
+  "预览素材库：{arg0}": [
+    "预览素材库：{arg0}",
+    "預覽素材庫：{arg0}",
+    "プレビュー素材ライブラリ：{arg0}",
+    "미리보기 리소스 라이브러리: {arg0}",
+    "Preview asset library: {arg0}"
+  ],
+  "全局查找": [
+    "全局查找",
+    "全域搜尋",
+    "全体を検索",
+    "전체 검색",
+    "Search all"
+  ],
+  "变量管理": [
+    "变量管理",
+    "變數管理",
+    "変数の管理",
+    "변수 관리",
+    "Manage variables"
+  ],
+  "条件检查": [
+    "条件检查",
+    "條件檢查",
+    "条件の確認",
+    "조건 검사",
+    "Inspect conditions"
+  ],
+  "路径模拟": [
+    "路径模拟",
+    "路徑模擬",
+    "経路シミュレーション",
+    "경로 시뮬레이션",
+    "Simulate paths"
+  ],
+  "跨章节复制": [
+    "跨章节复制",
+    "跨章節複製",
+    "別の章へコピー",
+    "다른 장으로 복사",
+    "Copy between chapters"
+  ],
+  "离线测试": [
+    "离线测试",
+    "離線測試",
+    "オフラインテスト",
+    "오프라인 테스트",
+    "Offline tests"
+  ],
+  "章节入口": [
+    "章节入口",
+    "章節入口",
+    "章の開始位置",
+    "장 시작 위치",
+    "Chapter entry"
+  ],
+  "首步（从 1 开始）": [
+    "首步（从 1 开始）",
+    "首步（從 1 開始）",
+    "最初のステップ（1から）",
+    "첫 단계 (1부터)",
+    "First step (starting at 1)"
+  ],
+  "末步（包含）": [
+    "末步（包含）",
+    "末步（包含）",
+    "最後のステップ（含む）",
+    "마지막 단계 (포함)",
+    "Last step (inclusive)"
+  ],
+  "未知": [
+    "未知",
+    "未知",
+    "不明",
+    "알 수 없음",
+    "Unknown"
+  ],
+  "称号": [
+    "称号",
+    "稱號",
+    "称号",
+    "칭호",
+    "Title"
+  ],
+  "立绘缩放": [
+    "立绘缩放",
+    "立繪縮放",
+    "立ち絵の拡大率",
+    "초상화 배율",
+    "Portrait scale"
+  ],
+  "图片缩放": [
+    "图片缩放",
+    "圖片縮放",
+    "画像の拡大率",
+    "이미지 배율",
+    "Image scale"
+  ],
+  "指定表情": [
+    "指定表情",
+    "指定表情",
+    "表情を指定",
+    "표정 지정",
+    "Choose expression"
+  ],
+  "介绍卡图片": [
+    "介绍卡图片",
+    "介紹卡圖片",
+    "紹介カードの画像",
+    "소개 카드 이미지",
+    "Introduction card image"
+  ],
+  "战斗待机": [
+    "战斗待机",
+    "戰鬥待機",
+    "戦闘待機",
+    "전투 대기",
+    "Battle idle"
+  ],
+  "战斗攻击": [
+    "战斗攻击",
+    "戰鬥攻擊",
+    "戦闘攻撃",
+    "전투 공격",
+    "Battle attack"
+  ],
+  "战斗受伤": [
+    "战斗受伤",
+    "戰鬥受傷",
+    "戦闘ダメージ",
+    "전투 피격",
+    "Battle hurt"
+  ],
+  "战斗防御": [
+    "战斗防御",
+    "戰鬥防禦",
+    "戦闘防御",
+    "전투 방어",
+    "Battle defense"
+  ],
+  "主文件": [
+    "主文件",
+    "主檔案",
+    "メインファイル",
+    "주 파일",
+    "Main file"
+  ],
+  "素材": [
+    "素材",
+    "素材",
+    "素材",
+    "리소스",
+    "Assets"
+  ],
+  "首次创建": [
+    "首次创建",
+    "首次建立",
+    "新規作成",
+    "처음 생성",
+    "First creation"
+  ],
+  "MOD 旗标": [
+    "MOD 旗标",
+    "MOD 旗標",
+    "MODのフラグ",
+    "MOD 플래그",
+    "Mod flag"
+  ],
+  "官方条件": [
+    "官方条件",
+    "官方條件",
+    "本編の条件",
+    "원작 조건",
+    "Base-game condition"
+  ],
+  "官方检查点": [
+    "官方检查点",
+    "官方檢查點",
+    "本編のチェックポイント",
+    "원작 체크포인트",
+    "Base-game checkpoint"
+  ],
+  "游戏数值旗标": [
+    "游戏数值旗标",
+    "遊戲數值旗標",
+    "ゲームの数値フラグ",
+    "게임 수치 플래그",
+    "Game numeric flag"
+  ],
+  "完成后跳转": [
+    "完成后跳转",
+    "完成後跳轉",
+    "完了後の移動先",
+    "완료 후 이동",
+    "Jump after completion"
+  ],
+  "新选项": [
+    "新选项",
+    "新選項",
+    "新しい選択肢",
+    "새 선택지",
+    "New choice"
+  ],
+  "数字": [
+    "数字",
+    "數字",
+    "数値",
+    "숫자",
+    "Number"
+  ],
+  "布尔": [
+    "布尔",
+    "布林",
+    "真偽値",
+    "불리언",
+    "Boolean"
+  ],
+  "对象": [
+    "对象",
+    "物件",
+    "オブジェクト",
+    "객체",
+    "Object"
+  ],
+  "列表": [
+    "列表",
+    "清單",
+    "リスト",
+    "목록",
+    "List"
+  ],
+  "武学": [
+    "武学",
+    "武學",
+    "武学",
+    "무학",
+    "Martial arts"
+  ],
+  "阵营": [
+    "阵营",
+    "陣營",
+    "陣営",
+    "진영",
+    "Faction"
+  ],
+  "奖励类型": [
+    "奖励类型",
+    "獎勵類型",
+    "報酬の種類",
+    "보상 유형",
+    "Reward type"
+  ],
+  "物品类型": [
+    "物品类型",
+    "物品類型",
+    "アイテムの種類",
+    "아이템 유형",
+    "Item type"
+  ],
+  "目标": [
+    "目标",
+    "目標",
+    "対象",
+    "대상",
+    "Target"
+  ],
+  "选择包含 Mortal_Data 的游戏目录": [
+    "选择包含 Mortal_Data 的游戏目录",
+    "選擇包含 Mortal_Data 的遊戲目錄",
+    "Mortal_Dataを含むゲームフォルダを選択",
+    "Mortal_Data가 있는 게임 폴더 선택",
+    "Choose the game folder containing Mortal_Data"
+  ],
+  "更改 MOD 启用状态": [
+    "更改 MOD 启用状态",
+    "變更 MOD 啟用狀態",
+    "MODの有効・無効を変更",
+    "MOD 활성 상태 변경",
+    "Change Mod enabled state"
+  ],
+  "选择 Save_universe.dat；将自动保留原始备份": [
+    "选择 Save_universe.dat；将自动保留原始备份",
+    "選擇 Save_universe.dat；將自動保留原始備份",
+    "Save_universe.datを選択（元のファイルを自動バックアップ）",
+    "Save_universe.dat 선택 (원본 자동 백업)",
+    "Choose Save_universe.dat; the original is backed up automatically"
+  ],
+  "只清理当前作品及临时试玩包的已读文本记录，保留其它存档内容。先建立备份。": [
+    "只清理当前作品及临时试玩包的已读文本记录，保留其它存档内容。先建立备份。",
+    "只清理目前作品與暫時試玩套件的已讀文字紀錄，保留其他存檔內容。先建立備份。",
+    "この作品と一時テストパッケージの既読記録だけを消去します。先にバックアップし、ほかのセーブ内容は保持します。",
+    "현재 작품과 임시 테스트 패키지의 읽음 기록만 지웁니다. 먼저 백업하며 다른 저장 내용은 유지합니다.",
+    "Back up first, then clear read history only for this project and temporary previews. Other save data is preserved."
+  ],
+  "重置已读记录": [
+    "重置已读记录",
+    "重設已讀紀錄",
+    "既読記録をリセット",
+    "읽음 기록 초기화",
+    "Reset read history"
+  ],
+  "安全修复已应用，可在编辑菜单中撤销": [
+    "安全修复已应用，可在编辑菜单中撤销",
+    "安全修復已套用，可在編輯選單中復原",
+    "安全な修正を適用しました。編集メニューから元に戻せます。",
+    "안전한 수정을 적용했습니다. 편집 메뉴에서 실행 취소할 수 있습니다.",
+    "Safe fixes applied. Undo them from the Edit menu."
+  ],
+  "发布包、校验和与安装说明的输出目录": [
+    "发布包、校验和与安装说明的输出目录",
+    "發行套件、校驗碼與安裝說明的輸出目錄",
+    "配布パッケージ・チェックサム・導入説明の出力先",
+    "배포 패키지, 체크섬, 설치 안내 출력 폴더",
+    "Output folder for the release package, checksums, and installation guide"
+  ],
+  "配音覆盖检查": [
+    "配音覆盖检查",
+    "配音覆蓋檢查",
+    "ボイスの収録状況を確認",
+    "음성 적용 범위 확인",
+    "Check voice coverage"
+  ],
+  "选择 ffmpeg 可执行程序": [
+    "选择 ffmpeg 可执行程序",
+    "選擇 ffmpeg 執行檔",
+    "ffmpegの実行ファイルを選択",
+    "ffmpeg 실행 파일 선택",
+    "Choose the ffmpeg executable"
+  ],
+  "视频": [
+    "视频",
+    "影片",
+    "動画",
+    "동영상",
+    "Video"
+  ],
+  "从视频检测水印": [
+    "从视频检测水印",
+    "從影片偵測浮水印",
+    "動画から透かしを検出",
+    "동영상에서 워터마크 감지",
+    "Detect watermark in video"
+  ],
+  "内容包": [
+    "内容包",
+    "內容套件",
+    "コンテンツパッケージ",
+    "콘텐츠 패키지",
+    "Content pack"
+  ],
+  "版本、作者、许可和依赖信息已填入表单": [
+    "版本、作者、许可和依赖信息已填入表单",
+    "版本、作者、授權與相依資訊已填入表單",
+    "バージョン・作者・ライセンス・依存関係を入力しました",
+    "버전, 제작자, 라이선스, 의존 정보를 입력했습니다",
+    "Version, author, license, and dependencies were filled in"
+  ],
+  "许可": [
+    "许可",
+    "授權",
+    "ライセンス",
+    "라이선스",
+    "License"
+  ],
+  "依赖 ID（逗号分隔）": [
+    "依赖 ID（逗号分隔）",
+    "相依 ID（逗號分隔）",
+    "依存ID（カンマ区切り）",
+    "의존 ID (쉼표로 구분)",
+    "Dependency IDs (comma-separated)"
+  ],
+  "迁移旧项目": [
+    "迁移旧项目",
+    "遷移舊專案",
+    "旧プロジェクトを移行",
+    "이전 프로젝트 이전",
+    "Migrate legacy project"
+  ],
+  "导出诊断资料": [
+    "导出诊断资料",
+    "匯出診斷資料",
+    "診断情報を書き出す",
+    "진단 정보 내보내기",
+    "Export diagnostics"
+  ],
+  "未指定人物": [
+    "未指定人物",
+    "未指定人物",
+    "人物未指定",
+    "캐릭터 미지정",
+    "No character specified"
+  ],
+  "技术详情": [
+    "技术详情",
+    "技術詳細資訊",
+    "技術的な詳細",
+    "기술 세부 정보",
+    "Technical details"
+  ],
+  "重复第三方 DLL 不会自动删除，请核对后手工处理": [
+    "重复第三方 DLL 不会自动删除，请核对后手工处理",
+    "重複的第三方 DLL 不會自動刪除，請確認後手動處理",
+    "重複した他社DLLは自動削除しません。確認して手動で処理してください。",
+    "중복된 외부 DLL은 자동 삭제하지 않습니다. 확인 후 직접 처리하세요.",
+    "Duplicate third-party DLLs are not deleted automatically. Review them and handle them manually."
+  ],
+  "未命名任务": [
+    "未命名任务",
+    "未命名任務",
+    "名前のないクエスト",
+    "이름 없는 퀘스트",
+    "Untitled quest"
+  ],
+  "找不到这个任务": [
+    "找不到这个任务",
+    "找不到此任務",
+    "クエストが見つかりません",
+    "퀘스트를 찾을 수 없습니다",
+    "Quest not found"
+  ],
+  "请选择状态": [
+    "请选择状态",
+    "請選擇狀態",
+    "状態を選択",
+    "상태 선택",
+    "Choose a state"
+  ],
+  "不限年份": [
+    "不限年份",
+    "不限年份",
+    "年を指定しない",
+    "연도 제한 없음",
+    "Any year"
+  ],
+  "不限月份": [
+    "不限月份",
+    "不限月份",
+    "月を指定しない",
+    "월 제한 없음",
+    "Any month"
+  ],
+  "不限旬": [
+    "不限旬",
+    "不限旬",
+    "旬を指定しない",
+    "순 제한 없음",
+    "Any period"
+  ],
+  "需要处于": [
+    "需要处于",
+    "需要處於",
+    "必要な状態",
+    "필요한 상태",
+    "Required state"
+  ],
+  "事件名称": [
+    "事件名称",
+    "事件名稱",
+    "イベント名",
+    "이벤트 이름",
+    "Event name"
+  ],
+  "怎样遇到": [
+    "怎样遇到",
+    "如何遇到",
+    "発生方法",
+    "발생 방식",
+    "How it triggers"
+  ],
+  "地点": [
+    "地点",
+    "地點",
+    "場所",
+    "장소",
+    "Location"
+  ],
+  "请选择地点": [
+    "请选择地点",
+    "請選擇地點",
+    "場所を選択",
+    "장소 선택",
+    "Choose a location"
+  ],
+  "播放哪段剧情": [
+    "播放哪段剧情",
+    "播放哪段劇情",
+    "再生する章",
+    "재생할 장",
+    "Chapter to play"
+  ],
+  "请选择剧情": [
+    "请选择剧情",
+    "請選擇劇情",
+    "章を選択",
+    "장 선택",
+    "Choose a chapter"
+  ],
+  "发生概率": [
+    "发生概率",
+    "發生機率",
+    "発生確率",
+    "발생 확률",
+    "Probability"
+  ],
+  "重复发生间隔": [
+    "重复发生间隔",
+    "重複發生間隔",
+    "再発生の間隔",
+    "반복 발생 간격",
+    "Repeat interval"
+  ],
+  "再次尝试间隔": [
+    "再次尝试间隔",
+    "再次嘗試間隔",
+    "再判定の間隔",
+    "재시도 간격",
+    "Retry interval"
+  ],
+  "成功播放后不再发生": [
+    "成功播放后不再发生",
+    "成功播放後不再發生",
+    "再生できたら再発生しない",
+    "재생에 성공하면 다시 발생하지 않음",
+    "Do not repeat after successful playback"
+  ],
+  "新的任务": [
+    "新的任务",
+    "新的任務",
+    "新しいクエスト",
+    "새 퀘스트",
+    "New quest"
+  ],
+  "任务名称": [
+    "任务名称",
+    "任務名稱",
+    "クエスト名",
+    "퀘스트 이름",
+    "Quest name"
+  ],
+  "开始时的状态": [
+    "开始时的状态",
+    "開始時的狀態",
+    "開始時の状態",
+    "시작 상태",
+    "Starting state"
+  ],
+  "当前是": [
+    "当前是",
+    "目前是",
+    "現在の状態",
+    "현재 상태",
+    "Current state"
+  ],
+  "自动变成": [
+    "自动变成",
+    "自動變成",
+    "自動変更先",
+    "자동 변경 상태",
+    "Automatically change to"
+  ],
+  "任务进度": [
+    "任务进度",
+    "任務進度",
+    "クエスト進行",
+    "퀘스트 진행",
+    "Quest progress"
+  ],
+  "事件安排": [
+    "事件安排",
+    "事件安排",
+    "イベント設定",
+    "이벤트 설정",
+    "Event scheduling"
+  ],
+  "只有多步流程才需要任务。从左侧添加一个任务。": [
+    "只有多步流程才需要任务。从左侧添加一个任务。",
+    "只有多步流程才需要任務。請從左側新增任務。",
+    "複数段階の進行にはクエストを使います。左側から追加してください。",
+    "여러 단계의 진행에는 퀘스트를 사용합니다. 왼쪽에서 추가하세요.",
+    "Use quests for multi-step progress. Add one on the left."
+  ],
+  "从左侧添加事件，再选择时间与要播放的剧情。": [
+    "从左侧添加事件，再选择时间与要播放的剧情。",
+    "從左側新增事件，再選擇時間與要播放的劇情。",
+    "左側からイベントを追加し、発生時期と再生する章を選びます。",
+    "왼쪽에서 이벤트를 추가한 뒤 시기와 재생할 장을 선택하세요.",
+    "Add an event on the left, then choose its timing and chapter."
+  ],
+  "任务进度 · 可由多个事件共同推进": [
+    "任务进度 · 可由多个事件共同推进",
+    "任務進度 · 可由多個事件共同推進",
+    "クエスト進行 · 複数イベントから更新可能",
+    "퀘스트 진행 · 여러 이벤트에서 갱신 가능",
+    "Quest progress · Can be updated by multiple events"
+  ],
+  "事件安排 · 决定剧情什么时候发生": [
+    "事件安排 · 决定剧情什么时候发生",
+    "事件安排 · 決定劇情何時發生",
+    "イベント設定 · シナリオの発生時期を指定",
+    "이벤트 설정 · 시나리오 발생 시기 지정",
+    "Event scheduling · Set when the story occurs"
+  ],
+  "启用这个事件": [
+    "启用这个事件",
+    "啟用此事件",
+    "このイベントを有効にする",
+    "이 이벤트 활성화",
+    "Enable this event"
+  ],
+  "删除这个任务": [
+    "删除这个任务",
+    "刪除此任務",
+    "このクエストを削除",
+    "이 퀘스트 삭제",
+    "Delete this quest"
+  ],
+  "删除这个事件": [
+    "删除这个事件",
+    "刪除此事件",
+    "このイベントを削除",
+    "이 이벤트 삭제",
+    "Delete this event"
+  ],
+  "新的事件": [
+    "新的事件",
+    "新的事件",
+    "新しいイベント",
+    "새 이벤트",
+    "New event"
+  ],
+  "事件 ID": [
+    "事件 ID",
+    "事件 ID",
+    "イベントID",
+    "이벤트 ID",
+    "Event ID"
+  ],
+  "自动触发": [
+    "自动触发",
+    "自動觸發",
+    "自動発生",
+    "자동 발생",
+    "Automatic trigger"
+  ],
+  "点击地点": [
+    "点击地点",
+    "點擊地點",
+    "場所をクリック",
+    "장소 클릭",
+    "Location click"
+  ],
+  "开场": [
+    "开场",
+    "開場",
+    "開始場面",
+    "시작 장면",
+    "Opening"
+  ],
+  "入口": [
+    "入口",
+    "入口",
+    "開始位置",
+    "진입점",
+    "Entry"
+  ],
+  "位置": [
+    "位置",
+    "位置",
+    "位置",
+    "위치",
+    "Position"
+  ],
+  "演出章节": [
+    "演出章节",
+    "演出章節",
+    "再生する章",
+    "재생할 장",
+    "Chapter to play"
+  ],
+  "成功演出后不再重复": [
+    "成功演出后不再重复",
+    "成功演出後不再重複",
+    "再生できたら繰り返さない",
+    "재생 성공 후 반복하지 않음",
+    "Do not repeat after successful playback"
+  ],
+  "判定周期": [
+    "判定周期",
+    "判定週期",
+    "判定の周期",
+    "판정 주기",
+    "Check interval"
+  ],
+  "每月一次": [
+    "每月一次",
+    "每月一次",
+    "月に1回",
+    "월 1회",
+    "Once per month"
+  ],
+  "每旬一次": [
+    "每旬一次",
+    "每旬一次",
+    "旬に1回",
+    "순마다 1회",
+    "Once per ten-day period"
+  ],
+  "每次行动一次": [
+    "每次行动一次",
+    "每次行動一次",
+    "行動ごとに1回",
+    "행동마다 1회",
+    "Once per action"
+  ],
+  "优先级": [
+    "优先级",
+    "優先順序",
+    "優先度",
+    "우선순위",
+    "Priority"
+  ],
+  "事件池 ID": [
+    "事件池 ID",
+    "事件池 ID",
+    "抽選グループID",
+    "이벤트 풀 ID",
+    "Event pool ID"
+  ],
+  "基础权重": [
+    "基础权重",
+    "基礎權重",
+    "基本の重み",
+    "기본 가중치",
+    "Base weight"
+  ],
+  "权重增减": [
+    "权重增减",
+    "權重增減",
+    "重みの増減",
+    "가중치 증감",
+    "Weight adjustment"
+  ],
+  "任务 ID": [
+    "任务 ID",
+    "任務 ID",
+    "クエストID",
+    "퀘스트 ID",
+    "Quest ID"
+  ],
+  "初始状态": [
+    "初始状态",
+    "初始狀態",
+    "初期状態",
+    "초기 상태",
+    "Initial state"
+  ],
+  "从状态": [
+    "从状态",
+    "起始狀態",
+    "変更前の状態",
+    "변경 전 상태",
+    "From state"
+  ],
+  "到状态": [
+    "到状态",
+    "目標狀態",
+    "変更後の状態",
+    "변경 후 상태",
+    "To state"
+  ],
+  "全部满足": [
+    "全部满足",
+    "全部符合",
+    "すべて満たす",
+    "모두 충족",
+    "All match"
+  ],
+  "任一满足": [
+    "任一满足",
+    "任一符合",
+    "いずれかを満たす",
+    "하나 이상 충족",
+    "Any match"
+  ],
+  "不满足": [
+    "不满足",
+    "不符合",
+    "満たさない",
+    "충족하지 않음",
+    "Does not match"
+  ],
+  "数值或状态比较": [
+    "数值或状态比较",
+    "數值或狀態比較",
+    "数値・状態の比較",
+    "수치·상태 비교",
+    "Compare value or state"
+  ],
+  "角色数值": [
+    "角色数值",
+    "角色數值",
+    "人物の能力値",
+    "캐릭터 수치",
+    "Character stat"
+  ],
+  "人物好感": [
+    "人物好感",
+    "人物好感",
+    "人物の好感度",
+    "캐릭터 호감도",
+    "Character affinity"
+  ],
+  "剧情记录": [
+    "剧情记录",
+    "劇情紀錄",
+    "シナリオの記録",
+    "시나리오 기록",
+    "Story record"
+  ],
+  "事件变量": [
+    "事件变量",
+    "事件變數",
+    "イベント変数",
+    "이벤트 변수",
+    "Event variable"
+  ],
+  "时间项": [
+    "时间项",
+    "時間項目",
+    "時間の項目",
+    "시간 항목",
+    "Time field"
+  ],
+  "剩余行动次数": [
+    "剩余行动次数",
+    "剩餘行動次數",
+    "残り行動回数",
+    "남은 행동 횟수",
+    "Remaining actions"
+  ],
+  "属性或任务 ID": [
+    "属性或任务 ID",
+    "屬性或任務 ID",
+    "能力値・クエストID",
+    "능력치·퀘스트 ID",
+    "Stat or quest ID"
+  ],
+  "比较": [
+    "比较",
+    "比較",
+    "比較",
+    "비교",
+    "Comparison"
+  ],
+  "等于": [
+    "等于",
+    "等於",
+    "等しい",
+    "같음",
+    "Equal to"
+  ],
+  "不等于": [
+    "不等于",
+    "不等於",
+    "等しくない",
+    "같지 않음",
+    "Not equal to"
+  ],
+  "小于": [
+    "小于",
+    "小於",
+    "より小さい",
+    "미만",
+    "Less than"
+  ],
+  "小于等于": [
+    "小于等于",
+    "小於等於",
+    "以下",
+    "이하",
+    "Less than or equal to"
+  ],
+  "大于": [
+    "大于",
+    "大於",
+    "より大きい",
+    "초과",
+    "Greater than"
+  ],
+  "大于等于": [
+    "大于等于",
+    "大於等於",
+    "以上",
+    "이상",
+    "Greater than or equal to"
+  ],
+  "增加": [
+    "增加",
+    "增加",
+    "増やす",
+    "증가",
+    "Increase"
+  ],
+  "推进到状态": [
+    "推进到状态",
+    "推進至狀態",
+    "次の状態",
+    "변경할 상태",
+    "Advance to state"
+  ],
+  "技能": [
+    "技能",
+    "技能",
+    "スキル",
+    "스킬",
+    "Skill"
+  ],
+  "记录剧情标记": [
+    "记录剧情标记",
+    "記錄劇情標記",
+    "シナリオフラグを記録",
+    "시나리오 플래그 기록",
+    "Record story flag"
+  ],
+  "设置游戏时间": [
+    "设置游戏时间",
+    "設定遊戲時間",
+    "ゲーム内時間を設定",
+    "게임 시간 설정",
+    "Set game time"
+  ],
+  "属性、人物或物品 ID": [
+    "属性、人物或物品 ID",
+    "屬性、人物或物品 ID",
+    "能力値・人物・アイテムID",
+    "능력치·캐릭터·아이템 ID",
+    "Stat, character, or item ID"
+  ],
+  "书籍": [
+    "书籍",
+    "書籍",
+    "書物",
+    "서적",
+    "Book"
+  ],
+  "减少": [
+    "减少",
+    "減少",
+    "減らす",
+    "감소",
+    "Decrease"
+  ],
+  "作品 ID": [
+    "作品 ID",
+    "作品 ID",
+    "作品ID",
+    "작품 ID",
+    "Project ID"
+  ],
+  "存档身份": [
+    "存档身份",
+    "存檔識別",
+    "セーブ識別子",
+    "저장 식별자",
+    "Save identity"
+  ],
+  "入口章节": [
+    "入口章节",
+    "入口章節",
+    "開始する章",
+    "시작 장",
+    "Entry chapter"
+  ],
+  "禁用官方事件": [
+    "禁用官方事件",
+    "停用官方事件",
+    "本編のイベントを無効にする",
+    "원작 이벤트 비활성화",
+    "Disable base-game events"
+  ],
+  "新游戏入口": [
+    "新游戏入口",
+    "新遊戲入口",
+    "新規ゲームの開始位置",
+    "새 게임 진입점",
+    "New-game entry"
+  ],
+  "触发规则": [
+    "触发规则",
+    "觸發規則",
+    "発生ルール",
+    "발생 규칙",
+    "Trigger rules"
+  ],
+  "要求旗标已设定": [
+    "要求旗标已设定",
+    "要求旗標已設定",
+    "設定済みフラグが必要",
+    "설정된 플래그 필요",
+    "Require flag set"
+  ],
+  "要求旗标未设定": [
+    "要求旗标未设定",
+    "要求旗標未設定",
+    "未設定フラグが必要",
+    "설정되지 않은 플래그 필요",
+    "Require flag unset"
+  ],
+  "Lua 逻辑 · 结果未知": [
+    "Lua 逻辑 · 结果未知",
+    "Lua 邏輯 · 結果未知",
+    "Lua処理 · 結果は不明",
+    "Lua 로직 · 결과 미정",
+    "Lua logic · Unknown result"
+  ],
+  "缩小流程图": [
+    "缩小流程图",
+    "縮小流程圖",
+    "フローチャートを縮小",
+    "흐름도 축소",
+    "Zoom out flowchart"
+  ],
+  "放大流程图": [
+    "放大流程图",
+    "放大流程圖",
+    "フローチャートを拡大",
+    "흐름도 확대",
+    "Zoom in flowchart"
+  ],
+  "适应宽度": [
+    "适应宽度",
+    "符合寬度",
+    "幅に合わせる",
+    "너비에 맞춤",
+    "Fit width"
+  ],
+  "定位选中": [
+    "定位选中",
+    "定位選取項目",
+    "選択中の場所へ",
+    "선택 항목으로 이동",
+    "Locate selection"
+  ],
+  "不可达": [
+    "不可达",
+    "無法到達",
+    "到達不能",
+    "도달 불가",
+    "Unreachable"
+  ],
+  "未命名作品": [
+    "未命名作品",
+    "未命名作品",
+    "名前のない作品",
+    "이름 없는 작품",
+    "Untitled project"
+  ],
+  "原版附加剧情": [
+    "原版附加剧情",
+    "原版附加劇情",
+    "本編への追加シナリオ",
+    "원작 추가 시나리오",
+    "Base-game scenario addon"
+  ],
+  "自由剧本": [
+    "自由剧本",
+    "自由劇本",
+    "独立シナリオ",
+    "독립 시나리오",
+    "Standalone scenario"
+  ],
+  "演出与画面": [
+    "演出与画面",
+    "演出與畫面",
+    "演出と画面",
+    "연출과 화면",
+    "Presentation and visuals"
+  ],
+  "属性与旗标": [
+    "属性与旗标",
+    "屬性與旗標",
+    "能力値とフラグ",
+    "능력치와 플래그",
+    "Stats and flags"
+  ],
+  "玩法与结果": [
+    "玩法与结果",
+    "玩法與結果",
+    "ゲーム処理と結果",
+    "게임 동작과 결과",
+    "Gameplay and results"
+  ],
+  "流程控制": [
+    "流程控制",
+    "流程控制",
+    "進行の制御",
+    "흐름 제어",
+    "Flow control"
+  ],
+  "原版附加剧情：在原版流程中加入事件。": [
+    "原版附加剧情：在原版流程中加入事件。",
+    "原版附加劇情：在原版流程中加入事件。",
+    "追加シナリオ：本編の進行にイベントを追加します。",
+    "추가 시나리오: 원작 진행에 이벤트를 추가합니다.",
+    "Scenario addon: add events to the base-game flow."
+  ],
+  "自由剧本：从自己的开场开始，使用独立存档。": [
+    "自由剧本：从自己的开场开始，使用独立存档。",
+    "自由劇本：從自己的開場開始，使用獨立存檔。",
+    "独立シナリオ：独自の開始場面と専用セーブを使います。",
+    "독립 시나리오: 별도의 시작 장면과 저장 파일을 사용합니다.",
+    "Standalone scenario: use your own opening and separate saves."
+  ],
+  "离线测试及创作扩展数据": [
+    "离线测试及创作扩展数据",
+    "離線測試與創作擴充資料",
+    "オフラインテストと制作補助データ",
+    "오프라인 테스트와 제작 확장 데이터",
+    "Offline tests and authoring extensions"
+  ],
+  "选择共同字段": [
+    "选择共同字段",
+    "選擇共同欄位",
+    "共通の項目を選択",
+    "공통 필드 선택",
+    "Choose a shared field"
+  ],
+  "入口路径模拟": [
+    "入口路径模拟",
+    "入口路徑模擬",
+    "開始位置から経路を確認",
+    "진입점부터 경로 시뮬레이션",
+    "Simulate from entry"
+  ],
+  "保留引用并插入": [
+    "保留引用并插入",
+    "保留引用並插入",
+    "参照を保持して挿入",
+    "참조를 유지하고 삽입",
+    "Keep references and insert"
+  ],
+  "载入预览素材": [
+    "载入预览素材",
+    "載入預覽素材",
+    "プレビュー素材を読み込む",
+    "미리보기 리소스 불러오기",
+    "Load preview assets"
+  ],
+  "新作品": [
+    "新作品",
+    "新作品",
+    "新しい作品",
+    "새 작품",
+    "New project"
+  ],
+  "剧情或 Mod 包": [
+    "剧情或 Mod 包",
+    "劇情或 Mod 套件",
+    "シナリオ・Modパッケージ",
+    "시나리오·Mod 패키지",
+    "Story or Mod package"
+  ],
+  "选择项目保存目录（保存全部章节与素材）": [
+    "选择项目保存目录（保存全部章节与素材）",
+    "選擇專案儲存目錄（儲存所有章節與素材）",
+    "プロジェクトの保存先を選択（全章と素材を保存）",
+    "프로젝트 저장 폴더 선택 (모든 장과 리소스 저장)",
+    "Choose project folder (save all chapters and assets)"
+  ],
+  "节点模板已保存到本机创作数据目录": [
+    "节点模板已保存到本机创作数据目录",
+    "節點範本已儲存至本機創作資料目錄",
+    "ノードのテンプレートをローカルの制作データに保存しました",
+    "노드 템플릿을 로컬 제작 데이터에 저장했습니다",
+    "Node template saved to local authoring data"
+  ],
+  "已撤销": [
+    "已撤销",
+    "已復原",
+    "元に戻しました",
+    "실행 취소했습니다",
+    "Undone"
+  ],
+  "已重做": [
+    "已重做",
+    "已重做",
+    "やり直しました",
+    "다시 실행했습니다",
+    "Redone"
+  ],
+  "流程在条件或选项处分叉，自动浏览已暂停": [
+    "流程在条件或选项处分叉，自动浏览已暂停",
+    "流程在條件或選項處分岔，自動瀏覽已暫停",
+    "条件・選択肢で分岐するため、自動再生を一時停止しました",
+    "조건·선택지에서 분기하여 자동 재생을 일시 중지했습니다",
+    "Automatic playback paused at a condition or choice"
+  ],
+  "新分组": [
+    "新分组",
+    "新群組",
+    "新しいグループ",
+    "새 그룹",
+    "New group"
+  ],
+  "新分区": [
+    "新分区",
+    "新區段",
+    "新しいセクション",
+    "새 구역",
+    "New section"
+  ],
+  "胜利": [
+    "胜利",
+    "勝利",
+    "勝利",
+    "승리",
+    "Victory"
+  ],
+  "条件成立（1）": [
+    "条件成立（1）",
+    "條件成立（1）",
+    "条件成立（1）",
+    "조건 충족 (1)",
+    "Condition true (1)"
+  ],
+  "条件不成立（2）": [
+    "条件不成立（2）",
+    "條件不成立（2）",
+    "条件不成立（2）",
+    "조건 불충족 (2)",
+    "Condition false (2)"
+  ],
+  "区间": [
+    "区间",
+    "區間",
+    "範囲",
+    "구간",
+    "Band"
+  ],
+  "原版结局插图占位\n游戏内由原版面板显示": [
+    "原版结局插图占位\n游戏内由原版面板显示",
+    "原版結局插圖佔位\n遊戲中由原版面板顯示",
+    "本編の結末イラスト\nゲーム内のパネルで表示",
+    "원작 결말 이미지 자리표시자\n게임 내 패널에서 표시",
+    "Base-game ending image placeholder\nShown by the in-game panel"
+  ],
+  "此步骤从入口不可达": [
+    "此步骤从入口不可达",
+    "此步驟無法從入口到達",
+    "開始位置からこのステップに到達できません",
+    "진입점에서 이 단계에 도달할 수 없습니다",
+    "This step is unreachable from the entry"
+  ],
+  "自定义结局标题": [
+    "自定义结局标题",
+    "自訂結局標題",
+    "独自の結末タイトル",
+    "사용자 정의 결말 제목",
+    "Custom ending title"
+  ],
+  "命殒江湖": [
+    "命殒江湖",
+    "命殞江湖",
+    "江湖に散る",
+    "강호에서 맞은 최후",
+    "Death in the martial world"
+  ],
+  "自定义人物\n未选择人物图片": [
+    "自定义人物\n未选择人物图片",
+    "自訂人物\n尚未選擇人物圖片",
+    "自作の人物\n人物画像が未選択",
+    "사용자 정의 캐릭터\n이미지 미선택",
+    "Custom character\nNo image selected"
+  ],
+  "还没有介绍卡。请在内容库填写角色介绍。": [
+    "还没有介绍卡。请在内容库填写角色介绍。",
+    "尚無介紹卡。請在內容庫填寫角色介紹。",
+    "紹介カードがありません。コンテンツライブラリで人物紹介を入力してください。",
+    "소개 카드가 없습니다. 콘텐츠 라이브러리에서 캐릭터 소개를 입력하세요.",
+    "No introduction card yet. Add one in the content library."
+  ],
+  "自定义角色\n未设置介绍图": [
+    "自定义角色\n未设置介绍图",
+    "自訂角色\n尚未設定介紹圖",
+    "自作キャラクター\n紹介画像が未設定",
+    "사용자 정의 캐릭터\n소개 이미지 미설정",
+    "Custom character\nNo introduction image"
+  ],
+  "原版人物资料": [
+    "原版人物资料",
+    "原版人物資料",
+    "本編の人物紹介",
+    "원작 캐릭터 정보",
+    "Base-game character information"
+  ],
+  "未提取到该人物的原版介绍正文。": [
+    "未提取到该人物的原版介绍正文。",
+    "尚未擷取此人物的原版介紹內文。",
+    "この人物の紹介文はまだ抽出されていません。",
+    "이 캐릭터의 원작 소개문이 아직 추출되지 않았습니다.",
+    "This character’s base-game introduction has not been extracted."
+  ],
+  "游戏内显示\n原版关系头像": [
+    "游戏内显示\n原版关系头像",
+    "遊戲中顯示\n原版關係頭像",
+    "ゲーム内で表示\n本編の人物アイコン",
+    "게임 내 표시\n원작 관계 초상화",
+    "Shown in game\nBase-game relationship portrait"
+  ],
+  "新しい物語": [
+    "新的故事",
+    "新的故事",
+    "新しい物語",
+    "새 이야기",
+    "New story"
+  ],
+  "编译尚未通过，不能导出 Lua。": [
+    "编译尚未通过，不能导出 Lua。",
+    "編譯尚未通過，無法匯出 Lua。",
+    "コンパイルが通っていないため、Luaを書き出せません。",
+    "컴파일이 통과되지 않아 Lua를 내보낼 수 없습니다.",
+    "Compilation has not passed; Lua cannot be exported."
+  ],
+  "编译未通过": [
+    "编译未通过",
+    "編譯未通過",
+    "コンパイルに失敗",
+    "컴파일 실패",
+    "Compilation failed"
+  ],
+  "还没有定义离线测试。请打开章节设置，添加测试并填写初始变量、选项和断言。": [
+    "还没有定义离线测试。请打开章节设置，添加测试并填写初始变量、选项和断言。",
+    "尚未定義離線測試。請開啟章節設定，新增測試並填寫初始變數、選項與斷言。",
+    "オフラインテストがありません。章設定でテストを追加し、初期変数・選択肢・検証条件を設定してください。",
+    "오프라인 테스트가 없습니다. 장 설정에서 테스트를 추가하고 초기 변수, 선택지, 검증 조건을 입력하세요.",
+    "No offline tests are defined. Add a test in chapter settings and enter initial variables, choices, and assertions."
+  ],
+  "已从模板创建项目；user:template.* 占位资源需要在内容库中替换": [
+    "已从模板创建项目；user:template.* 占位资源需要在内容库中替换",
+    "已從範本建立專案；user:template.* 佔位資源需要在內容庫中替換",
+    "テンプレートから作成しました。user:template.* の仮素材をライブラリで差し替えてください。",
+    "템플릿으로 생성했습니다. user:template.* 자리표시자 리소스를 라이브러리에서 교체하세요.",
+    "Project created from template. Replace user:template.* placeholder assets in the library."
+  ],
+  "已恢复创作副本，请检查并保存到原项目或新目录": [
+    "已恢复创作副本，请检查并保存到原项目或新目录",
+    "已復原創作副本，請檢查並儲存至原專案或新目錄",
+    "編集用コピーを復元しました。確認して元のプロジェクトか別のフォルダに保存してください。",
+    "작업 복사본을 복구했습니다. 확인 후 원래 프로젝트나 새 폴더에 저장하세요.",
+    "Recovered your work. Review it and save to the original project or a new folder."
+  ],
+  "值": [
+    "值",
+    "值",
+    "値",
+    "값",
+    "Value"
+  ],
+  "大成功": [
+    "大成功",
+    "大成功",
+    "大成功",
+    "대성공",
+    "Critical success"
+  ],
+  "无法确定编辑器位置": [
+    "无法确定编辑器位置",
+    "無法確定編輯器位置",
+    "エディターの場所を確認できません",
+    "편집기 위치를 확인할 수 없습니다",
+    "Cannot locate the editor"
+  ],
+  "找不到素材提取组件。源码版请使用 ./editor 启动；发布版请完整解压包含 asset-extractor 文件夹的安装包。": [
+    "找不到素材提取组件。源码版请使用 ./editor 启动；发布版请完整解压包含 asset-extractor 文件夹的安装包。",
+    "找不到素材提取元件。原始碼版請使用 ./editor 啟動；發行版請完整解壓包含 asset-extractor 資料夾的安裝包。",
+    "素材抽出ツールが見つかりません。ソース版は ./editor で起動してください。配布版は asset-extractor フォルダーを含む一式を展開してください。",
+    "소재 추출 도구를 찾을 수 없습니다. 소스 버전은 ./editor로 실행하세요. 배포 버전은 asset-extractor 폴더를 포함한 전체 패키지를 압축 해제하세요.",
+    "The asset extractor is missing. Launch a source checkout with ./editor. For a packaged editor, extract the full package including the asset-extractor folder."
+  ],
+  "请选择包含 Mortal_Data 的游戏安装目录；缺少 {file}": [
+    "请选择包含 Mortal_Data 的游戏安装目录；缺少 {file}",
+    "請選擇包含 Mortal_Data 的遊戲安裝目錄；缺少 {file}",
+    "Mortal_Data を含むゲームフォルダーを選んでください。{file} が見つかりません。",
+    "Mortal_Data가 있는 게임 설치 폴더를 선택하세요. {file}이 없습니다.",
+    "Select the game installation folder containing Mortal_Data. Missing: {file}"
+  ],
+  "游戏目录缺少图片素材包（StandaloneWindows64 / StandaloneWindows）": [
+    "游戏目录缺少图片素材包（StandaloneWindows64 / StandaloneWindows）",
+    "遊戲目錄缺少圖片素材包（StandaloneWindows64 / StandaloneWindows）",
+    "ゲームフォルダーに画像素材がありません（StandaloneWindows64 / StandaloneWindows）。",
+    "게임 폴더에 이미지 소재 묶음이 없습니다(StandaloneWindows64 / StandaloneWindows).",
+    "The game folder is missing its image bundles (StandaloneWindows64 / StandaloneWindows)."
+  ],
+  "素材缓存必须位于游戏目录之外": [
+    "素材缓存必须位于游戏目录之外",
+    "素材快取必須位於遊戲目錄之外",
+    "素材の保存先にはゲームフォルダーの外を指定してください。",
+    "소재 캐시는 게임 폴더 밖에 저장해야 합니다.",
+    "The asset cache must be outside the game folder."
+  ],
+  "无法启动素材提取组件": [
+    "无法启动素材提取组件",
+    "無法啟動素材提取元件",
+    "素材抽出ツールを起動できません",
+    "소재 추출 도구를 실행할 수 없습니다",
+    "Could not start the asset extractor"
+  ],
+  "素材提取结果读取中断": [
+    "素材提取结果读取中断",
+    "素材提取結果讀取中斷",
+    "抽出結果の読み取りが中断されました",
+    "추출 결과 읽기가 중단되었습니다",
+    "Reading the extraction results was interrupted"
+  ],
+  "提取已取消，原素材库保持不变": [
+    "提取已取消，原素材库保持不变",
+    "提取已取消，原素材庫保持不變",
+    "抽出をキャンセルしました。読み込み済みの素材はそのまま使えます。",
+    "추출을 취소했습니다. 기존에 불러온 소재는 그대로 사용할 수 있습니다.",
+    "Extraction cancelled. Your existing asset library is unchanged."
+  ],
+  "素材提取组件意外退出，请重新安装提取组件或检查游戏版本": [
+    "素材提取组件意外退出，请重新安装提取组件或检查游戏版本",
+    "素材提取元件意外結束，請重新安裝提取元件或檢查遊戲版本",
+    "素材抽出ツールが異常終了しました。ツールの再準備またはゲームのバージョンを確認してください。",
+    "소재 추출 도구가 예기치 않게 종료되었습니다. 도구를 다시 준비하거나 게임 버전을 확인하세요.",
+    "The asset extractor exited unexpectedly. Rebuild or reinstall it, or check the game version."
+  ],
+  "提取组件没有返回完成结果，原素材库保持不变": [
+    "提取组件没有返回完成结果，原素材库保持不变",
+    "提取元件沒有回傳完成結果，原素材庫保持不變",
+    "抽出の完了を確認できませんでした。読み込み済みの素材は変更していません。",
+    "추출 완료 결과를 받지 못했습니다. 기존 소재는 변경하지 않았습니다.",
+    "The extractor did not return a completion result. Your existing asset library is unchanged."
+  ],
+  "未能提取任何游戏图片": [
+    "未能提取任何游戏图片",
+    "未能提取任何遊戲圖片",
+    "ゲームの画像を抽出できませんでした",
+    "게임 이미지를 추출하지 못했습니다",
+    "No game images could be extracted"
+  ],
+  "没有读到人物或背景目录，当前游戏资源结构可能已改变；请更新提取工具": [
+    "没有读到人物或背景目录，当前游戏资源结构可能已改变；请更新提取工具",
+    "沒有讀到人物或背景目錄，目前遊戲資源結構可能已改變；請更新提取工具",
+    "人物・背景の一覧を読み取れませんでした。ゲームの素材構成が変わった可能性があります。抽出ツールを更新してください。",
+    "인물 또는 배경 목록을 읽지 못했습니다. 게임 리소스 구조가 변경되었을 수 있습니다. 추출 도구를 업데이트하세요.",
+    "Could not read the character or background catalog. The game resource layout may have changed; update the extractor."
+  ]
+}

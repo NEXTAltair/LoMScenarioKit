@@ -1,0 +1,39 @@
+#!/bin/sh
+# Copyright (C) 2026 NEXTAltair
+# GPL-3.0-only with the additional permission in LICENSE-GAME-EXCEPTION.txt.
+set -eu
+
+editor_root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+if ! command -v cargo >/dev/null 2>&1; then
+    printf '%s\n' 'エディターの起動にはRustとCargoが必要です。' >&2
+    exit 127
+fi
+
+# WSLg: use X11 and CPU rendering to avoid the EGL/Zink startup failure.
+if [ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" ]; then
+    unset WAYLAND_DISPLAY WAYLAND_SOCKET
+    export LIBGL_ALWAYS_SOFTWARE="${LIBGL_ALWAYS_SOFTWARE:-true}"
+    # Xcursor otherwise derives 45px cursors from a 2160px WSLg desktop.
+    export XCURSOR_SIZE="${XCURSOR_SIZE:-24}"
+    export GALLIUM_DRIVER="${GALLIUM_DRIVER:-llvmpipe}"
+fi
+
+# Source checkout: prepare the self-contained preview extractor once. The
+# environment and build outputs stay under Cargo's target directory.
+if [ -n "${EXTRACTOR_PYTHON:-}" ]; then
+    editor_python=$EXTRACTOR_PYTHON
+elif command -v python3.12 >/dev/null 2>&1; then
+    editor_python=python3.12
+elif command -v python3 >/dev/null 2>&1; then
+    editor_python=python3
+else
+    printf '%s\n' '初回の抽出ツール準備にはPython 3.12以降が必要です。' >&2
+    exit 127
+fi
+editor_target=$("$editor_python" "$editor_root/tools/build_editor.py" --prepare-extractor --print-target)
+
+# Keep the caller's working directory so relative project paths still work.
+exec cargo run --quiet --locked \
+    --manifest-path "$editor_root/tools/modkit/Cargo.toml" \
+    --target "$editor_target" -p lom-editor -- "$@"

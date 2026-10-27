@@ -9,8 +9,10 @@
 lom_modkitの既存Rust GUIを使って、章・ノード・プレビュー・フロー図を編集できます。資料検索、判定、コメントと返信、保存履歴を追加し、エージェント向けのJSON CLIと同じ制作フォルダを共有します。
 
 ```sh
-cargo run --locked --manifest-path tools/modkit/Cargo.toml -p lom-editor
+./editor
 ```
+
+Linux・macOS・WSLのターミナルから実行します。ソースからの起動にはRust・CargoとPython 3.12以降が必要です。初回はゲームのプレビュー素材を抽出するツールを専用環境に準備します。WSLでは起動に必要な描画設定を自動で適用します。
 
 [起動・共同編集・書き出しの手順](docs/native-editor.md)を参照してください。
 
