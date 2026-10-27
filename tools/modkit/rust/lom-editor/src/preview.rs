@@ -355,6 +355,51 @@ fn number(v: &Value, key: &str, default: f64) -> f64 {
 // a readable editor preview interval, not a claim about that installed value.
 const PREVIEW_TRANSITION_SECONDS: f64 = 1.0;
 
+#[derive(Debug, PartialEq)]
+pub enum Action {
+    Advance,
+    Choose(String),
+}
+
+pub fn branching(node: &Value) -> bool {
+    matches!(
+        text(node, "type"),
+        "choice"
+            | "branch"
+            | "dice"
+            | "combat"
+            | "battle"
+            | "battle_result"
+            | "stat_check"
+            | "affinity_check"
+            | "item_check"
+            | "talent_check"
+            | "flag_check"
+            | "activity"
+            | "quest_check"
+            | "persistent_check"
+    )
+}
+
+pub fn waits_for_click(node: &Value) -> bool {
+    matches!(text(node, "type"), "say" | "intro")
+}
+
+/// Follow the story graph, never the next row in the editor's list. Even a
+/// one-option choice needs its button, and conditions need a deliberate route.
+pub fn next_index(story: &Value, index: usize) -> Option<usize> {
+    let nodes = story["nodes"].as_array()?;
+    let node = nodes.get(index)?;
+    if branching(node) || matches!(text(node, "type"), "end" | "goto_scene" | "death") {
+        return None;
+    }
+    let targets = lom_core::analysis::successors(story, index);
+    if targets.len() != 1 {
+        return None;
+    }
+    nodes.iter().position(|n| n["id"] == targets[0])
+}
+
 /// Editor timing only: game loading, filters and audio are not simulated here.
 pub fn playback_duration(node: &Value) -> f64 {
     fn duration(action: &Value) -> f64 {
@@ -775,7 +820,7 @@ impl Preview {
         story: &Value,
         index: usize,
         elapsed: Option<f64>,
-    ) -> Option<String> {
+    ) -> Option<Action> {
         let ctx = ui.ctx().clone();
         let node = &story["nodes"][index];
         let target = text(node, "id");
@@ -792,6 +837,22 @@ impl Preview {
             .rect_filled(outer, 8.0, Color32::from_black_alpha(4));
         let width = size.x.min(size.y * 16.0 / 9.0);
         let rect = Rect::from_center_size(outer.center(), Vec2::new(width, width * 9.0 / 16.0));
+        // Register the canvas before its choice buttons so the buttons are on
+        // top. Choices and unresolved conditions never accept background clicks.
+        let advance = ui.interact(
+            rect,
+            ui.id().with("stage-advance"),
+            if next_index(story, index).is_some() {
+                egui::Sense::click()
+            } else {
+                egui::Sense::hover()
+            },
+        );
+        if advance.sense.senses_click() {
+            advance
+                .clone()
+                .on_hover_cursor(egui::CursorIcon::PointingHand);
+        }
         let painter = ui.painter().with_clip_rect(rect);
         painter.rect_filled(rect, 6.0, Color32::from_rgb(29, 35, 42));
         let bg = state["background"]
@@ -1114,6 +1175,8 @@ impl Preview {
             );
         }
         choice
+            .map(Action::Choose)
+            .or_else(|| advance.clicked().then_some(Action::Advance))
     }
     pub fn show_portrait(&mut self, ui: &mut egui::Ui, project: &Project, node: &Value) {
         let cid = text(node, "character");
@@ -1606,6 +1669,88 @@ mod tests {
 #[cfg(test)]
 mod content_tests {
     use super::*;
+    fn click_preview(story: &Value, position: Pos2) -> Vec<Action> {
+        let context = egui::Context::default();
+        let mut preview = Preview::new(Path::new("/not-a-repository"));
+        let project = Project::new();
+        let mut actions = Vec::new();
+        for events in [
+            vec![],
+            vec![],
+            vec![
+                egui::Event::PointerMoved(position),
+                egui::Event::PointerButton {
+                    pos: position,
+                    button: egui::PointerButton::Primary,
+                    pressed: true,
+                    modifiers: Default::default(),
+                },
+            ],
+            vec![egui::Event::PointerButton {
+                pos: position,
+                button: egui::PointerButton::Primary,
+                pressed: false,
+                modifiers: Default::default(),
+            }],
+            vec![],
+        ] {
+            let _ = context.run(
+                egui::RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, Vec2::new(800.0, 500.0))),
+                    events,
+                    ..Default::default()
+                },
+                |ctx| {
+                    egui::CentralPanel::default().show(ctx, |ui| {
+                        if let Some(action) = preview.show(ui, &project, story, 0, None) {
+                            actions.push(action);
+                        }
+                    });
+                },
+            );
+        }
+        actions
+    }
+    #[test]
+    fn preview_canvas_emits_one_advance_for_one_click_inside_the_scene() {
+        let story = json!({"start":"a","nodes":[
+            {"id":"a","type":"say","text":"Click to continue"},
+            {"id":"b","type":"end"}
+        ]});
+        assert_eq!(
+            click_preview(&story, Pos2::new(400.0, 450.0)),
+            vec![Action::Advance]
+        );
+        // The letterbox area is outside the actual scene.
+        assert!(click_preview(&story, Pos2::new(400.0, 15.0)).is_empty());
+    }
+    #[test]
+    fn preview_choice_buttons_never_emit_a_background_advance() {
+        let story = json!({"start":"choice","nodes":[
+            {"id":"choice","type":"choice","options":[
+                {"text":"First","goto":"a"},{"text":"Second","goto":"b"}
+            ]},
+            {"id":"a","type":"end"},{"id":"b","type":"end"}
+        ]});
+        assert!(click_preview(&story, Pos2::new(400.0, 450.0)).is_empty());
+        assert_eq!(
+            click_preview(&story, Pos2::new(400.0, 175.0)),
+            vec![Action::Choose("a".into())]
+        );
+        assert_eq!(
+            click_preview(&story, Pos2::new(400.0, 210.0)),
+            vec![Action::Choose("b".into())]
+        );
+        for kind in ["end", "death", "goto_scene", "flag_check", "branch"] {
+            let blocked = json!({"start":"a","nodes":[
+                {"id":"a","type":kind,"goto":"b"}, {"id":"b","type":"end"}
+            ]});
+            assert!(
+                click_preview(&blocked, Pos2::new(400.0, 450.0)).is_empty(),
+                "{kind}"
+            );
+        }
+    }
     #[test]
     fn omitted_dialogue_mode_renders_character_name_and_matching_text_position() {
         let mut project = Project::new();
