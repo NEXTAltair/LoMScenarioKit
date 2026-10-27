@@ -1,11 +1,15 @@
 <!doctype html><html lang="en"><meta charset="utf-8"><title>LoMScenarioKit · Help</title>
+<style>body{font-family:sans-serif;max-width:72rem;margin:2rem auto;padding:0 1rem;line-height:1.7}figure{margin:1.5rem 0}figure img{max-width:100%;height:auto;border:1px solid #ddd}figcaption{font-size:.9rem;color:#444}</style>
 <h2 id="start">Create your first story</h2>
 <p>Finish a short scene before adding more characters and backgrounds. Arrange steps on the left, edit in the middle, and preview on the right. A node is one step in the story.</p>
-<h3>Start with one line</h3><ol><li>Create a project from the File menu.</li><li>Select a dialogue step and edit its text. Narration is a useful starting point.</li><li>Return the preview to the beginning and press Play.</li><li>Save the project to a folder. Run the checks before exporting.</li></ol>
+<h3>Start with one line</h3><ol><li>Choose File → Start from an example to open an editable copy of the short scene.</li><li>Select a Dialogue step on the left and edit Text in the middle. Check the speaker, expression, and dialogue on the right.</li><li>Press Play below the preview. Click the scene to advance dialogue, and click an option button to follow that route.</li><li>Choose File → Save all chapters to save your copy.</li><li>Press F6 to check the current chapter. Correct any reported steps, then use Export Addon to create game files for an Addon project.</li></ol>
 <aside>Keep the project folder for continued editing. Export creates files for the game; it is separate from saving your work.</aside>
+<figure><a href="../../../../../docs/images/native-editor/start-menu.png"><img src="../../../../../docs/images/native-editor/start-menu.png" alt="Choose Start from an example in the File menu. Screenshots show the Japanese interface; click an image to enlarge it." width="1280" height="760"></a><figcaption>Choose Start from an example in the File menu. Screenshots show the Japanese interface; click an image to enlarge it.</figcaption></figure>
+<p>Game images appear after extracting preview assets from your own game installation.</p>
 <h2 id="characters">Show characters and write dialogue</h2>
 <ol><li>Add Show character before the dialogue.</li><li>Choose a character, appearance, expression, position, and facing.</li><li>Add Dialogue and select the same character.</li><li>Use Hide character when the character leaves.</li></ol>
 <p>Dialogue and inner voice use a speaker. Narration does not need one. Imported voice lines are optional. Preview portraits require your locally extracted game assets.</p>
+<figure><a href="../../../../../docs/images/native-editor/dialogue.png"><img src="../../../../../docs/images/native-editor/dialogue.png" alt="Select dialogue on the left, edit its text, character, and expression in the middle, and check the preview on the right. Japanese interface shown." width="1280" height="760"></a><figcaption>Select dialogue on the left, edit its text, character, and expression in the middle, and check the preview on the right. Japanese interface shown.</figcaption></figure>
 <h2 id="parallel">Run several actions together</h2>
 <p>A Parallel actions group starts its actions together and continues when they all finish.</p>
 <ol><li>Add a Parallel actions group.</li><li>Add two Hide character actions, choosing a different character for each.</li><li>Set both durations to 0.5 seconds and play the preview. Both characters fade out together.</li></ol>
@@ -20,6 +24,7 @@
 <p>Select Character, then Appearance, then Expression. Only expressions available for that appearance are listed. An unavailable expression returns to the normal expression when appearance changes. Hide the old character before showing a different base-game character appearance.</p>
 <h3>Import your own content</h3><ol><li>Open Project assets under Assets.</li><li>Import an image, character, or audio file.</li><li>Select the imported content in a step’s form.</li></ol>
 <aside>Local game preview images are not automatically included in exported projects. Game character and item names use their canonical names where no English game-name translation is supplied.</aside>
+<figure><a href="../../../../../docs/images/native-editor/start-menu.png"><img src="../../../../../docs/images/native-editor/start-menu.png" alt="Choose Extract preview assets from game… near the bottom of File. This prepares portraits, backgrounds, and dialogue UI. Japanese interface shown." width="1280" height="760"></a><figcaption>Choose Extract preview assets from game… near the bottom of File. This prepares portraits, backgrounds, and dialogue UI. Japanese interface shown.</figcaption></figure>
 <h2 id="flow">Choices, jumps, and endings</h2>
 <p>Without a jump, steps play in their listed order. Choices and conditional branches change the destination.</p>
 <ol><li>Create the dialogue that follows each choice.</li><li>Add a Choice node and set each option’s text and destination.</li><li>Use F7 to check the flowchart, then test each route.</li></ol>
@@ -27,6 +32,7 @@
 <pre>Standalone scene: Dialogue → End (Next chapter empty)
 Continuing story: Dialogue → End (Next chapter selected)</pre>
 <aside>A flag records an event such as meeting a character. Conditional branches can check that record later.</aside>
+<figure><a href="../../../../../docs/images/native-editor/choices.png"><img src="../../../../../docs/images/native-editor/choices.png" alt="Set option text and destinations in the middle, then click a preview button to test its route. Japanese interface shown." width="1280" height="760"></a><figcaption>Set option text and destinations in the middle, then click a preview button to test its route. Japanese interface shown.</figcaption></figure>
 <h2 id="checks">Read check results</h2>
 <p>Read the conclusion first, then follow issues back to the affected steps. Expand Technical details to inspect the original report.</p>
 <ul><li>Status OK: the check found no issue.</li><li>Needs correction: fix the listed fields or story links.</li><li>Check in game: offline analysis cannot determine the result; this is not a pass.</li></ul>
@@ -36,6 +42,7 @@ Continuing story: Dialogue → End (Next chapter selected)</pre>
 <ul><li>Beginning returns to the chapter’s first step.</li><li>Pause can be resumed; selecting a different step stops playback.</li><li>F7 opens the flowchart.</li></ul>
 <p>On Windows, Play or F5 validates the project and creates a separate temporary package for game testing. Configure the game under Game and Mods. Mac does not support game playtesting.</p>
 <aside>Check audio, filters, combat, and final timing in the game. Offline previews cannot reproduce every game effect.</aside>
+<figure><a href="../../../../../docs/images/native-editor/choices.png"><img src="../../../../../docs/images/native-editor/choices.png" alt="Click the scene to advance dialogue and option buttons to choose a route. Music continues while dialogue waits; Stop pauses both music and playback. Japanese interface shown." width="1280" height="760"></a><figcaption>Click the scene to advance dialogue and option buttons to choose a route. Music continues while dialogue waits; Stop pauses both music and playback. Japanese interface shown.</figcaption></figure>
 <h2 id="terms">Common terms</h2>
 <p>Form-based authoring does not require programming.</p>
 <ul><li>Node: one story step.</li><li>Flag: a record of whether an event happened.</li><li>Conditional branch: choose a destination using a record or number.</li><li>Asset library: images or other resources available to the editor.</li><li>Project package: an exported .lommod file.</li><li>Host: the component that loads a Mod into the game.</li><li>API: an interface used by scripts.</li><li>Lua: code the editor generates from your steps; normally you do not write it yourself.</li></ul>

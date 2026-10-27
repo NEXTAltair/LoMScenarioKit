@@ -82,6 +82,7 @@ fn known_label(key: &str) -> Option<String> {
         "actual" => "当前值",
         "portraits" => "立绘和表情",
         "views" => "背景",
+        "ui_images" => "对话界面图片",
         "exported" => "成功导出的图片数",
         "failed" => "未能导出的图片数",
         "failures" => "未能导出的素材",

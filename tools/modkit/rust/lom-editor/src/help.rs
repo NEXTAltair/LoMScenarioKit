@@ -4,7 +4,7 @@
 use crate::i18n::{self, tr};
 use eframe::egui::{self, Color32, RichText};
 use serde_json::Value;
-use std::sync::OnceLock;
+use std::{collections::BTreeMap, sync::OnceLock};
 
 const BLUE: Color32 = Color32::from_rgb(41, 101, 158);
 const INK: Color32 = Color32::from_rgb(45, 51, 59);
@@ -16,6 +16,7 @@ enum Block {
     List { numbered: bool, items: Vec<String> },
     Note(String),
     Example(String),
+    Image { source: String, caption: String },
 }
 #[derive(Debug)]
 struct Article {
@@ -40,8 +41,11 @@ fn plain(html: &str) -> String {
 }
 fn parse(html: &str) -> Vec<Article> {
     let headings = regex::Regex::new(r#"(?s)<h2 id="([^"]+)">(.*?)</h2>"#).unwrap();
-    let blocks =
-        regex::Regex::new(r"(?s)<(p|h3|ol|ul|aside|pre)>(.*?)</(?:p|h3|ol|ul|aside|pre)>").unwrap();
+    let blocks = regex::Regex::new(
+        r"(?s)<(p|h3|ol|ul|aside|pre|figure)>(.*?)</(?:p|h3|ol|ul|aside|pre|figure)>",
+    )
+    .unwrap();
+    let image_source = regex::Regex::new(r#"<img\s+src="([^"]+)""#).unwrap();
     let items = regex::Regex::new(r"(?s)<li>(.*?)</li>").unwrap();
     let sections: Vec<_> = headings.captures_iter(html).collect();
     sections
@@ -67,6 +71,13 @@ fn parse(html: &str) -> Vec<Article> {
                         },
                         "aside" => Block::Note(plain(&c[2])),
                         "pre" => Block::Example(plain(&c[2])),
+                        "figure" => Block::Image {
+                            source: image_source
+                                .captures(&c[2])
+                                .map(|image| image[1].to_owned())
+                                .unwrap_or_default(),
+                            caption: plain(&c[2]),
+                        },
                         _ => Block::Paragraph(plain(&c[2])),
                     })
                     .collect(),
@@ -161,9 +172,12 @@ pub struct HelpDocument {
     guide: String,
     node: String,
     reset_scroll: bool,
+    images: BTreeMap<String, egui::TextureHandle>,
+    zoomed: Option<(String, String)>,
 }
 impl HelpDocument {
     pub fn open_guide(&mut self) {
+        self.zoomed = None;
         self.search.clear();
         self.page = 0;
         self.guide = "start".into();
@@ -173,6 +187,7 @@ impl HelpDocument {
         self.reset_scroll = true;
     }
     pub fn open_node(&mut self, kind: &str) {
+        self.zoomed = None;
         self.search.clear();
         self.page = 1;
         self.node = kind.into();
@@ -181,6 +196,7 @@ impl HelpDocument {
     /// Returns true when the reader closes. This component never modifies a project.
     pub fn show(&mut self, ctx: &egui::Context) -> bool {
         let mut close = false;
+        let was_zoomed = self.zoomed.is_some();
         let response = egui::Modal::new(egui::Id::new("help-document"))
             .frame(crate::shell::dialog_frame())
             .show(ctx, |ui| {
@@ -376,7 +392,12 @@ impl HelpDocument {
                                                 &i18n::key("help.guide_tab"),
                                                 &article.title,
                                             );
-                                            render_blocks(ui, &article.blocks);
+                                            if let Some(image) =
+                                                render_blocks(ui, &article.blocks, &mut self.images)
+                                            {
+                                                self.zoomed = Some(image);
+                                                ctx.request_repaint();
+                                            }
                                         } else {
                                             empty(ui);
                                         }
@@ -403,7 +424,34 @@ impl HelpDocument {
                     });
                 });
             });
-        close || response.should_close()
+        if let Some((source, caption)) = self.zoomed.clone() {
+            if let Some(texture) = screenshot_texture(ctx, &mut self.images, &source) {
+                let zoom = egui::Modal::new(egui::Id::new("help-screenshot"))
+                    .frame(crate::shell::dialog_frame())
+                    .show(ctx, |ui| {
+                        let available = (ctx.content_rect().size() - egui::vec2(64.0, 155.0))
+                            .max(egui::vec2(100.0, 80.0));
+                        let scale = (available.x / texture.size_vec2().x)
+                            .min(available.y / texture.size_vec2().y)
+                            .min(1.0);
+                        ui.set_width(texture.size_vec2().x * scale);
+                        let close = crate::shell::dialog_header(ui, &tr("操作截图"));
+                        ui.add(
+                            egui::Image::new((texture.id(), texture.size_vec2() * scale))
+                                .alt_text(&caption),
+                        );
+                        ui.add(egui::Label::new(&caption).wrap());
+                        close || ui.button(i18n::key("help.close")).clicked()
+                    });
+                if zoom.inner || zoom.should_close() {
+                    self.zoomed = None;
+                    ctx.request_repaint();
+                }
+            } else {
+                self.zoomed = None;
+            }
+        }
+        close || (!was_zoomed && response.should_close())
     }
     fn show_node(&mut self, ui: &mut egui::Ui) {
         let kind = self.node.clone();
@@ -519,13 +567,75 @@ fn empty(ui: &mut egui::Ui) {
         "试试更短的词，或切换“使用指南”和“步骤查询”。清空搜索可查看全部目录。",
     ));
 }
-fn render_blocks(ui: &mut egui::Ui, blocks: &[Block]) {
+fn screenshot_bytes(source: &str) -> Option<&'static [u8]> {
+    // Only bundled documentation images are supported. Never fetch URLs or
+    // resolve arbitrary local paths while reading a help article.
+    match source.rsplit('/').next()? {
+        "start-menu.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/start-menu.png"
+        )),
+        "dialogue.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/dialogue.png"
+        )),
+        "choices.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/choices.png"
+        )),
+        _ => None,
+    }
+}
+fn screenshot_texture(
+    ctx: &egui::Context,
+    images: &mut BTreeMap<String, egui::TextureHandle>,
+    source: &str,
+) -> Option<egui::TextureHandle> {
+    if let Some(texture) = images.get(source) {
+        return Some(texture.clone());
+    }
+    let image = image::load_from_memory(screenshot_bytes(source)?)
+        .ok()?
+        .into_rgba8();
+    let texture = ctx.load_texture(
+        format!("help:{source}"),
+        egui::ColorImage::from_rgba_unmultiplied(
+            [image.width() as usize, image.height() as usize],
+            image.as_raw(),
+        ),
+        egui::TextureOptions::LINEAR,
+    );
+    images.insert(source.to_owned(), texture.clone());
+    Some(texture)
+}
+fn render_blocks(
+    ui: &mut egui::Ui,
+    blocks: &[Block],
+    images: &mut BTreeMap<String, egui::TextureHandle>,
+) -> Option<(String, String)> {
+    let mut zoomed = None;
     for block in blocks {
         match block {
             Block::Paragraph(text) => {
                 ui.label(text);
             }
             Block::Heading(text) => subheading(ui, text),
+            Block::Image { source, caption } => {
+                if let Some(texture) = screenshot_texture(ui.ctx(), images, source) {
+                    let width = ui.available_width().min(texture.size_vec2().x);
+                    let size = texture.size_vec2() * (width / texture.size_vec2().x);
+                    if ui
+                        .add(
+                            egui::Image::new((texture.id(), size))
+                                .alt_text(caption)
+                                .sense(egui::Sense::click()),
+                        )
+                        .on_hover_cursor(egui::CursorIcon::ZoomIn)
+                        .on_hover_text(tr("点击图片放大"))
+                        .clicked()
+                    {
+                        zoomed = Some((source.clone(), caption.clone()));
+                    }
+                }
+                ui.add(egui::Label::new(RichText::new(caption).small()).wrap());
+            }
             Block::Note(text) => note(ui, text),
             Block::Example(text) => {
                 egui::Frame::new()
@@ -560,11 +670,84 @@ fn render_blocks(ui: &mut egui::Ui, blocks: &[Block]) {
             }
         }
     }
+    zoomed
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn every_locale_has_readable_bundled_screenshots() {
+        for locale in i18n::LOCALES {
+            let mut count = 0;
+            for article in parse(i18n::help_html(locale)) {
+                for block in article.blocks {
+                    if let Block::Image { source, caption } = block {
+                        assert!(!caption.is_empty(), "{locale}/{}", article.id);
+                        let bytes = screenshot_bytes(&source).expect("bundled help image");
+                        let image = image::load_from_memory(bytes).unwrap();
+                        assert_eq!((image.width(), image.height()), (1280, 760));
+                        count += 1;
+                    }
+                }
+            }
+            assert_eq!(count, 5, "{locale}");
+        }
+        assert!(screenshot_bytes("https://example.com/unknown.png").is_none());
+    }
+
+    #[test]
+    fn enlarged_screenshot_fits_and_escape_returns_to_its_article() {
+        for size in [egui::vec2(900.0, 560.0), egui::vec2(1280.0, 760.0)] {
+            let ctx = egui::Context::default();
+            ctx.enable_accesskit();
+            let mut doc = HelpDocument::default();
+            doc.open_guide();
+            doc.zoomed = Some(("choices.png".into(), "Screenshot caption".into()));
+            let input = egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(egui::Pos2::ZERO, size)),
+                ..Default::default()
+            };
+            let _ = ctx.run(input.clone(), |ctx| {
+                assert!(!doc.show(ctx));
+            });
+            let output = ctx.run(input.clone(), |ctx| {
+                assert!(!doc.show(ctx));
+            });
+            let nodes = output.platform_output.accesskit_update.unwrap().nodes;
+            let close = nodes
+                .iter()
+                .rev()
+                .find_map(|(_, node)| {
+                    (node.label() == Some(i18n::key("help.close").as_str()))
+                        .then(|| node.bounds())
+                        .flatten()
+                })
+                .expect("image close button");
+            assert!(
+                close.y0 >= 0.0 && close.y1 <= size.y as f64,
+                "{size:?}: {close:?}"
+            );
+            let _ = ctx.run(
+                egui::RawInput {
+                    events: vec![egui::Event::Key {
+                        key: egui::Key::Escape,
+                        physical_key: None,
+                        pressed: true,
+                        repeat: false,
+                        modifiers: Default::default(),
+                    }],
+                    ..input
+                },
+                |ctx| {
+                    assert!(!doc.show(ctx), "Escape must only close the image");
+                },
+            );
+            assert!(doc.zoomed.is_none());
+            assert_eq!(doc.guide, "start");
+        }
+    }
 
     #[test]
     fn article_stacks_vertically_and_close_stays_visible_at_supported_sizes() {
