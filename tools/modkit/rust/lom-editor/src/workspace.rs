@@ -281,7 +281,7 @@ struct App {
     last_recovery: Instant,
     templates: Value,
     locale: String,
-    auto: bool,
+    preview_playing: bool,
     last_step: Instant,
     preview_elapsed: Option<f64>,
     preview_location: (String, usize),
@@ -556,7 +556,7 @@ impl App {
             last_recovery: Instant::now(),
             templates,
             locale: "cht".into(),
-            auto: false,
+            preview_playing: false,
             last_step: Instant::now(),
             preview_elapsed: None,
             preview_location: (String::new(), usize::MAX),
@@ -757,7 +757,7 @@ impl App {
         self.multiselect.clear();
         self.search.clear();
         self.center = Center::Node;
-        self.auto = false;
+        self.preview_playing = false;
         self.track();
         self.flush();
         self.chapter_dialog = None;
@@ -873,7 +873,7 @@ impl App {
             },
         };
         if current != self.last {
-            self.auto = false;
+            self.preview_playing = false;
             self.preview_elapsed = None;
             if current.assets != self.last.assets {
                 self.catalog.sync_assets(&self.project.assets);
@@ -1013,7 +1013,7 @@ impl App {
         self.asset_import_dialog = None;
         self.audio.stop();
         self.music.reset();
-        self.auto = false;
+        self.preview_playing = false;
         self.preview_elapsed = None;
         self.remember_source();
         self.catalog.sync_assets(&self.project.assets);
@@ -1954,7 +1954,7 @@ impl App {
         self.flush();
         self.center = center;
         if matches!(center, Center::Events | Center::Tasks | Center::Manifest) {
-            self.auto = false;
+            self.preview_playing = false;
             self.audio.stop();
         }
         true
@@ -2537,9 +2537,70 @@ impl App {
         if self.preview_location != location {
             self.music.reset();
             self.preview_location = location;
-            self.auto = false;
+            self.preview_playing = false;
             self.preview_elapsed = None;
             self.last_step = Instant::now();
+        }
+    }
+    fn pause_preview(&mut self) {
+        self.preview_elapsed = Some(self.last_step.elapsed().as_secs_f64());
+        self.preview_playing = false;
+    }
+    fn resume_preview(&mut self) {
+        self.last_step =
+            Instant::now() - Duration::from_secs_f64(self.preview_elapsed.unwrap_or(0.0));
+        self.preview_elapsed = Some(0.0);
+        self.preview_playing = true;
+    }
+    fn preview_action(&mut self, action: preview::Action) {
+        let story = self.story();
+        let target = match action {
+            preview::Action::Advance => preview::next_index(&story, self.selected),
+            preview::Action::Choose(target) => {
+                let node = &story["nodes"][self.selected];
+                let offered = node["type"] == "choice"
+                    && node["options"].as_array().is_some_and(|options| {
+                        options.iter().any(|option| option["goto"] == target)
+                    });
+                story["nodes"]
+                    .as_array()
+                    .and_then(|nodes| nodes.iter().position(|n| offered && n["id"] == target))
+            }
+        };
+        if let Some(index) = target {
+            self.selected = index;
+            // A playback step preserves the current BGM. Selecting a row in the
+            // editor still pauses and reconstructs the preview via sync above.
+            self.preview_location = (self.current.clone(), index);
+            self.preview_elapsed = Some(0.0);
+            self.last_step = Instant::now();
+            self.preview_playing = true;
+        }
+    }
+    fn tick_preview(&mut self, waiting_for_music: bool) {
+        if !self.preview_playing {
+            return;
+        }
+        if waiting_for_music {
+            self.last_step = Instant::now();
+            return;
+        }
+        let story = self.story();
+        let node = &story["nodes"][self.selected];
+        // Input waits are still active playback: keep music running while the
+        // reader takes their time, including at a choice with a single target.
+        if preview::waits_for_click(node) || node["type"] == "choice" {
+            return;
+        }
+        if preview::branching(node) {
+            self.pause_preview();
+            self.status = tr("条件分岔需要确认，请在左侧选择要预览的后续步骤");
+        } else if self.last_step.elapsed().as_secs_f64() >= preview::playback_duration(node) {
+            if preview::next_index(&story, self.selected).is_some() {
+                self.preview_action(preview::Action::Advance);
+            } else {
+                self.pause_preview();
+            }
         }
     }
     fn follow_scenario_link(&mut self, link: crate::scenario_panel::Navigate) {
@@ -2678,37 +2739,34 @@ impl App {
                                         self.selected + 1,
                                         story["nodes"].as_array().map(Vec::len).unwrap_or(0)
                                     ));
-                                    if ui.button(crate::i18n::key("stage.next")).clicked() {
-                                        self.selected = (self.selected + 1).min(
-                                            story["nodes"]
-                                                .as_array()
-                                                .map(Vec::len)
-                                                .unwrap_or(1)
-                                                .saturating_sub(1),
-                                        );
+                                    if ui
+                                        .add_enabled(
+                                            preview::next_index(&story, self.selected).is_some(),
+                                            egui::Button::new(crate::i18n::key("stage.next")),
+                                        )
+                                        .clicked()
+                                    {
+                                        self.preview_action(preview::Action::Advance);
                                     }
                                     if ui
-                                        .button(crate::i18n::key(if self.auto {
+                                        .button(crate::i18n::key(if self.preview_playing {
                                             "stage.pause"
                                         } else {
                                             "stage.play"
                                         }))
                                         .clicked()
                                     {
-                                        if self.auto {
-                                            self.preview_elapsed =
-                                                Some(self.last_step.elapsed().as_secs_f64());
-                                            self.auto = false;
+                                        if self.preview_playing {
+                                            self.pause_preview();
                                         } else {
-                                            self.last_step = Instant::now()
-                                                - Duration::from_secs_f64(
-                                                    self.preview_elapsed.unwrap_or(0.0),
-                                                );
-                                            self.preview_elapsed = Some(0.0);
-                                            self.auto = true;
+                                            self.resume_preview();
                                         }
                                     }
                                 });
+                                ui.label(
+                                    RichText::new(tr("点击画面继续对话；出现选项时点击选项。"))
+                                        .small(),
+                                );
                                 if self.music.preparing() {
                                     ui.horizontal(|ui| {
                                         ui.spinner();
@@ -2733,20 +2791,16 @@ impl App {
                                 }
                             });
                         self.sync_preview_selection();
-                        let elapsed = if self.auto {
+                        let elapsed = if self.preview_playing {
                             Some(self.last_step.elapsed().as_secs_f64())
                         } else {
                             self.preview_elapsed
                         };
-                        if let Some(target) =
+                        if let Some(action) =
                             self.preview
                                 .show(ui, &self.project, &story, self.selected, elapsed)
                         {
-                            if let Some(i) = story["nodes"].as_array().and_then(|a| {
-                                a.iter().position(|n| n["id"].as_str() == Some(&target))
-                            }) {
-                                self.selected = i;
-                            }
+                            self.preview_action(action);
                         }
                     }
                     View::Portraits => {
@@ -4395,7 +4449,7 @@ impl eframe::App for App {
         );
         let waiting_for_music = match self.music.sync(
             cue,
-            self.auto,
+            self.preview_playing,
             &self.project,
             self.tools_panel.game_folder(),
             &user_root().join("rust/preview-music"),
@@ -4404,62 +4458,12 @@ impl eframe::App for App {
             Ok(waiting) => waiting,
             Err(error) => {
                 self.error = Some(format!("{error:#}"));
-                self.auto = false;
+                self.preview_playing = false;
                 self.preview_elapsed = Some(self.last_step.elapsed().as_secs_f64());
                 false
             }
         };
-        if waiting_for_music {
-            self.last_step = Instant::now();
-        }
-        if self.auto
-            && !waiting_for_music
-            && self.last_step.elapsed().as_secs_f64()
-                >= preview::playback_duration(&self.story()["nodes"][self.selected])
-        {
-            let story = self.story();
-            let node = &story["nodes"][self.selected];
-            let branching = [
-                "choice",
-                "branch",
-                "dice",
-                "combat",
-                "battle",
-                "battle_result",
-                "stat_check",
-                "affinity_check",
-                "item_check",
-                "talent_check",
-                "flag_check",
-                "activity",
-                "quest_check",
-                "persistent_check",
-            ];
-            if branching.contains(&node["type"].as_str().unwrap_or("")) {
-                self.auto = false;
-                self.preview_elapsed = Some(preview::playback_duration(node));
-                self.status = tr("流程在条件或选项处分叉，自动浏览已暂停");
-            } else {
-                let targets = lom_core::analysis::successors(&story, self.selected);
-                if targets.len() == 1 {
-                    if let Some(index) = story["nodes"]
-                        .as_array()
-                        .and_then(|nodes| nodes.iter().position(|n| n["id"] == targets[0]))
-                    {
-                        self.selected = index;
-                        self.preview_location = (self.current.clone(), index);
-                        self.preview_elapsed = Some(0.0);
-                    } else {
-                        self.auto = false;
-                        self.preview_elapsed = Some(preview::playback_duration(node));
-                    }
-                } else {
-                    self.auto = false;
-                    self.preview_elapsed = Some(preview::playback_duration(node));
-                }
-            }
-            self.last_step = Instant::now();
-        }
+        self.tick_preview(waiting_for_music);
         self.toolbar(ctx);
         egui::TopBottomPanel::bottom("status")
             .frame(surface(false))
@@ -4564,7 +4568,7 @@ impl eframe::App for App {
             }
             self.screenshot = None;
         }
-        ctx.request_repaint_after(Duration::from_millis(if self.auto {
+        ctx.request_repaint_after(Duration::from_millis(if self.preview_playing {
             16
         } else if self.screenshot.is_some() {
             70
@@ -6359,6 +6363,115 @@ mod application_regression_tests {
         app.pending = None; // Cancel the same confirmation used by New/Open.
         assert!(snapshot(&app.project) == before);
         assert!(app.dirty());
+    }
+    fn preview_app(nodes: Value) -> App {
+        let mut app = app();
+        app.project.stories.insert(
+            "main".into(),
+            json!({"id":"main", "start":nodes[0]["id"], "nodes":nodes}),
+        );
+        app.selected = 0;
+        app.track();
+        app.sync_preview_selection();
+        app
+    }
+    #[test]
+    fn preview_waits_for_dialogue_clicks_and_follows_goto_without_resetting_playback() {
+        let mut app = preview_app(json!([
+            {"id":"a","type":"say","text":"Read at your own pace","goto":"b"},
+            {"id":"skipped","type":"say","text":"Not this route"},
+            {"id":"b","type":"say","mode":"narrative","text":"Next line"},
+            {"id":"intro","type":"intro","text":"Character introduction"},
+            {"id":"end","type":"end"}
+        ]));
+        let original = snapshot(&app.project);
+        app.resume_preview();
+        for _ in 0..3 {
+            app.last_step = Instant::now() - Duration::from_secs(120);
+            app.tick_preview(false);
+            assert_eq!(app.selected, 0);
+            assert!(app.preview_playing);
+        }
+        app.preview_action(preview::Action::Advance);
+        assert_eq!(app.selected, 2);
+        app.sync_preview_selection();
+        assert!(
+            app.preview_playing,
+            "a playback click must not reset the BGM"
+        );
+        app.last_step = Instant::now() - Duration::from_secs(120);
+        app.tick_preview(false);
+        assert_eq!(app.selected, 2);
+        app.preview_action(preview::Action::Advance);
+        assert_eq!(app.selected, 3);
+        app.last_step = Instant::now() - Duration::from_secs(120);
+        app.tick_preview(false);
+        assert_eq!(app.selected, 3);
+        assert!(snapshot(&app.project) == original);
+    }
+    #[test]
+    fn preview_choices_require_a_button_and_continue_once_on_the_selected_route() {
+        let mut app = preview_app(json!([
+            {"id":"choice","type":"choice","options":[
+                {"text":"First","goto":"answer"},{"text":"Second","goto":"answer"}
+            ]},
+            {"id":"wrong","type":"say","text":"Not an option"},
+            {"id":"answer","type":"say","text":"Answer","goto":"end"},
+            {"id":"other","type":"say","text":"Other route"},
+            {"id":"end","type":"end"}
+        ]));
+        app.resume_preview();
+        app.last_step = Instant::now() - Duration::from_secs(120);
+        app.tick_preview(false);
+        app.preview_action(preview::Action::Advance);
+        app.preview_action(preview::Action::Choose("wrong".into()));
+        assert_eq!(app.selected, 0);
+        assert!(app.preview_playing);
+        app.preview_action(preview::Action::Choose("answer".into()));
+        app.sync_preview_selection();
+        assert_eq!(app.selected, 2);
+        assert!(app.preview_playing);
+        app.last_step = Instant::now() - Duration::from_secs(120);
+        app.tick_preview(false);
+        assert_eq!(app.selected, 2);
+        app.preview_action(preview::Action::Advance);
+        assert_eq!(app.selected, 4);
+        app.last_step = Instant::now() - Duration::from_secs(120);
+        app.tick_preview(false);
+        app.preview_action(preview::Action::Advance);
+        assert_eq!(app.selected, 4);
+        assert!(!app.preview_playing);
+    }
+    #[test]
+    fn preview_effects_keep_their_timing_across_pause_and_music_preparation() {
+        let mut app = preview_app(json!([
+            {"id":"enter","type":"show","character":"player","fadeDuration":4.0},
+            {"id":"talk","type":"say","text":"Ready"},
+            {"id":"condition","type":"flag_check","success":"end","failure":"end"},
+            {"id":"end","type":"end"}
+        ]));
+        app.resume_preview();
+        app.last_step = Instant::now() - Duration::from_secs(2);
+        app.tick_preview(false);
+        assert_eq!(app.selected, 0);
+        app.pause_preview();
+        app.last_step = Instant::now() - Duration::from_secs(120);
+        app.tick_preview(false);
+        assert_eq!(app.selected, 0);
+        app.resume_preview();
+        assert!(app.last_step.elapsed().as_secs_f64() < 3.0);
+        app.last_step = Instant::now() - Duration::from_secs(5);
+        app.tick_preview(true);
+        assert_eq!(app.selected, 0);
+        assert!(app.last_step.elapsed().as_secs_f64() < 1.0);
+        app.last_step = Instant::now() - Duration::from_secs(5);
+        app.tick_preview(false);
+        assert_eq!(app.selected, 1);
+        app.preview_action(preview::Action::Advance);
+        app.tick_preview(false);
+        app.preview_action(preview::Action::Advance);
+        assert_eq!(app.selected, 2);
+        assert!(!app.preview_playing);
     }
     #[test]
     fn reading_every_main_panel_preserves_project() {

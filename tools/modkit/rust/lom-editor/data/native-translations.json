@@ -3838,5 +3838,17 @@
     "サンプルのコピーを作成できませんでした",
     "예제 사본을 만들 수 없습니다",
     "Could not create an example copy"
+  ],
+  "点击画面继续对话；出现选项时点击选项。": [
+    "點選畫面繼續對話；出現選項時點選選項。",
+    "画面をクリックすると次へ進みます。選択肢はボタンを選んでください。",
+    "화면을 클릭하면 대화가 진행됩니다. 선택지가 나오면 버튼을 선택하세요.",
+    "Click the preview to continue. When choices appear, select a button."
+  ],
+  "条件分岔需要确认，请在左侧选择要预览的后续步骤": [
+    "條件分岔需要確認，請在左側選擇要預覽的後續步驟",
+    "条件分岐で停止しました。左の一覧で、確認したい分岐先を選んでください。",
+    "조건 분기에서 멈췄습니다. 왼쪽 목록에서 확인할 다음 단계를 선택하세요.",
+    "Paused at a condition. Select the branch to preview in the list on the left."
   ]
 }
