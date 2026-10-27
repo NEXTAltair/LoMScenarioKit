@@ -1,4 +1,7 @@
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 //! Launch the bundled extractor without requiring an end-user Python install.
+use crate::i18n::tr;
 use anyhow::{ensure, Context, Result};
 use serde_json::Value;
 use std::{
@@ -14,7 +17,7 @@ use std::{
 
 pub fn helper_path() -> Result<PathBuf> {
     let exe = std::env::current_exe()?;
-    let folder = exe.parent().context("无法确定编辑器位置")?;
+    let folder = exe.parent().context(tr("无法确定编辑器位置"))?;
     let name = if cfg!(windows) {
         "lom-asset-extractor.exe"
     } else {
@@ -26,14 +29,18 @@ pub fn helper_path() -> Result<PathBuf> {
     ]
     .into_iter()
     .find(|p| p.is_file())
-    .context("安装包缺少素材提取组件，请使用包含 asset-extractor 的完整编辑器安装包")
+    .context(tr("找不到素材提取组件。源码版请使用 ./editor 启动；发布版请完整解压包含 asset-extractor 文件夹的安装包。"))
 }
 
 pub fn validate_game(root: &Path) -> Result<()> {
     for file in ["sharedassets2.assets", "StreamingAssets/aa/catalog.json"] {
         ensure!(
             root.join("Mortal_Data").join(file).is_file(),
-            "请选择包含 Mortal_Data 的《活侠传》安装目录；缺少 {file}"
+            "{}",
+            crate::i18n::text(
+                "请选择包含 Mortal_Data 的游戏安装目录；缺少 {file}",
+                &[("file", file.into())]
+            )
         );
     }
     ensure!(
@@ -43,7 +50,8 @@ pub fn validate_game(root: &Path) -> Result<()> {
                 .join("Mortal_Data/StreamingAssets/aa")
                 .join(platform)
                 .is_dir()),
-        "游戏目录缺少图片素材包（StandaloneWindows64 / StandaloneWindows）"
+        "{}",
+        tr("游戏目录缺少图片素材包（StandaloneWindows64 / StandaloneWindows）")
     );
     Ok(())
 }
@@ -67,7 +75,8 @@ pub fn extract(
             .path()
             .canonicalize()?
             .starts_with(game.canonicalize()?),
-        "素材缓存必须位于游戏目录之外"
+        "{}",
+        tr("素材缓存必须位于游戏目录之外")
     );
     let mut command = Command::new(helper);
     command
@@ -84,7 +93,7 @@ pub fn extract(
         use std::os::windows::process::CommandExt;
         command.creation_flags(0x08000000); // CREATE_NO_WINDOW
     }
-    let mut child = command.spawn().context("无法启动素材提取组件")?;
+    let mut child = command.spawn().context(tr("无法启动素材提取组件"))?;
     let stdout = child.stdout.take().unwrap();
     let stderr = child.stderr.take().unwrap();
     let reader = std::thread::spawn(move || {
@@ -122,32 +131,34 @@ pub fn extract(
     };
     let event = reader
         .join()
-        .map_err(|_| anyhow::anyhow!("素材提取结果读取中断"))??;
+        .map_err(|_| anyhow::anyhow!(tr("素材提取结果读取中断")))??;
     let stderr = errors.join().unwrap_or_default();
     ensure!(
         !cancel.load(Ordering::Relaxed),
-        "提取已取消，原素材库保持不变"
+        "{}",
+        tr("提取已取消，原素材库保持不变")
     );
     ensure!(
         status.success(),
         "{}",
-        event
+        tr(event
             .as_ref()
             .and_then(|v| v["message"].as_str())
             .unwrap_or(if stderr.is_empty() {
                 "素材提取组件意外退出，请重新安装提取组件或检查游戏版本"
             } else {
                 &stderr
-            })
+            }))
     );
     let mut report = event
         .filter(|v| v["event"] == "result")
-        .context("提取组件没有返回完成结果，原素材库保持不变")?;
+        .context(tr("提取组件没有返回完成结果，原素材库保持不变"))?;
     let mapping = lom_core::load_json(output.path().join("preview_map.json"))?;
     validate_mapping(output.path(), &mapping)?;
     ensure!(
         report["exported"].as_u64().unwrap_or(0) > 0,
-        "未能提取任何游戏图片"
+        "{}",
+        tr("未能提取任何游戏图片")
     );
     report["output_dir"] = serde_json::json!(output.keep());
     Ok(report)
@@ -285,7 +296,9 @@ printf '%s\n' '{"event":"progress","done":1,"total":1}' '{"event":"result","expo
         });
         let error = extract(&helper, &game, &cache, cancel, |_| {}).unwrap_err();
         thread.join().unwrap();
-        assert!(error.to_string().contains("取消"));
+        assert!(error
+            .to_string()
+            .contains(&tr("提取已取消，原素材库保持不变")));
         assert_eq!(std::fs::read_dir(cache).unwrap().count(), 0);
     }
 }
