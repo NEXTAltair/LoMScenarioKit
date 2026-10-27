@@ -76,7 +76,8 @@ pub struct ToolsPanel {
 }
 impl Default for ToolsPanel {
     fn default() -> Self {
-        let settings = lom_core::load_json(settings_path()).unwrap_or(json!({}));
+        let settings =
+            load_tool_settings(&settings_path(), &legacy_settings_path()).unwrap_or(json!({}));
         Self {
             page: ToolPage::default(),
             export_requested: false,
@@ -186,12 +187,7 @@ impl ToolsPanel {
     }
     fn save_setting(&mut self, key: &str, value: Value) -> bool {
         let path = settings_path();
-        let result = (|| {
-            let mut settings = lom_core::load_json(&path).unwrap_or(json!({}));
-            anyhow::ensure!(settings.is_object(), "设置文件不是对象");
-            settings[key] = value;
-            lom_core::project::atomic_write(&path, &lom_core::stable_json(&settings)?)
-        })();
+        let result = save_tool_setting(&path, &legacy_settings_path(), key, value);
         if let Err(e) = result {
             self.result::<Value>("操作未完成", Err(e));
             false
@@ -280,9 +276,7 @@ impl ToolsPanel {
         }
         self.game = path;
         self.game_loaded = false;
-        if self.save_setting("game_dir", json!(self.game)) {
-            self.start_extraction();
-        }
+        self.start_extraction();
     }
     pub fn start_extraction(&mut self) {
         if self.job.is_some() {
@@ -310,9 +304,9 @@ impl ToolsPanel {
             }
             self.game = path;
             self.game_loaded = false;
-            if !self.save_setting("game_dir", json!(self.game)) {
-                return;
-            }
+        }
+        if !self.save_setting("game_dir", json!(self.game)) {
+            return;
         }
         let game = self.game.clone();
         let cache = settings_path().parent().unwrap().join("game-previews");
@@ -1442,10 +1436,35 @@ pub(crate) fn steam_launch_fix(root: &std::path::Path) -> anyhow::Result<Vec<Str
     }
 }
 fn settings_path() -> PathBuf {
+    crate::workspace::user_root().join("settings.json")
+}
+fn legacy_settings_path() -> PathBuf {
     lom_core::content::default_repository_root()
         .parent()
         .unwrap()
         .join("settings.json")
+}
+fn load_tool_settings(path: &std::path::Path, legacy: &std::path::Path) -> anyhow::Result<Value> {
+    // Migrate only when our settings do not exist; a damaged current file must
+    // not be silently replaced by the reference editor's settings.
+    if path.exists() {
+        lom_core::load_json(path)
+    } else if legacy.exists() {
+        lom_core::load_json(legacy)
+    } else {
+        Ok(json!({}))
+    }
+}
+fn save_tool_setting(
+    path: &std::path::Path,
+    legacy: &std::path::Path,
+    key: &str,
+    value: Value,
+) -> anyhow::Result<()> {
+    let mut settings = load_tool_settings(path, legacy)?;
+    anyhow::ensure!(settings.is_object(), "设置文件不是对象");
+    settings[key] = value;
+    lom_core::project::atomic_write(path, &lom_core::stable_json(&settings)?)
 }
 fn prepare_preview(project: &Project, script: &str, node: &str) -> anyhow::Result<Project> {
     let mut preview = project.clone();
@@ -1573,6 +1592,25 @@ fn show_report(ui: &mut egui::Ui, value: &Value, depth: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn tool_settings_migrate_without_modifying_legacy_or_replacing_damaged_current_settings() {
+        let dir = tempfile::tempdir().unwrap();
+        let legacy = dir.path().join("reference/settings.json");
+        let current = dir.path().join("ours/settings.json");
+        let original = br#"{"game_dir":"old game","ffmpeg":"keep tool","custom":true}"#;
+        std::fs::create_dir_all(legacy.parent().unwrap()).unwrap();
+        std::fs::write(&legacy, original).unwrap();
+        save_tool_setting(&current, &legacy, "game_dir", json!("chosen game")).unwrap();
+        let saved = lom_core::load_json(&current).unwrap();
+        assert_eq!(saved["game_dir"], "chosen game");
+        assert_eq!(saved["ffmpeg"], "keep tool");
+        assert_eq!(saved["custom"], true);
+        assert_eq!(std::fs::read(&legacy).unwrap(), original);
+        std::fs::write(&current, b"{damaged").unwrap();
+        assert!(save_tool_setting(&current, &legacy, "game_dir", json!("another game")).is_err());
+        assert_eq!(std::fs::read(&current).unwrap(), b"{damaged");
+        assert_eq!(std::fs::read(&legacy).unwrap(), original);
+    }
     #[cfg(windows)]
     #[test]
     fn windows_game_tools_work_with_an_unusable_system_temp() {

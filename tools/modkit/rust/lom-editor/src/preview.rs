@@ -498,17 +498,8 @@ impl Preview {
         // Never touch the compilation-time Documents checkout during app startup.
         let library = if let Some(root) = std::env::var_os("LOM_MODKIT_ROOT") {
             PathBuf::from(root).join("data")
-        } else if let Some(appdata) = std::env::var_os("APPDATA") {
-            PathBuf::from(appdata).join("lom_modkit/game-previews")
         } else {
-            let home = std::env::var_os("HOME")
-                .map(PathBuf::from)
-                .unwrap_or_default();
-            if cfg!(target_os = "macos") {
-                home.join("Library/Application Support/lom_modkit/game-previews")
-            } else {
-                home.join(".local/share/lom_modkit/game-previews")
-            }
+            crate::workspace::user_root().join("game-previews")
         };
         let mapping: Value = serde_json::from_str(include_str!("../../../data/preview_map.json"))
             .expect("embedded preview mapping");

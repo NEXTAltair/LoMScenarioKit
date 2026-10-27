@@ -3134,5 +3134,89 @@
     "大成功",
     "대성공",
     "Critical success"
+  ],
+  "无法确定编辑器位置": [
+    "无法确定编辑器位置",
+    "無法確定編輯器位置",
+    "エディターの場所を確認できません",
+    "편집기 위치를 확인할 수 없습니다",
+    "Cannot locate the editor"
+  ],
+  "找不到素材提取组件。源码版请使用 ./editor 启动；发布版请完整解压包含 asset-extractor 文件夹的安装包。": [
+    "找不到素材提取组件。源码版请使用 ./editor 启动；发布版请完整解压包含 asset-extractor 文件夹的安装包。",
+    "找不到素材提取元件。原始碼版請使用 ./editor 啟動；發行版請完整解壓包含 asset-extractor 資料夾的安裝包。",
+    "素材抽出ツールが見つかりません。ソース版は ./editor で起動してください。配布版は asset-extractor フォルダーを含む一式を展開してください。",
+    "소재 추출 도구를 찾을 수 없습니다. 소스 버전은 ./editor로 실행하세요. 배포 버전은 asset-extractor 폴더를 포함한 전체 패키지를 압축 해제하세요.",
+    "The asset extractor is missing. Launch a source checkout with ./editor. For a packaged editor, extract the full package including the asset-extractor folder."
+  ],
+  "请选择包含 Mortal_Data 的游戏安装目录；缺少 {file}": [
+    "请选择包含 Mortal_Data 的游戏安装目录；缺少 {file}",
+    "請選擇包含 Mortal_Data 的遊戲安裝目錄；缺少 {file}",
+    "Mortal_Data を含むゲームフォルダーを選んでください。{file} が見つかりません。",
+    "Mortal_Data가 있는 게임 설치 폴더를 선택하세요. {file}이 없습니다.",
+    "Select the game installation folder containing Mortal_Data. Missing: {file}"
+  ],
+  "游戏目录缺少图片素材包（StandaloneWindows64 / StandaloneWindows）": [
+    "游戏目录缺少图片素材包（StandaloneWindows64 / StandaloneWindows）",
+    "遊戲目錄缺少圖片素材包（StandaloneWindows64 / StandaloneWindows）",
+    "ゲームフォルダーに画像素材がありません（StandaloneWindows64 / StandaloneWindows）。",
+    "게임 폴더에 이미지 소재 묶음이 없습니다(StandaloneWindows64 / StandaloneWindows).",
+    "The game folder is missing its image bundles (StandaloneWindows64 / StandaloneWindows)."
+  ],
+  "素材缓存必须位于游戏目录之外": [
+    "素材缓存必须位于游戏目录之外",
+    "素材快取必須位於遊戲目錄之外",
+    "素材の保存先にはゲームフォルダーの外を指定してください。",
+    "소재 캐시는 게임 폴더 밖에 저장해야 합니다.",
+    "The asset cache must be outside the game folder."
+  ],
+  "无法启动素材提取组件": [
+    "无法启动素材提取组件",
+    "無法啟動素材提取元件",
+    "素材抽出ツールを起動できません",
+    "소재 추출 도구를 실행할 수 없습니다",
+    "Could not start the asset extractor"
+  ],
+  "素材提取结果读取中断": [
+    "素材提取结果读取中断",
+    "素材提取結果讀取中斷",
+    "抽出結果の読み取りが中断されました",
+    "추출 결과 읽기가 중단되었습니다",
+    "Reading the extraction results was interrupted"
+  ],
+  "提取已取消，原素材库保持不变": [
+    "提取已取消，原素材库保持不变",
+    "提取已取消，原素材庫保持不變",
+    "抽出をキャンセルしました。読み込み済みの素材はそのまま使えます。",
+    "추출을 취소했습니다. 기존에 불러온 소재는 그대로 사용할 수 있습니다.",
+    "Extraction cancelled. Your existing asset library is unchanged."
+  ],
+  "素材提取组件意外退出，请重新安装提取组件或检查游戏版本": [
+    "素材提取组件意外退出，请重新安装提取组件或检查游戏版本",
+    "素材提取元件意外結束，請重新安裝提取元件或檢查遊戲版本",
+    "素材抽出ツールが異常終了しました。ツールの再準備またはゲームのバージョンを確認してください。",
+    "소재 추출 도구가 예기치 않게 종료되었습니다. 도구를 다시 준비하거나 게임 버전을 확인하세요.",
+    "The asset extractor exited unexpectedly. Rebuild or reinstall it, or check the game version."
+  ],
+  "提取组件没有返回完成结果，原素材库保持不变": [
+    "提取组件没有返回完成结果，原素材库保持不变",
+    "提取元件沒有回傳完成結果，原素材庫保持不變",
+    "抽出の完了を確認できませんでした。読み込み済みの素材は変更していません。",
+    "추출 완료 결과를 받지 못했습니다. 기존 소재는 변경하지 않았습니다.",
+    "The extractor did not return a completion result. Your existing asset library is unchanged."
+  ],
+  "未能提取任何游戏图片": [
+    "未能提取任何游戏图片",
+    "未能提取任何遊戲圖片",
+    "ゲームの画像を抽出できませんでした",
+    "게임 이미지를 추출하지 못했습니다",
+    "No game images could be extracted"
+  ],
+  "没有读到人物或背景目录，当前游戏资源结构可能已改变；请更新提取工具": [
+    "没有读到人物或背景目录，当前游戏资源结构可能已改变；请更新提取工具",
+    "沒有讀到人物或背景目錄，目前遊戲資源結構可能已改變；請更新提取工具",
+    "人物・背景の一覧を読み取れませんでした。ゲームの素材構成が変わった可能性があります。抽出ツールを更新してください。",
+    "인물 또는 배경 목록을 읽지 못했습니다. 게임 리소스 구조가 변경되었을 수 있습니다. 추출 도구를 업데이트하세요.",
+    "Could not read the character or background catalog. The game resource layout may have changed; update the extractor."
   ]
 }

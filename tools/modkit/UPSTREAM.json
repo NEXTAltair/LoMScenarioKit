@@ -622,6 +622,34 @@
     {
       "path": "samples/showcase3/story/main.json",
       "sha256": "3978be406b82f2448fda9c8eaa4f2f7e3a87e00e1fc62deefec8738dd204d157"
+    },
+    {
+      "path": "scripts/build_asset_extractor.py",
+      "sha256": "94d529a823ab6fbd065fbd7762e4a76b4edfb4556739c899c02ac21603e3cf68"
+    },
+    {
+      "path": "scripts/pyinstaller-hooks/hook-archspec.py",
+      "sha256": "ded9de8bd6196cf1eb9efd9120736bf9c33e95192b9848694b18f132253fc85b"
+    },
+    {
+      "path": "tools/_probe_assets.py",
+      "sha256": "e8c6619714e9a8d5be087231474da8404d02c3e25b42c494ae4aca9a3b241b01"
+    },
+    {
+      "path": "tools/preview_asset_worker.py",
+      "sha256": "1bbe5375d6ca2323dfdc64e101587b0a82da923f4c45162130e9983b1c88be24"
+    },
+    {
+      "path": "tools/requirements-preview-extractor.txt",
+      "sha256": "e1b8f7dd7fd363e0a09d773fbe03ca90a5ab35c42b46e31500bb036c0c644746"
+    },
+    {
+      "path": "tools/tests/test_character_catalog.py",
+      "sha256": "46a74503669c983b5ad7e93573772f0baa37e05f93e1e8b773f85124022c2f42"
+    },
+    {
+      "path": "tools/tests/test_preview_asset_worker.py",
+      "sha256": "8819582c4988a3b17bff88258750bc2052937292ee83592a8a90c60ded7a3ac3"
     }
   ],
   "hash_scope": "Hashes identify the original imported files, before LoMScenarioKit modifications.",

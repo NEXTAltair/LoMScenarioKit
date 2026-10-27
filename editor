@@ -19,6 +19,20 @@ if [ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" ]; then
     export GALLIUM_DRIVER="${GALLIUM_DRIVER:-llvmpipe}"
 fi
 
+# Source checkout: prepare the self-contained preview extractor once. The
+# environment and build outputs stay under Cargo's target directory.
+if [ -n "${EXTRACTOR_PYTHON:-}" ]; then
+    editor_python=$EXTRACTOR_PYTHON
+elif command -v python3.12 >/dev/null 2>&1; then
+    editor_python=python3.12
+elif command -v python3 >/dev/null 2>&1; then
+    editor_python=python3
+else
+    printf '%s\n' '初回の抽出ツール準備にはPython 3.12以降が必要です。' >&2
+    exit 127
+fi
+"$editor_python" "$editor_root/tools/build_editor.py" --prepare-extractor
+
 # Keep the caller's working directory so relative project paths still work.
 exec cargo run --quiet --locked \
     --manifest-path "$editor_root/tools/modkit/Cargo.toml" \

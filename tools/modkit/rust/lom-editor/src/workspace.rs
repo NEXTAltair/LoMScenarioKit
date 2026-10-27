@@ -307,7 +307,7 @@ struct App {
     last_sync: Instant,
     sync_conflict: bool,
 }
-fn user_root() -> PathBuf {
+pub(crate) fn user_root() -> PathBuf {
     if let Some(appdata) = std::env::var_os("APPDATA") {
         return PathBuf::from(appdata).join("LoMScenarioKit");
     }
