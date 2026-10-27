@@ -15,6 +15,13 @@ enum JobEvent {
     Finished(Result<Value, String>),
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum GameFolderPurpose {
+    Game,
+    Previews,
+    Extract,
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum ToolPage {
     #[default]
@@ -53,6 +60,7 @@ pub struct ToolsPanel {
     library: PathBuf,
     game: PathBuf,
     game_candidates: Vec<PathBuf>,
+    game_folder: Option<(GameFolderPurpose, crate::folder_picker::FolderPicker)>,
     runtime: PathBuf,
     ffmpeg: Option<PathBuf>,
     content_id: String,
@@ -94,6 +102,7 @@ impl Default for ToolsPanel {
             library: lom_core::content::default_repository_root(),
             game: PathBuf::from(settings["game_dir"].as_str().unwrap_or("")),
             game_candidates: Vec::new(),
+            game_folder: None,
             runtime: settings["rust_runtime_dir"]
                 .as_str()
                 .filter(|s| !s.is_empty())
@@ -240,7 +249,7 @@ impl ToolsPanel {
         self.report_open = true;
     }
     pub fn dialog_open(&self) -> bool {
-        self.report_open || self.help_open
+        self.report_open || self.help_open || self.game_folder.is_some()
     }
     pub fn open_help(&mut self) {
         self.help.open_guide();
@@ -265,18 +274,9 @@ impl ToolsPanel {
             self.report_open = true;
             return;
         }
-        let path = if path.file_name().is_some_and(|name| name == "Mortal_Data") {
-            path.parent().unwrap_or(&path).to_path_buf()
-        } else {
-            path
-        };
-        if let Err(error) = crate::asset_extraction::validate_game(&path) {
+        if let Err(error) = self.accept_game_folder(path, GameFolderPurpose::Extract) {
             self.result::<Value>("选择游戏目录", Err(error));
-            return;
         }
-        self.game = path;
-        self.game_loaded = false;
-        self.start_extraction();
     }
     pub fn start_extraction(&mut self) {
         if self.job.is_some() {
@@ -292,18 +292,8 @@ impl ToolsPanel {
             }
         };
         if crate::asset_extraction::validate_game(&self.game).is_err() {
-            let Some(path) = rfd::FileDialog::new()
-                .set_title(crate::i18n::tr("选择包含 Mortal_Data 的游戏目录"))
-                .pick_folder()
-            else {
-                return;
-            };
-            if let Err(e) = crate::asset_extraction::validate_game(&path) {
-                self.result::<Value>("一键提取游戏资产", Err(e));
-                return;
-            }
-            self.game = path;
-            self.game_loaded = false;
+            self.open_game_folder(GameFolderPurpose::Extract);
+            return;
         }
         if !self.save_setting("game_dir", json!(self.game)) {
             return;
@@ -355,6 +345,21 @@ impl ToolsPanel {
         }
     }
     pub fn show_dialog(&mut self, ctx: &egui::Context, project: &Project) {
+        if let Some((purpose, mut picker)) = self.game_folder.take() {
+            match picker.show(ctx, "选择游戏目录") {
+                crate::folder_picker::Selection::Pending => {
+                    self.game_folder = Some((purpose, picker))
+                }
+                crate::folder_picker::Selection::Cancelled => {}
+                crate::folder_picker::Selection::Chosen(path) => {
+                    if let Err(error) = self.accept_game_folder(path, purpose) {
+                        picker.error = Some(error.to_string());
+                        self.game_folder = Some((purpose, picker));
+                    }
+                }
+            }
+            return;
+        }
         if self.help_open {
             self.show_help(ctx);
             return;
@@ -531,24 +536,30 @@ impl ToolsPanel {
             .all(|name| self.runtime.join(name).is_file())
     }
     fn choose_game(&mut self) {
-        if let Some(path) = rfd::FileDialog::new()
-            .set_title(crate::i18n::tr("选择包含 Mortal.exe 的游戏目录"))
-            .pick_folder()
-        {
-            self.select_game(path);
+        self.open_game_folder(GameFolderPurpose::Game);
+    }
+    fn open_game_folder(&mut self, purpose: GameFolderPurpose) {
+        self.game_folder = Some((purpose, crate::folder_picker::FolderPicker::new(&self.game)));
+    }
+    fn accept_game_folder(
+        &mut self,
+        path: PathBuf,
+        purpose: GameFolderPurpose,
+    ) -> anyhow::Result<()> {
+        let path = save_game_folder(&path, purpose, &settings_path(), &legacy_settings_path())?;
+        self.game = path;
+        self.game_candidates.clear();
+        self.game_loaded = false;
+        match purpose {
+            GameFolderPurpose::Game => self.refresh_game(),
+            GameFolderPurpose::Previews => {}
+            GameFolderPurpose::Extract => self.start_extraction(),
         }
+        Ok(())
     }
     fn select_game(&mut self, path: PathBuf) {
-        if let Err(error) = game_tools::validate_root(&path)
-            .and_then(|_| game_tools::game_architecture(&path).map(|_| ()))
-        {
+        if let Err(error) = self.accept_game_folder(path, GameFolderPurpose::Game) {
             self.result::<Value>("选择游戏目录", Err(error));
-            return;
-        }
-        if self.save_setting("game_dir", json!(path)) {
-            self.game = path;
-            self.game_candidates.clear();
-            self.refresh_game();
         }
     }
     fn locate_game(&mut self) {
@@ -938,19 +949,7 @@ impl ToolsPanel {
                         )
                         .clicked()
                     {
-                        if let Some(path) = rfd::FileDialog::new()
-                            .set_title(crate::i18n::tr("选择包含 Mortal_Data 的游戏目录"))
-                            .pick_folder()
-                        {
-                            match crate::asset_extraction::validate_game(&path) {
-                                Ok(()) => {
-                                    self.game = path;
-                                    self.game_loaded = false;
-                                    self.save_setting("game_dir", json!(self.game));
-                                }
-                                Err(e) => self.result::<Value>("选择游戏目录", Err(e)),
-                            }
-                        }
+                        self.open_game_folder(GameFolderPurpose::Previews);
                     }
                 });
                 ui.small(crate::i18n::tr(
@@ -1466,6 +1465,38 @@ fn save_tool_setting(
     settings[key] = value;
     lom_core::project::atomic_write(path, &lom_core::stable_json(&settings)?)
 }
+fn save_game_folder(
+    path: &std::path::Path,
+    purpose: GameFolderPurpose,
+    settings: &std::path::Path,
+    legacy: &std::path::Path,
+) -> anyhow::Result<PathBuf> {
+    let root = if path.file_name().is_some_and(|name| name == "Mortal_Data") {
+        path.parent().unwrap_or(path)
+    } else {
+        path
+    };
+    match purpose {
+        GameFolderPurpose::Game => {
+            game_tools::validate_root(root).map_err(|_| {
+                anyhow::anyhow!(crate::i18n::tr(
+                    "请选择包含 Mortal.exe 和 Mortal_Data/Managed 的游戏目录"
+                ))
+            })?;
+            game_tools::game_architecture(root).map_err(|_| {
+                anyhow::anyhow!(crate::i18n::tr(
+                    "无法读取或识别 Mortal.exe，请重新选择游戏目录"
+                ))
+            })?;
+        }
+        GameFolderPurpose::Previews | GameFolderPurpose::Extract => {
+            crate::asset_extraction::validate_game(root)?
+        }
+    }
+    let root = root.canonicalize()?;
+    save_tool_setting(settings, legacy, "game_dir", json!(root))?;
+    Ok(root)
+}
 fn prepare_preview(project: &Project, script: &str, node: &str) -> anyhow::Result<Project> {
     let mut preview = project.clone();
     preview.scenario = None; // F5 previews presentation only; it must not advance authored tasks.
@@ -1592,6 +1623,124 @@ fn show_report(ui: &mut egui::Ui, value: &Value, depth: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn visible_game_folder_buttons_open_picker_and_invalid_selection_or_cancel_keeps_game() {
+        use egui::accesskit::{Action, ActionRequest, Role};
+        let dir = tempfile::tempdir().unwrap();
+        for page in [ToolPage::Game, ToolPage::Previews] {
+            let mut panel = ToolsPanel::default();
+            panel.game = dir.path().to_path_buf();
+            panel.game_loaded = true;
+            let old_game = panel.game.clone();
+            let ctx = egui::Context::default();
+            ctx.enable_accesskit();
+            let project = Project::new();
+            let draw = |panel: &mut ToolsPanel, events| {
+                ctx.run(
+                    egui::RawInput {
+                        screen_rect: Some(egui::Rect::from_min_size(
+                            egui::Pos2::ZERO,
+                            egui::vec2(1200.0, 900.0),
+                        )),
+                        events,
+                        ..Default::default()
+                    },
+                    |ctx| {
+                        egui::CentralPanel::default().show(ctx, |ui| {
+                            if page == ToolPage::Game {
+                                panel.show_game_controls(ui, &project);
+                            } else {
+                                panel.show_previews(ui);
+                            }
+                        });
+                        panel.show_dialog(ctx, &project);
+                    },
+                )
+            };
+            let button = |output: egui::FullOutput, source: &str| {
+                output
+                    .platform_output
+                    .accesskit_update
+                    .unwrap()
+                    .nodes
+                    .into_iter()
+                    .find_map(|(id, node)| {
+                        (node.role() == Role::Button
+                            && node.label() == Some(crate::i18n::tr(source).as_str()))
+                        .then_some(id)
+                    })
+                    .unwrap_or_else(|| panic!("missing visible button: {source}"))
+            };
+            let click = |target| {
+                vec![egui::Event::AccessKitActionRequest(ActionRequest {
+                    action: Action::Click,
+                    target,
+                    data: None,
+                })]
+            };
+            let change = button(draw(&mut panel, vec![]), "更换游戏目录");
+            draw(&mut panel, click(change));
+            assert!(panel.dialog_open());
+            let confirm = button(draw(&mut panel, vec![]), "使用此文件夹");
+            draw(&mut panel, click(confirm));
+            assert!(panel.game_folder.as_ref().unwrap().1.error.is_some());
+            assert_eq!(panel.game, old_game);
+            let cancel = button(draw(&mut panel, vec![]), "取消");
+            draw(&mut panel, click(cancel));
+            assert!(!panel.dialog_open());
+            assert_eq!(panel.game, old_game);
+            assert!(panel.job.is_none());
+
+            panel.open_game_folder(GameFolderPurpose::Extract);
+            draw(&mut panel, vec![]);
+            draw(
+                &mut panel,
+                vec![egui::Event::Key {
+                    key: egui::Key::Escape,
+                    physical_key: None,
+                    pressed: true,
+                    repeat: false,
+                    modifiers: egui::Modifiers::NONE,
+                }],
+            );
+            assert!(!panel.dialog_open());
+            assert!(panel.job.is_none());
+            assert_eq!(panel.game, old_game);
+        }
+    }
+
+    #[test]
+    fn game_folder_validation_and_persistence_are_atomic_and_accept_mortal_data() {
+        let temp = tempfile::tempdir().unwrap();
+        let settings = temp.path().join("settings.json");
+        let legacy = temp.path().join("legacy.json");
+        let original = br#"{"game_dir":"previous game","custom":true}"#;
+        std::fs::write(&settings, original).unwrap();
+        let root = temp.path().join("new game 日本語");
+        let data = root.join("Mortal_Data");
+        std::fs::create_dir_all(data.join("StreamingAssets/aa/StandaloneWindows64")).unwrap();
+        assert!(save_game_folder(&root, GameFolderPurpose::Previews, &settings, &legacy).is_err());
+        assert_eq!(std::fs::read(&settings).unwrap(), original);
+        std::fs::write(data.join("sharedassets2.assets"), b"fixture").unwrap();
+        std::fs::write(data.join("StreamingAssets/aa/catalog.json"), b"{}").unwrap();
+        // Preview assets alone must not bypass the game's executable check.
+        assert!(save_game_folder(&root, GameFolderPurpose::Game, &settings, &legacy).is_err());
+        assert_eq!(std::fs::read(&settings).unwrap(), original);
+        let chosen =
+            save_game_folder(&data, GameFolderPurpose::Previews, &settings, &legacy).unwrap();
+        assert_eq!(chosen, root.canonicalize().unwrap());
+        let saved = lom_core::load_json(&settings).unwrap();
+        assert_eq!(saved["game_dir"], json!(chosen));
+        assert_eq!(saved["custom"], true);
+        std::fs::write(&settings, b"{damaged").unwrap();
+        assert!(save_game_folder(&root, GameFolderPurpose::Extract, &settings, &legacy).is_err());
+        assert_eq!(std::fs::read(&settings).unwrap(), b"{damaged");
+        assert_eq!(
+            std::fs::read(data.join("sharedassets2.assets")).unwrap(),
+            b"fixture"
+        );
+    }
+
     #[test]
     fn tool_settings_migrate_without_modifying_legacy_or_replacing_damaged_current_settings() {
         let dir = tempfile::tempdir().unwrap();
