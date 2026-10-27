@@ -1,15 +1,98 @@
 <!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>活侠传剧情编辑器 · 使用指南</title>
 <h1>活侠传剧情编辑器 · 使用指南</h1>
 <style>body{font-family:sans-serif;max-width:72rem;margin:2rem auto;padding:0 1rem;line-height:1.7}figure{margin:1.5rem 0}figure img{max-width:100%;height:auto;border:1px solid #ddd}figcaption{font-size:.9rem;color:#444}</style>
-<h2 id="start">做出第一段剧情</h2>
-<p>先写一段能从头播到尾的短剧情，再加背景、人物和选项。左边排步骤，中间填内容，右边看效果；“节点”就是剧情中的一步。</p>
-<h3>从一句对白开始</h3>
-<ol><li>在“文件”中选择“从示例开始”，打开短篇对话的可编辑副本。</li><li>选中左侧“对白”，在中间修改文本、人物和表情，右侧会显示预览。</li><li>点击右下角“播放”。读完对白后点击预览画面继续；遇到选项时点击对应按钮。</li><li>选择“文件 → 保存所有章节”保存副本。</li><li>按 F6 检查当前章节并修正问题，然后通过“导出 Addon”生成 Addon 项目的游戏用文件。</li></ol>
-<aside>想看某一步怎么填？点击中间标题旁的“说明”，会直接打开该步骤的帮助。顶栏“帮助”或 F1 可随时回到这里。</aside>
-<h3>接下来做什么</h3>
-<p>在左侧“剧情安排”设置事件的年月旬、地点、重复间隔和可选任务进度；“作品设置”管理整部作品的名称和作者。想给演出加上人物，从帮助目录选择“人物登场与对白”；想做多人同时行动，查看“让多个动作同时发生”。</p>
-<figure><a href="../../../../../docs/images/native-editor/start-menu.png"><img src="../../../../../docs/images/native-editor/start-menu.png" alt="在文件菜单中选择“从示例开始”。截图为日语界面，点击图片可放大。" width="1280" height="760"></a><figcaption>在文件菜单中选择“从示例开始”。截图为日语界面，点击图片可放大。</figcaption></figure>
-<p>截图中的游戏图片来自本机游戏安装的预览素材提取。</p>
+<h2 id="start">1. 打开示例</h2>
+<p>先把示例的第一句对白改成“Hello!”，再播放、保存并重新打开。请先启动编辑器，然后按顺序操作。</p><aside>截图使用日语界面，点击图片可放大。黑色遮挡用于隐藏个人路径和文件夹名。</aside>
+<h3>1-1. 在“文件”中选择“从示例开始”</h3>
+<p>打开顶部的“文件”菜单，选择第二项“从示例开始”。</p>
+<figure><a href="../../../../../docs/images/native-editor/01-open-sample.png"><img src="../../../../../docs/images/native-editor/01-open-sample.png" alt="在“文件”中选择“从示例开始”" width="325" height="215"></a><figcaption>在“文件”中选择“从示例开始”</figcaption></figure>
+<h3>1-2. 确认示例已经打开</h3>
+<p>左侧列出01～17步。尚未准备素材时，右侧背景为黑色是正常的。编辑器已经创建了单独的示例副本。</p>
+<figure><a href="../../../../../docs/images/native-editor/02-sample-open.png"><img src="../../../../../docs/images/native-editor/02-sample-open.png" alt="确认示例已经打开" width="1280" height="760"></a><figcaption>确认示例已经打开</figcaption></figure>
+<nav><a href="#assets">下一步：2. 准备预览图片</a></nav>
+<h2 id="assets">2. 准备预览图片</h2>
+<h3>2-1. 打开提取菜单</h3>
+<p>选择“文件 → 从游戏提取预览素材…”。如果已经能看到背景和人物，可直接进入第3节。</p>
+<figure><a href="../../../../../docs/images/native-editor/03-extract-menu.png"><img src="../../../../../docs/images/native-editor/03-extract-menu.png" alt="打开提取菜单" width="330" height="267"></a><figcaption>打开提取菜单</figcaption></figure>
+<h3>2-2. 选择包含Mortal_Data的文件夹</h3>
+<p>在文件夹路径中输入游戏安装位置，点击“前往文件夹”。确认列表中有Mortal_Data，再点击“使用此文件夹”。黑色遮挡处应是你自己的路径。</p>
+<figure><a href="../../../../../docs/images/native-editor/04-game-folder.png"><img src="../../../../../docs/images/native-editor/04-game-folder.png" alt="选择包含Mortal_Data的文件夹" width="1382" height="1138"></a><figcaption>选择包含Mortal_Data的文件夹</figcaption></figure>
+<h3>2-3. 等待提取完成</h3>
+<p>界面显示进度。关闭窗口继续编辑不会中断提取。完成后会显示结果，并自动载入图片。</p>
+<figure><a href="../../../../../docs/images/native-editor/05-extraction-progress.png"><img src="../../../../../docs/images/native-editor/05-extraction-progress.png" alt="等待提取完成" width="606" height="254"></a><figcaption>等待提取完成</figcaption></figure>
+<h3>2-4. 确认背景出现</h3>
+<p>关闭结果，选择左侧第01步。右侧从黑色画面变成后山背景，就准备好了。</p>
+<figure><a href="../../../../../docs/images/native-editor/06-assets-ready.png"><img src="../../../../../docs/images/native-editor/06-assets-ready.png" alt="确认背景出现" width="536" height="598"></a><figcaption>确认背景出现</figcaption></figure>
+<nav><a href="#start">上一步：1. 打开示例</a> · <a href="#edit">下一步：3. 修改一句对白</a></nav>
+<h3>补充：修改素材</h3>
+<p>重要人物按“人物 → 外观 → 表情”选择，例如“虞小梅 → 入魔 → 特殊表情”。切换外观后只列出它实际可用的表情，不可用的旧表情恢复为正常表情。场中更换为另一官方人物配置时，先让旧外观退场，再让新外观登场。</p><p>游戏预览素材用于编辑器右侧的画面。自己的图片、人物和音频则通过“用户内容”加入作品，两者入口不同。</p><p>已有素材库时，从“文件 → 选择预览素材库…”载入即可。提取的游戏图片留在本机，不会自动加入导出的作品包。</p><h3>使用自己制作的素材</h3>
+<p>打开“素材管理 → 作品素材 → 导入素材…”，导入自己的图片、人物或音频，再到相应步骤的表单中选择它。</p>
+<aside>立绘或背景没显示时：确认素材已载入 → 检查步骤中选的人物和表情 → 回到开头重新播放。编辑器预览不代表所有游戏效果都已验证。</aside>
+
+<h2 id="edit">3. 修改一句对白</h2>
+<h3>3-1. 选中左侧第05步对白</h3>
+<p>中央的文本栏显示“趙活、こんな所にいたのか。”。若列表已滚动，请找到05。</p>
+<figure><a href="../../../../../docs/images/native-editor/07-select-dialogue.png"><img src="../../../../../docs/images/native-editor/07-select-dialogue.png" alt="选中左侧第05步对白" width="699" height="547"></a><figcaption>选中左侧第05步对白</figcaption></figure>
+<h3>3-2. 把文本改成“Hello!”</h3>
+<p>点击中央文本栏，全选原文并输入Hello!。右侧对白也变为Hello!，说明修改已生效。</p>
+<figure><a href="../../../../../docs/images/native-editor/08-edited-dialogue.png"><img src="../../../../../docs/images/native-editor/08-edited-dialogue.png" alt="把文本改成“Hello!”" width="936" height="600"></a><figcaption>把文本改成“Hello!”</figcaption></figure>
+<nav><a href="#assets">上一步：2. 准备预览图片</a> · <a href="#preview">下一步：4. 播放并推进对白</a></nav>
+<h2 id="preview">4. 播放并推进对白</h2>
+<h3>4-1. 点击预览下方的“开头”</h3>
+<p>播放位置回到1 / 17，已经修改的对白会保留。</p>
+<figure><a href="../../../../../docs/images/native-editor/09-rewind.png"><img src="../../../../../docs/images/native-editor/09-rewind.png" alt="点击预览下方的“开头”" width="536" height="460"></a><figcaption>点击预览下方的“开头”</figcaption></figure>
+<h3>4-2. 点击“播放”</h3>
+<p>背景和人物依次出现，然后在第05步的Hello!处等待。BGM需要FFplay；首次使用时请等曲目准备完成。</p>
+<figure><a href="../../../../../docs/images/native-editor/10-playing.png"><img src="../../../../../docs/images/native-editor/10-playing.png" alt="点击“播放”" width="536" height="460"></a><figcaption>点击“播放”</figcaption></figure>
+<h3>4-3. 点击一次画面预览</h3>
+<p>进入第06步“少し風に当たりたくて。”。对白会等待点击，不会计时跳过；也可以点击下方的“下一步”。</p>
+<figure><a href="../../../../../docs/images/native-editor/11-next-dialogue.png"><img src="../../../../../docs/images/native-editor/11-next-dialogue.png" alt="点击一次画面预览" width="536" height="460"></a><figcaption>点击一次画面预览</figcaption></figure>
+<nav><a href="#edit">上一步：3. 修改一句对白</a> · <a href="#flow">下一步：5. 试选一个选项</a></nav>
+<h3>补充：在游戏中试玩</h3>
+
+<h3>在游戏里看</h3>
+<p>Windows 的“试玩”按钮或 F5 会先检查作品，生成独立的临时试玩包并启动游戏。游戏目录、自动配置和 MOD 列表在顶栏“游戏与 MOD”页面管理；Mac 不提供游戏试玩。</p>
+<aside>转场预览使用示意节奏；音频、滤镜、战斗以及其他游戏系统效果仍以游戏内表现为准。</aside>
+
+<h2 id="flow">5. 试选一个选项</h2>
+<h3>5-1. 推进到选项，选择“一緒に稽古する”</h3>
+<p>从第06步再点击画面两次，就会看到第08步的选项。点击下方的“一緒に稽古する”（一起练功）。</p>
+<figure><a href="../../../../../docs/images/native-editor/12-choose-training.png"><img src="../../../../../docs/images/native-editor/12-choose-training.png" alt="推进到选项，选择“一緒に稽古する”" width="536" height="460"></a><figcaption>推进到选项，选择“一緒に稽古する”</figcaption></figure>
+<h3>5-2. 确认分支对白</h3>
+<p>第11步显示“大師兄、お手柔らかに。”。要试另一条路，选中左侧第08步，再点击“少し休む”（休息一下）。</p>
+<figure><a href="../../../../../docs/images/native-editor/13-branch-result.png"><img src="../../../../../docs/images/native-editor/13-branch-result.png" alt="确认分支对白" width="536" height="460"></a><figcaption>确认分支对白</figcaption></figure>
+<nav><a href="#preview">上一步：4. 播放并推进对白</a> · <a href="#save">下一步：6. 保存并重新打开</a></nav>
+<h3>补充：设置选项、跳转和结束</h3>
+<p>没有跳转时，剧情会按左侧的顺序向下播放。选项和条件分支可以把剧情带到另一处；结束剧情用来为当前章节收尾。</p>
+<h3>写一个有去向的选项</h3>
+<ol>
+<li>先添加选项之后要播放的对白或步骤。</li>
+<li>添加“选项分支”，为每个选项写文字，并选择对应的后续步骤。</li>
+<li>按 F7 看流程图，检查每个选项是否连到了预期的位置；再用右侧播放逐条查看。</li>
+</ol>
+<h3>“结束剧情”怎么填</h3>
+<ul>
+<li>“下一章节”留空：当前章节结束，回到自由模式。</li>
+<li>选择了“下一章节”：当前章节结束后接着播放该章节。</li>
+</ul>
+<pre>只写一段独立剧情：对白 → 结束剧情（下一章节留空）
+继续下一章：对白 → 结束剧情（选择下一章节）</pre>
+<aside>“剧情旗标”就是一条事件记录，例如“已经见过师兄”。设置旗标后，可以用条件分支决定以后该走哪段剧情。</aside>
+
+<h2 id="save">6. 保存并重新打开</h2>
+<h3>6-1. 选择“文件 → 保存全部章节”</h3>
+<p>修改会保存到这个副本。Windows/Linux也可用Ctrl+S，macOS用⌘S。</p>
+<figure><a href="../../../../../docs/images/native-editor/14-save-menu.png"><img src="../../../../../docs/images/native-editor/14-save-menu.png" alt="选择“文件 → 保存全部章节”" width="310" height="354"></a><figcaption>选择“文件 → 保存全部章节”</figcaption></figure>
+<h3>6-2. 确认左下角显示“已保存”</h3>
+<p>出现这个状态就表示已写入磁盘。保存前，修改只存在于当前打开的编辑器中。</p>
+<figure><a href="../../../../../docs/images/native-editor/15-saved.png"><img src="../../../../../docs/images/native-editor/15-saved.png" alt="确认左下角显示“已保存”" width="173" height="44"></a><figcaption>确认左下角显示“已保存”</figcaption></figure>
+<h3>6-3. 从最近打开重新打开同一个副本</h3>
+<p>选择“文件 → 最近打开”，再选择刚保存的first-scene-…。再次选择“从示例开始”会新建另一个副本，继续编辑时请用最近打开。</p>
+<figure><a href="../../../../../docs/images/native-editor/16-recent-project.png"><img src="../../../../../docs/images/native-editor/16-recent-project.png" alt="从最近打开重新打开同一个副本" width="1940" height="811"></a><figcaption>从最近打开重新打开同一个副本</figcaption></figure>
+<h3>6-4. 选中第05步，确认Hello!仍在</h3>
+<p>检查中央文本和右侧对白。这样就完成了修改、播放、保存和重新打开。接下来可换成自己的台词。F6可检查当前章节。</p>
+<figure><a href="../../../../../docs/images/native-editor/17-reopened.png"><img src="../../../../../docs/images/native-editor/17-reopened.png" alt="选中第05步，确认Hello!仍在" width="1256" height="600"></a><figcaption>选中第05步，确认Hello!仍在</figcaption></figure>
+<nav><a href="#flow">上一步：5. 试选一个选项</a></nav>
 <h2 id="characters">人物登场与对白</h2>
 <p>“人物登场”负责把立绘放到画面里，“对白”负责显示台词。先让人物登场，再安排移动或退场，会更容易看懂演出顺序。</p>
 <h3>一个完整的小例子</h3>
@@ -29,7 +112,6 @@
 <li>想让人物走动就加“人物移动”；想让人物离开就加“人物退场”。可以拖动左侧步骤调整先后顺序。</li>
 </ol>
 <aside>看不到立绘时，先确认是否已经载入预览素材。设置人物编号不会自动把游戏图片复制到编辑器里，具体操作见“让预览显示素材”。</aside>
-<figure><a href="../../../../../docs/images/native-editor/dialogue.png"><img src="../../../../../docs/images/native-editor/dialogue.png" alt="左侧选择对白，中间修改文本、人物和表情，右侧确认效果。截图为日语界面。" width="1280" height="760"></a><figcaption>左侧选择对白，中间修改文本、人物和表情，右侧确认效果。截图为日语界面。</figcaption></figure>
 <h2 id="parallel">让多个动作同时发生</h2>
 <p>普通步骤按顺序执行。“同时执行组”把多个演出动作放在同一组里：一起开始，等全部动作结束，再继续后面的步骤。</p>
 <h3>例子：让两个人一起退场</h3>
@@ -64,37 +146,6 @@
 ↓
 对白</pre>
 <aside>这里的“淡入 / 淡出”指黑幕出现和消失。右侧能预览遮挡和揭幕；转场节奏为示意，游戏中的实际时长由游戏决定。</aside>
-<h2 id="assets">让预览显示素材</h2>
-<p>快捷入口：文件 → 从游戏提取预览素材…。选择含 Mortal_Data 的游戏安装目录，完成后自动载入。已有素材库则选含 preview_map.json 和 assets 的完整文件夹；普通图片文件夹不能直接载入。选择素材库时若选中游戏安装目录，也会自动开始提取。</p><p>重要人物按“人物 → 外观 → 表情”选择，例如“虞小梅 → 入魔 → 特殊表情”。切换外观后只列出它实际可用的表情，不可用的旧表情恢复为正常表情。场中更换为另一官方人物配置时，先让旧外观退场，再让新外观登场。</p>
-<p>游戏预览素材用于编辑器右侧的画面。自己的图片、人物和音频则通过“用户内容”加入作品，两者入口不同。</p>
-<h3>使用游戏里的立绘、表情和背景</h3>
-<ol>
-<li>在顶栏打开“素材管理 → 游戏预览素材”。</li>
-<li>找到“游戏预览素材”，点“一键提取游戏资产”。</li>
-<li>选择自己安装的游戏目录。提取过程中可看进度，完成后会自动载入预览。</li>
-</ol>
-<p>已有素材库时，从“文件 → 选择预览素材库…”载入即可。提取的游戏图片留在本机，不会自动加入导出的作品包。</p>
-<h3>使用自己制作的素材</h3>
-<p>打开“素材管理 → 作品素材 → 导入素材…”，导入自己的图片、人物或音频，再到相应步骤的表单中选择它。</p>
-<aside>立绘或背景没显示时：确认素材已载入 → 检查步骤中选的人物和表情 → 回到开头重新播放。编辑器预览不代表所有游戏效果都已验证。</aside>
-<figure><a href="../../../../../docs/images/native-editor/start-menu.png"><img src="../../../../../docs/images/native-editor/start-menu.png" alt="在文件菜单下方选择“从游戏提取预览素材…”，一起准备立绘、背景和对话界面。截图为日语界面。" width="1280" height="760"></a><figcaption>在文件菜单下方选择“从游戏提取预览素材…”，一起准备立绘、背景和对话界面。截图为日语界面。</figcaption></figure>
-<h2 id="flow">选项、跳转与结束</h2>
-<p>没有跳转时，剧情会按左侧的顺序向下播放。选项和条件分支可以把剧情带到另一处；结束剧情用来为当前章节收尾。</p>
-<h3>写一个有去向的选项</h3>
-<ol>
-<li>先添加选项之后要播放的对白或步骤。</li>
-<li>添加“选项分支”，为每个选项写文字，并选择对应的后续步骤。</li>
-<li>按 F7 看流程图，检查每个选项是否连到了预期的位置；再用右侧播放逐条查看。</li>
-</ol>
-<h3>“结束剧情”怎么填</h3>
-<ul>
-<li>“下一章节”留空：当前章节结束，回到自由模式。</li>
-<li>选择了“下一章节”：当前章节结束后接着播放该章节。</li>
-</ul>
-<pre>只写一段独立剧情：对白 → 结束剧情（下一章节留空）
-继续下一章：对白 → 结束剧情（选择下一章节）</pre>
-<aside>“剧情旗标”就是一条事件记录，例如“已经见过师兄”。设置旗标后，可以用条件分支决定以后该走哪段剧情。</aside>
-<figure><a href="../../../../../docs/images/native-editor/choices.png"><img src="../../../../../docs/images/native-editor/choices.png" alt="在中间设置选项文本和目标，点击右侧按钮确认分支。截图为日语界面。" width="1280" height="760"></a><figcaption>在中间设置选项文本和目标，点击右侧按钮确认分支。截图为日语界面。</figcaption></figure>
 <h2 id="checks">看懂检查与操作结果</h2>
 <p>检查结果会弹窗显示。先看顶部结论，再看具体问题及位置；原始字段和完整数据收在“技术详情”，需要排查时再展开。</p>
 <h3>这些结果是什么意思</h3>
@@ -107,18 +158,6 @@
 <p>F6 检查当前章节。完整作品检查：打开“发布”，在“发布体检与打包”里选择“发布体检”。</p>
 <p>耗时任务可以点“收起，继续编辑”。底部“查看进度或结果”能重新打开窗口；完成后还会提示结果。</p>
 <aside>“状态正常”只对应当前这次检查；“待游戏确认”不会被当作已通过。遇到错误请保留结论和具体问题，方便定位。</aside>
-<h2 id="preview">编辑器预览与游戏试玩</h2>
-<p>右侧的“播放”用来边写边看，不会启动游戏。它适合检查台词、立绘位置、同时动作和黑幕换景。</p>
-<h3>在编辑器里看</h3>
-<ul>
-<li>“开头”回到章节起点，“播放”继续自动演出，“暂停”停下来修改。</li>
-<li>手动选择另一条步骤会停止自动播放。</li>
-<li>F7 切换到流程图，适合检查选项和分支的去向。</li>
-</ul>
-<h3>在游戏里看</h3>
-<p>Windows 的“试玩”按钮或 F5 会先检查作品，生成独立的临时试玩包并启动游戏。游戏目录、自动配置和 MOD 列表在顶栏“游戏与 MOD”页面管理；Mac 不提供游戏试玩。</p>
-<aside>转场预览使用示意节奏；音频、滤镜、战斗以及其他游戏系统效果仍以游戏内表现为准。</aside>
-<figure><a href="../../../../../docs/images/native-editor/choices.png"><img src="../../../../../docs/images/native-editor/choices.png" alt="点击画面推进对白，点击选项按钮选择路线。等待对白时音乐继续；“停止”会暂停音乐和播放。截图为日语界面。" width="1280" height="760"></a><figcaption>点击画面推进对白，点击选项按钮选择路线。等待对白时音乐继续；“停止”会暂停音乐和播放。截图为日语界面。</figcaption></figure>
 <h2 id="terms">常用词，用人话说</h2>
 <p>用表单写剧情时，不需要先学编程。遇到不熟悉的词，可以先按下面的意思理解。</p>
 <ul>

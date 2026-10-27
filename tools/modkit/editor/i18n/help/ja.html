@@ -1,12 +1,81 @@
 <!doctype html><html><meta charset="utf-8"><title>LoM Modkit · Help</title>
 <style>body{font-family:sans-serif;max-width:72rem;margin:2rem auto;padding:0 1rem;line-height:1.7}figure{margin:1.5rem 0}figure img{max-width:100%;height:auto;border:1px solid #ddd}figcaption{font-size:.9rem;color:#444}</style>
-<h2 id="start">最初の物語を作る</h2>
-<p>まず短い物語を完成させてから、人物や背景を追加しましょう。左で手順を並べ、中央で編集し、右で確認します。ノードは物語の一つのステップです。</p><h3>一つの会話から始める</h3><ol><li>「ファイル → サンプルから始める」で「裏山でひと休み」の編集用コピーを開きます。</li><li>左の「台詞」を選び、中央の「テキスト」を編集します。右側で話者・表情・本文を確認できます。</li><li>右下の「再生」を押します。台詞を読んだら画面プレビューをクリックし、選択肢ではボタンを選んで進めます。</li><li>「ファイル → 全章を保存」で編集したコピーを保存します。</li><li>F6 で現在の章を検査します。問題を直したら、Addon用の作品は「Addonを書き出す」からゲーム用ファイルに書き出せます。</li></ol><aside>各ステップの見出し横の説明ボタンから、そのステップのヘルプを直接開けます。上部のヘルプまたは F1 でいつでも戻れます。</aside>
-<figure><a href="../../../../../docs/images/native-editor/start-menu.png"><img src="../../../../../docs/images/native-editor/start-menu.png" alt="ファイルメニューの「サンプルから始める」を選びます。画像は日本語UIです。クリックすると拡大できます。" width="1280" height="760"></a><figcaption>ファイルメニューの「サンプルから始める」を選びます。画像は日本語UIです。クリックすると拡大できます。</figcaption></figure>
-<p>画面内のゲーム画像は、手元のゲームからプレビュー素材を抽出した場合の表示です。</p>
+<h2 id="start">1. サンプルを開く</h2>
+<p>サンプルの最初の台詞を「Hello!」に変え、再生してから保存するまでを、順番に試します。まずエディターを起動してください。</p><aside>画像は日本語UIです。画像をクリックすると拡大できます。黒い帯は個人のパスやフォルダー名を隠しています。</aside>
+<h3>1-1. 「ファイル → サンプルから始める」を選ぶ</h3>
+<p>上部の「ファイル」を開き、上から2番目の「サンプルから始める」を押します。</p>
+<figure><a href="../../../../../docs/images/native-editor/01-open-sample.png"><img src="../../../../../docs/images/native-editor/01-open-sample.png" alt="「ファイル → サンプルから始める」を選ぶ" width="325" height="215"></a><figcaption>「ファイル → サンプルから始める」を選ぶ</figcaption></figure>
+<h3>1-2. 「裏山でひと休み」が開いたことを確認する</h3>
+<p>左に01～17のステップが並びます。素材をまだ準備していない場合、右の背景は黒いままで正常です。元のサンプルとは別の編集用コピーが作られます。</p>
+<figure><a href="../../../../../docs/images/native-editor/02-sample-open.png"><img src="../../../../../docs/images/native-editor/02-sample-open.png" alt="「裏山でひと休み」が開いたことを確認する" width="1280" height="760"></a><figcaption>「裏山でひと休み」が開いたことを確認する</figcaption></figure>
+<nav><a href="#assets">次へ：2. 画像を準備する</a></nav>
+<h2 id="assets">2. 画像を準備する</h2>
+<h3>2-1. 抽出メニューを開く</h3>
+<p>「ファイル → ゲームからプレビュー素材を抽出…」を選びます。すでに背景や立ち絵が表示される場合は、手順3へ進んでください。</p>
+<figure><a href="../../../../../docs/images/native-editor/03-extract-menu.png"><img src="../../../../../docs/images/native-editor/03-extract-menu.png" alt="抽出メニューを開く" width="330" height="267"></a><figcaption>抽出メニューを開く</figcaption></figure>
+<h3>2-2. Mortal_Dataがあるフォルダーを選ぶ</h3>
+<p>「フォルダーのパス」にゲームのインストール先を入力して「移動」を押します。一覧に「Mortal_Data」があることを確認し、「このフォルダーを使う」を押します。黒い帯の部分は自分の環境のパスになります。</p>
+<figure><a href="../../../../../docs/images/native-editor/04-game-folder.png"><img src="../../../../../docs/images/native-editor/04-game-folder.png" alt="Mortal_Dataがあるフォルダーを選ぶ" width="1382" height="1138"></a><figcaption>Mortal_Dataがあるフォルダーを選ぶ</figcaption></figure>
+<h3>2-3. 抽出の完了を待つ</h3>
+<p>進捗が表示されます。「閉じて編集を続ける」でこの画面を閉じても処理は続きます。完了すると結果が表示され、画像が自動で読み込まれます。</p>
+<figure><a href="../../../../../docs/images/native-editor/05-extraction-progress.png"><img src="../../../../../docs/images/native-editor/05-extraction-progress.png" alt="抽出の完了を待つ" width="606" height="254"></a><figcaption>抽出の完了を待つ</figcaption></figure>
+<h3>2-4. 背景が表示されたことを確認する</h3>
+<p>結果を閉じて左の「01 公式背景切替」を選びます。右が黒い画面から裏山の背景に変われば準備完了です。</p>
+<figure><a href="../../../../../docs/images/native-editor/06-assets-ready.png"><img src="../../../../../docs/images/native-editor/06-assets-ready.png" alt="背景が表示されたことを確認する" width="536" height="598"></a><figcaption>背景が表示されたことを確認する</figcaption></figure>
+<nav><a href="#start">前へ：1. サンプルを開く</a> · <a href="#edit">次へ：3. 台詞を書き換える</a></nav>
+<h3>補足：素材を変更する</h3>
+<p>主要人物は「人物 → 外観 → 表情」の順に選びます。外観ごとに使用可能な表情のみ表示します。外観変更後に使えない表情は通常表情に戻ります。別の公式人物設定へ切り替える場合は、古い外観を退場させてから新しい外観を登場させます。</p><p>ゲームのプレビュー素材はこの端末に保存します。自作素材はユーザーコンテンツから作品に追加します。</p><p>既存の素材庫はファイルメニューから選択。プレビュー画像は作品に自動では含まれません。</p><h3>自作素材を取り込む</h3><p>素材管理の作品の素材から素材インポートで追加し、ステップのフォームで選びます。見えないときは素材庫と人物・表情を確認して先頭から再生してください。</p>
+
+<h2 id="edit">3. 台詞を書き換える</h2>
+<h3>3-1. 左の「05 台詞」を選ぶ</h3>
+<p>中央の「テキスト」に「趙活、こんな所にいたのか。」が表示されます。左の一覧がスクロールしている場合は、05番まで戻してください。</p>
+<figure><a href="../../../../../docs/images/native-editor/07-select-dialogue.png"><img src="../../../../../docs/images/native-editor/07-select-dialogue.png" alt="左の「05 台詞」を選ぶ" width="699" height="547"></a><figcaption>左の「05 台詞」を選ぶ</figcaption></figure>
+<h3>3-2. 本文を「Hello!」に置き換える</h3>
+<p>中央の「テキスト」欄をクリックし、全文を選択して「Hello!」と入力します。右の会話文も「Hello!」になれば変更できています。</p>
+<figure><a href="../../../../../docs/images/native-editor/08-edited-dialogue.png"><img src="../../../../../docs/images/native-editor/08-edited-dialogue.png" alt="本文を「Hello!」に置き換える" width="936" height="600"></a><figcaption>本文を「Hello!」に置き換える</figcaption></figure>
+<nav><a href="#assets">前へ：2. 画像を準備する</a> · <a href="#preview">次へ：4. 再生して台詞を進める</a></nav>
+<h2 id="preview">4. 再生して台詞を進める</h2>
+<h3>4-1. 右下の「先頭」を押す</h3>
+<p>再生位置が「1 / 17」に戻ります。この操作で編集した台詞は消えません。</p>
+<figure><a href="../../../../../docs/images/native-editor/09-rewind.png"><img src="../../../../../docs/images/native-editor/09-rewind.png" alt="右下の「先頭」を押す" width="536" height="460"></a><figcaption>右下の「先頭」を押す</figcaption></figure>
+<h3>4-2. 「再生」を押す</h3>
+<p>背景と人物の登場が進み、05番の「Hello!」で止まります。BGMにはFFplayが必要です。初回は曲の準備が終わるまで待ってください。</p>
+<figure><a href="../../../../../docs/images/native-editor/10-playing.png"><img src="../../../../../docs/images/native-editor/10-playing.png" alt="「再生」を押す" width="536" height="460"></a><figcaption>「再生」を押す</figcaption></figure>
+<h3>4-3. 右の画面プレビューを1回クリックする</h3>
+<p>06番の「少し風に当たりたくて。」に進みます。台詞は時間では進まず、クリックを待ちます。右下の「次へ」でも進められます。</p>
+<figure><a href="../../../../../docs/images/native-editor/11-next-dialogue.png"><img src="../../../../../docs/images/native-editor/11-next-dialogue.png" alt="右の画面プレビューを1回クリックする" width="536" height="460"></a><figcaption>右の画面プレビューを1回クリックする</figcaption></figure>
+<nav><a href="#edit">前へ：3. 台詞を書き換える</a> · <a href="#flow">次へ：5. 選択肢を試す</a></nav>
+<h3>補足：ゲームで試遊する</h3>
+<p>Windows の試遊または F5 は検査後に独立した一時パッケージを作りゲームを起動します。ゲームの設定と MOD 一覧は上部の「ゲームと MOD」にあります。Mac はゲーム試遊非対応です。</p><aside>転換時間は目安です。音声、フィルター、戦闘などの実際の効果はゲーム内で確認してください。</aside>
+
+<h2 id="flow">5. 選択肢を試す</h2>
+<h3>5-1. 選択肢まで進み、「一緒に稽古する」を押す</h3>
+<p>06番から画面を2回クリックすると、08番の選択肢が出ます。画面内の下のボタン「一緒に稽古する」を選びます。</p>
+<figure><a href="../../../../../docs/images/native-editor/12-choose-training.png"><img src="../../../../../docs/images/native-editor/12-choose-training.png" alt="選択肢まで進み、「一緒に稽古する」を押す" width="536" height="460"></a><figcaption>選択肢まで進み、「一緒に稽古する」を押す</figcaption></figure>
+<h3>5-2. 選んだ先の台詞を確認する</h3>
+<p>11番の「大師兄、お手柔らかに。」が表示されます。別の分岐を試すときは、左の「08 選択肢分岐」を選び、「少し休む」を押します。</p>
+<figure><a href="../../../../../docs/images/native-editor/13-branch-result.png"><img src="../../../../../docs/images/native-editor/13-branch-result.png" alt="選んだ先の台詞を確認する" width="536" height="460"></a><figcaption>選んだ先の台詞を確認する</figcaption></figure>
+<nav><a href="#preview">前へ：4. 再生して台詞を進める</a> · <a href="#save">次へ：6. 保存して開き直す</a></nav>
+<h3>補足：選択肢・ジャンプ・終了を設定する</h3>
+<p>ジャンプがなければ左側の順序で再生します。選択肢や条件分岐で行き先を変えられます。</p><ol><li>選択後に表示する会話を先に用意。</li><li>選択肢分岐を追加し、文章と行き先を設定。</li><li>F7 で経路を確認してから各ルートを再生。</li></ol><h3>シナリオ終了の設定</h3><ul><li>次の章が空欄：章を終えて自由モードへ戻る。</li><li>次の章を指定：終了後にその章を再生する。</li></ul><pre>独立した話：会話 → 終了（次の章は空欄）
+続きのある話：会話 → 終了（次の章を選択）</pre><aside>フラグは「人物に会った」などの記録。条件分岐でその記録を確認できます。</aside>
+
+<h2 id="save">6. 保存して開き直す</h2>
+<h3>6-1. 「ファイル → 全章を保存」を押す</h3>
+<p>編集したコピーへ保存します。Windows・LinuxはCtrl+S、macOSは⌘Sでも保存できます。</p>
+<figure><a href="../../../../../docs/images/native-editor/14-save-menu.png"><img src="../../../../../docs/images/native-editor/14-save-menu.png" alt="「ファイル → 全章を保存」を押す" width="310" height="354"></a><figcaption>「ファイル → 全章を保存」を押す</figcaption></figure>
+<h3>6-2. 画面左下の「保存済み」を確認する</h3>
+<p>この表示になれば保存できています。保存するまで、変更は開いているエディター内だけにあります。</p>
+<figure><a href="../../../../../docs/images/native-editor/15-saved.png"><img src="../../../../../docs/images/native-editor/15-saved.png" alt="画面左下の「保存済み」を確認する" width="173" height="44"></a><figcaption>画面左下の「保存済み」を確認する</figcaption></figure>
+<h3>6-3. 「最近使ったファイル」から同じコピーを開く</h3>
+<p>「ファイル → 最近使ったファイル」を開き、いま保存したfirst-scene-…を選びます。「サンプルから始める」を選ぶと別のコピーができるので、続きを編集するときは最近使ったファイルを使います。</p>
+<figure><a href="../../../../../docs/images/native-editor/16-recent-project.png"><img src="../../../../../docs/images/native-editor/16-recent-project.png" alt="「最近使ったファイル」から同じコピーを開く" width="1940" height="811"></a><figcaption>「最近使ったファイル」から同じコピーを開く</figcaption></figure>
+<h3>6-4. 05番を選び、「Hello!」が残っていることを確認する</h3>
+<p>中央のテキストと右の会話文を確認できれば、編集・再生・保存・開き直しを一通り完了です。次は好きな台詞に変えてみてください。F6で現在の章を検査できます。</p>
+<figure><a href="../../../../../docs/images/native-editor/17-reopened.png"><img src="../../../../../docs/images/native-editor/17-reopened.png" alt="05番を選び、「Hello!」が残っていることを確認する" width="1256" height="600"></a><figcaption>05番を選び、「Hello!」が残っていることを確認する</figcaption></figure>
+<nav><a href="#flow">前へ：5. 選択肢を試す</a></nav>
 <h2 id="characters">人物の登場と会話</h2>
 <p>登場は立ち絵を配置し、会話は台詞を表示します。登場してから移動や退場を設定します。</p><pre>背景変更 → 人物登場 → 会話 → 人物退場 → 終了</pre><ol><li>ステップ追加の演出から背景と人物を加えます。</li><li>人物、表情、位置を選択。すぐに配置する場合はフェードと移動時間を両方 0 にします。</li><li>会話で同じ人物を選び、台詞を入力。情景描写にはナレーションを使います。</li></ol><aside>立ち絵が見えない場合は素材庫を読み込んでください。素材の項目で手順を確認できます。</aside>
-<figure><a href="../../../../../docs/images/native-editor/dialogue.png"><img src="../../../../../docs/images/native-editor/dialogue.png" alt="左で台詞を選び、中央で本文・人物・表情を編集すると、右側のプレビューに反映されます。" width="1280" height="760"></a><figcaption>左で台詞を選び、中央で本文・人物・表情を編集すると、右側のプレビューに反映されます。</figcaption></figure>
 <h2 id="parallel">複数の動作を同時に実行</h2>
 <p>通常のステップは順番に進みます。同時実行グループはすべて一緒に始まり、全動作が終わってから次へ進みます。</p><h3>例：二人が同時に退場</h3><ol><li>二人を登場させ、同時実行グループを追加。</li><li>人物退場を二つ加え、別々の人物を選択。</li><li>両方を 0.5 秒に設定。続く会話はグループの外に置きます。</li></ol><pre>同時実行グループ
   人物 A 退場：0.5 秒
@@ -15,19 +84,8 @@
 次の会話</pre><aside>一組 2～32 動作。同一人物や画面チャンネルは重複操作できません。会話、選択肢、戦闘、ジャンプは外に配置。音楽・効果音・ループ効果は開始時に完了扱いのため、必要なら待機を加えます。</aside>
 <h2 id="transition">場面を開く前に人物を配置</h2>
 <p>暗幕を掛け、その裏で背景と人物を準備し、最後に暗幕を開きます。</p><ol><li>トランジションのインで暗幕を掛ける。</li><li>背景を変更する。</li><li>人物を登場させ、フェードと移動時間を 0 にする。複数なら同時実行グループを使う。</li><li>トランジションのアウトで暗幕を開く。</li></ol><pre>暗幕を掛ける → 背景変更・人物配置 → 暗幕を開く → 会話</pre><aside>イン／アウトは暗幕の出現／消失です。エディターの時間は確認用の目安で、実際の時間はゲーム側で決まります。</aside>
-<h2 id="assets">プレビューに素材を表示</h2>
-<p>ファイル → ゲームからプレビュー素材を抽出…から、Mortal_Data を含むゲームフォルダーを選択すると、抽出後に自動で読み込みます。既存の素材集は preview_map.json と assets を含むフォルダー全体を選択します。通常の画像フォルダーは直接読み込めません。</p><p>主要人物は「人物 → 外観 → 表情」の順に選びます。外観ごとに使用可能な表情のみ表示します。外観変更後に使えない表情は通常表情に戻ります。別の公式人物設定へ切り替える場合は、古い外観を退場させてから新しい外観を登場させます。</p>
-<p>ゲームのプレビュー素材はこの端末に保存します。自作素材はユーザーコンテンツから作品に追加します。</p><h3>ゲーム画像を抽出する</h3><ol><li>上部の素材管理からゲームプレビュー素材を開く。</li><li>ゲームプレビュー素材で一括抽出を選ぶ。</li><li>自分のゲームフォルダーを指定。立ち絵、表情、背景、会話UIを抽出して自動で読み込みます。</li></ol><p>既存の素材庫はファイルメニューから選択。プレビュー画像は作品に自動では含まれません。</p><h3>自作素材を取り込む</h3><p>素材管理の作品の素材から素材インポートで追加し、ステップのフォームで選びます。見えないときは素材庫と人物・表情を確認して先頭から再生してください。</p>
-<figure><a href="../../../../../docs/images/native-editor/start-menu.png"><img src="../../../../../docs/images/native-editor/start-menu.png" alt="ファイルメニュー下部の「ゲームからプレビュー素材を抽出…」を選びます。立ち絵・背景・会話UIをまとめて準備できます。" width="1280" height="760"></a><figcaption>ファイルメニュー下部の「ゲームからプレビュー素材を抽出…」を選びます。立ち絵・背景・会話UIをまとめて準備できます。</figcaption></figure>
-<h2 id="flow">選択肢、ジャンプ、終了</h2>
-<p>ジャンプがなければ左側の順序で再生します。選択肢や条件分岐で行き先を変えられます。</p><ol><li>選択後に表示する会話を先に用意。</li><li>選択肢分岐を追加し、文章と行き先を設定。</li><li>F7 で経路を確認してから各ルートを再生。</li></ol><h3>シナリオ終了の設定</h3><ul><li>次の章が空欄：章を終えて自由モードへ戻る。</li><li>次の章を指定：終了後にその章を再生する。</li></ul><pre>独立した話：会話 → 終了（次の章は空欄）
-続きのある話：会話 → 終了（次の章を選択）</pre><aside>フラグは「人物に会った」などの記録。条件分岐でその記録を確認できます。</aside>
-<figure><a href="../../../../../docs/images/native-editor/choices.png"><img src="../../../../../docs/images/native-editor/choices.png" alt="中央で選択肢の文章と行き先を設定し、右側のボタンを押して分岐先を確認します。" width="1280" height="760"></a><figcaption>中央で選択肢の文章と行き先を設定し、右側のボタンを押して分岐先を確認します。</figcaption></figure>
 <h2 id="checks">検査結果の読み方</h2>
 <p>結果ウィンドウの結論を先に読み、問題の場所へ戻って修正します。元のデータは技術詳細にあります。</p><ul><li>正常：今回の検査では問題なし。</li><li>修正が必要：表示された項目を修正。</li><li>ゲーム内確認待ち：オフラインでは判断できず、まだ合格ではない。</li></ul><p>F6 は現在の章。全体の検査は公開ページの公開検査・梱包から行います。</p><aside>長い処理は畳んで編集を続けられます。下部から進捗や結果を再表示でき、完了時にも通知します。</aside>
-<h2 id="preview">プレビューとゲーム試遊</h2>
-<p>右側の再生はエディター内で台詞、位置、同時動作、暗幕を確認する機能です。ゲームは起動しません。</p><ul><li>先頭で章の最初へ戻る。一時停止後は続行可能。</li><li>別のステップを選ぶと停止。</li><li>F7 でフローチャート。</li></ul><p>Windows の試遊または F5 は検査後に独立した一時パッケージを作りゲームを起動します。ゲームの設定と MOD 一覧は上部の「ゲームと MOD」にあります。Mac はゲーム試遊非対応です。</p><aside>転換時間は目安です。音声、フィルター、戦闘などの実際の効果はゲーム内で確認してください。</aside>
-<figure><a href="../../../../../docs/images/native-editor/choices.png"><img src="../../../../../docs/images/native-editor/choices.png" alt="台詞は画面クリックで進み、選択肢はボタンで選びます。台詞待ちの間もBGMは続き、「停止」で音と進行を止めます。" width="1280" height="760"></a><figcaption>台詞は画面クリックで進み、選択肢はボタンで選びます。台詞待ちの間もBGMは続き、「停止」で音と進行を止めます。</figcaption></figure>
 <h2 id="terms">用語をやさしく説明</h2>
 <p>フォームでの制作にプログラミング知識は不要です。</p><ul><li>ノード：物語の一つのステップ。</li><li>フラグ：出来事が起きたかを記録。</li><li>条件分岐：記録や数値で行き先を選ぶ。</li><li>素材庫：この端末で表示する画像集。</li><li>作品パッケージ：書き出した .lommod ファイル。</li><li>ホスト：ゲームに作品を読み込ませる接続部品。</li><li>API：プログラムから使う機能の入口。</li><li>Lua：エディターが手順から生成するコード。通常は手書き不要。</li></ul>
 <h2 id="settings">保存、言語、ショートカット</h2>

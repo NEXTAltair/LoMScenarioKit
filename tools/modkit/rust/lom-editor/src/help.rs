@@ -17,6 +17,11 @@ enum Block {
     Note(String),
     Example(String),
     Image { source: String, caption: String },
+    Navigation { links: Vec<(String, String)> },
+}
+enum HelpAction {
+    Zoom(String, String),
+    Guide(String),
 }
 #[derive(Debug)]
 struct Article {
@@ -42,10 +47,11 @@ fn plain(html: &str) -> String {
 fn parse(html: &str) -> Vec<Article> {
     let headings = regex::Regex::new(r#"(?s)<h2 id="([^"]+)">(.*?)</h2>"#).unwrap();
     let blocks = regex::Regex::new(
-        r"(?s)<(p|h3|ol|ul|aside|pre|figure)>(.*?)</(?:p|h3|ol|ul|aside|pre|figure)>",
+        r"(?s)<(p|h3|ol|ul|aside|pre|figure|nav)>(.*?)</(?:p|h3|ol|ul|aside|pre|figure|nav)>",
     )
     .unwrap();
     let image_source = regex::Regex::new(r#"<img\s+src="([^"]+)""#).unwrap();
+    let guide_links = regex::Regex::new(r##"<a href="#([^"]+)">(.*?)</a>"##).unwrap();
     let items = regex::Regex::new(r"(?s)<li>(.*?)</li>").unwrap();
     let sections: Vec<_> = headings.captures_iter(html).collect();
     sections
@@ -71,6 +77,12 @@ fn parse(html: &str) -> Vec<Article> {
                         },
                         "aside" => Block::Note(plain(&c[2])),
                         "pre" => Block::Example(plain(&c[2])),
+                        "nav" => Block::Navigation {
+                            links: guide_links
+                                .captures_iter(&c[2])
+                                .map(|link| (link[1].to_owned(), plain(&link[2])))
+                                .collect(),
+                        },
                         "figure" => Block::Image {
                             source: image_source
                                 .captures(&c[2])
@@ -392,10 +404,19 @@ impl HelpDocument {
                                                 &i18n::key("help.guide_tab"),
                                                 &article.title,
                                             );
-                                            if let Some(image) =
+                                            if let Some(action) =
                                                 render_blocks(ui, &article.blocks, &mut self.images)
                                             {
-                                                self.zoomed = Some(image);
+                                                match action {
+                                                    HelpAction::Zoom(source, caption) => {
+                                                        self.zoomed = Some((source, caption))
+                                                    }
+                                                    HelpAction::Guide(id) => {
+                                                        self.guide = id;
+                                                        self.search.clear();
+                                                        self.reset_scroll = true;
+                                                    }
+                                                }
                                                 ctx.request_repaint();
                                             }
                                         } else {
@@ -571,14 +592,56 @@ fn screenshot_bytes(source: &str) -> Option<&'static [u8]> {
     // Only bundled documentation images are supported. Never fetch URLs or
     // resolve arbitrary local paths while reading a help article.
     match source.rsplit('/').next()? {
-        "start-menu.png" => Some(include_bytes!(
-            "../../../../../docs/images/native-editor/start-menu.png"
+        "01-open-sample.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/01-open-sample.png"
         )),
-        "dialogue.png" => Some(include_bytes!(
-            "../../../../../docs/images/native-editor/dialogue.png"
+        "02-sample-open.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/02-sample-open.png"
         )),
-        "choices.png" => Some(include_bytes!(
-            "../../../../../docs/images/native-editor/choices.png"
+        "03-extract-menu.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/03-extract-menu.png"
+        )),
+        "04-game-folder.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/04-game-folder.png"
+        )),
+        "05-extraction-progress.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/05-extraction-progress.png"
+        )),
+        "06-assets-ready.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/06-assets-ready.png"
+        )),
+        "07-select-dialogue.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/07-select-dialogue.png"
+        )),
+        "08-edited-dialogue.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/08-edited-dialogue.png"
+        )),
+        "09-rewind.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/09-rewind.png"
+        )),
+        "10-playing.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/10-playing.png"
+        )),
+        "11-next-dialogue.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/11-next-dialogue.png"
+        )),
+        "12-choose-training.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/12-choose-training.png"
+        )),
+        "13-branch-result.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/13-branch-result.png"
+        )),
+        "14-save-menu.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/14-save-menu.png"
+        )),
+        "15-saved.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/15-saved.png"
+        )),
+        "16-recent-project.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/16-recent-project.png"
+        )),
+        "17-reopened.png" => Some(include_bytes!(
+            "../../../../../docs/images/native-editor/17-reopened.png"
         )),
         _ => None,
     }
@@ -609,8 +672,8 @@ fn render_blocks(
     ui: &mut egui::Ui,
     blocks: &[Block],
     images: &mut BTreeMap<String, egui::TextureHandle>,
-) -> Option<(String, String)> {
-    let mut zoomed = None;
+) -> Option<HelpAction> {
+    let mut action = None;
     for block in blocks {
         match block {
             Block::Paragraph(text) => {
@@ -631,12 +694,20 @@ fn render_blocks(
                         .on_hover_text(tr("点击图片放大"))
                         .clicked()
                     {
-                        zoomed = Some((source.clone(), caption.clone()));
+                        action = Some(HelpAction::Zoom(source.clone(), caption.clone()));
                     }
                 }
                 ui.add(egui::Label::new(RichText::new(caption).small()).wrap());
             }
             Block::Note(text) => note(ui, text),
+            Block::Navigation { links } => {
+                ui.separator();
+                for (target, label) in links {
+                    if ui.add(egui::Button::new(label).wrap()).clicked() {
+                        action = Some(HelpAction::Guide(target.clone()));
+                    }
+                }
+            }
             Block::Example(text) => {
                 egui::Frame::new()
                     .fill(Color32::from_rgb(247, 248, 249))
@@ -670,7 +741,7 @@ fn render_blocks(
             }
         }
     }
-    zoomed
+    action
 }
 
 #[cfg(test)]
@@ -687,14 +758,117 @@ mod tests {
                         assert!(!caption.is_empty(), "{locale}/{}", article.id);
                         let bytes = screenshot_bytes(&source).expect("bundled help image");
                         let image = image::load_from_memory(bytes).unwrap();
-                        assert_eq!((image.width(), image.height()), (1280, 760));
+                        assert!(image.width() >= 150 && image.height() >= 30, "{source}");
                         count += 1;
                     }
                 }
             }
-            assert_eq!(count, 5, "{locale}");
+            assert_eq!(count, 17, "{locale}");
         }
         assert!(screenshot_bytes("https://example.com/unknown.png").is_none());
+    }
+
+    #[test]
+    fn tutorial_links_follow_the_same_sequence_in_every_locale() {
+        let sequence = ["start", "assets", "edit", "preview", "flow", "save"];
+        for locale in i18n::LOCALES {
+            let articles = parse(i18n::help_html(locale));
+            assert_eq!(
+                articles
+                    .iter()
+                    .take(6)
+                    .map(|a| a.id.as_str())
+                    .collect::<Vec<_>>(),
+                sequence
+            );
+            for (index, article) in articles.iter().take(6).enumerate() {
+                let links = article
+                    .blocks
+                    .iter()
+                    .find_map(|block| match block {
+                        Block::Navigation { links } => Some(links),
+                        _ => None,
+                    })
+                    .expect("tutorial previous/next links");
+                let expected: Vec<_> = index
+                    .checked_sub(1)
+                    .into_iter()
+                    .chain((index + 1 < sequence.len()).then_some(index + 1))
+                    .map(|i| sequence[i])
+                    .collect();
+                assert_eq!(
+                    links.iter().map(|(id, _)| id.as_str()).collect::<Vec<_>>(),
+                    expected
+                );
+                assert!(links.iter().all(|(_, label)| !label.is_empty()));
+            }
+        }
+    }
+
+    #[test]
+    fn next_tutorial_button_opens_the_next_article_from_the_top() {
+        let ctx = egui::Context::default();
+        ctx.enable_accesskit();
+        let mut doc = HelpDocument::default();
+        doc.open_guide();
+        let draw = |doc: &mut HelpDocument, events| {
+            ctx.run(
+                egui::RawInput {
+                    screen_rect: Some(egui::Rect::from_min_size(
+                        egui::Pos2::ZERO,
+                        egui::vec2(1280.0, 760.0),
+                    )),
+                    events,
+                    ..Default::default()
+                },
+                |ctx| {
+                    doc.show(ctx);
+                },
+            )
+        };
+        draw(&mut doc, vec![]);
+        let output = draw(&mut doc, vec![]);
+        let next = output
+            .platform_output
+            .accesskit_update
+            .unwrap()
+            .nodes
+            .into_iter()
+            .find_map(|(id, node)| {
+                (node.role() == egui::accesskit::Role::Button
+                    && node
+                        .label()
+                        .is_some_and(|label| label.starts_with("下一步：2.")))
+                .then_some(id)
+            })
+            .expect("next tutorial button");
+        draw(
+            &mut doc,
+            vec![egui::Event::AccessKitActionRequest(
+                egui::accesskit::ActionRequest {
+                    action: egui::accesskit::Action::Click,
+                    target: next,
+                    data: None,
+                },
+            )],
+        );
+        assert_eq!(doc.guide, "assets");
+        assert!(doc.reset_scroll);
+        let output = draw(&mut doc, vec![]);
+        let heading = output
+            .platform_output
+            .accesskit_update
+            .unwrap()
+            .nodes
+            .into_iter()
+            .find_map(|(_, node)| {
+                node.label()
+                    .or_else(|| node.value())
+                    .filter(|label| label.starts_with("2-1."))
+                    .and_then(|_| node.bounds())
+            })
+            .expect("first instruction on next page");
+        assert!(heading.y0 >= 0.0 && heading.y1 <= 760.0, "{heading:?}");
     }
 
     #[test]
@@ -704,7 +878,7 @@ mod tests {
             ctx.enable_accesskit();
             let mut doc = HelpDocument::default();
             doc.open_guide();
-            doc.zoomed = Some(("choices.png".into(), "Screenshot caption".into()));
+            doc.zoomed = Some(("12-choose-training.png".into(), "Screenshot caption".into()));
             let input = egui::RawInput {
                 screen_rect: Some(egui::Rect::from_min_size(egui::Pos2::ZERO, size)),
                 ..Default::default()
@@ -778,13 +952,14 @@ mod tests {
                     })
                     .unwrap_or_else(|| panic!("Missing {prefix}: {nodes:?}"))
             };
-            let intro = bounds("先写一段能从头播到尾");
-            let heading = bounds("从一句对白开始");
-            let step_one = bounds("在“文件”中选择");
-            let step_two = bounds("选中左侧“对白");
+            let intro = bounds("先把示例的第一句对白");
+            let heading = bounds("1-1.");
+            let step_one = bounds("打开顶部的“文件”菜单");
             assert!(intro.width() >= 300.0, "Unreadable column: {intro:?}");
-            assert!(heading.y0 >= intro.y1 && step_one.y0 >= heading.y1 && step_two.y0 >= step_one.y1,
-                "Article must flow top to bottom: {intro:?}, {heading:?}, {step_one:?}, {step_two:?}");
+            assert!(
+                heading.y0 >= intro.y1 && step_one.y0 >= heading.y1,
+                "Article must flow top to bottom: {intro:?}, {heading:?}, {step_one:?}"
+            );
             let close = bounds(&i18n::key("help.close"));
             assert!(
                 close.x0 >= 0.0
@@ -802,7 +977,7 @@ mod tests {
             .into_iter()
             .map(|a| a.id)
             .collect();
-        assert_eq!(ids.len(), 10);
+        assert_eq!(ids.len(), 12);
         for locale in i18n::LOCALES {
             let guide = parse(i18n::help_html(locale));
             assert_eq!(
