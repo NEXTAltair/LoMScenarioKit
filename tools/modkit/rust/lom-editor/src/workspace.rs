@@ -156,6 +156,7 @@ struct Snapshot {
 enum Pending {
     New,
     NewAddon,
+    FirstSample,
     Template(String),
     Recover(PathBuf),
     Open(PathBuf),
@@ -959,6 +960,19 @@ impl App {
             }
             Pending::New => self.install(new_addon_project()),
             Pending::NewAddon => self.install(Project::new_scenario("addon")),
+            Pending::FirstSample => {
+                match crate::first_sample::create(&user_root().join("projects")) {
+                    Ok(project) => {
+                        self.install(project);
+                        self.view = View::Stage;
+                        self.status =
+                            tr("示例副本已打开。点击右下角的播放；可在资料页阅读使用方法。");
+                    }
+                    Err(error) => {
+                        self.error = Some(format!("{}: {error:#}", tr("无法创建示例副本")))
+                    }
+                }
+            }
             Pending::Template(key) => match template_project(&key) {
                 Ok(project) => {
                     self.install(project);
@@ -1660,6 +1674,12 @@ impl App {
                         if ui.button(tr("新建 LoMScenarioAddon 项目")).clicked() {
                             ui.close();
                             self.request(Pending::New, ctx);
+                        }
+                        if ui.button(tr("从示例开始"))
+                            .on_hover_text(tr("用一段短对话练习背景、立绘、表情、音乐和选项。创建可直接保存的编辑副本。"))
+                            .clicked() {
+                            ui.close();
+                            self.request(Pending::FirstSample, ctx);
                         }
                         if ui.button(tr("新建 MortalModHost 项目（兼容）")).clicked() {
                             ui.close();
@@ -6325,6 +6345,20 @@ mod application_regression_tests {
                 lom_core::validate::validate_story(story).unwrap();
             }
         }
+    }
+    #[test]
+    fn sample_request_preserves_unsaved_work_until_the_existing_save_decision() {
+        let mut app = app();
+        let ctx = egui::Context::default();
+        app.project.stories.get_mut("main").unwrap()["nodes"][0]["text"] = json!("編集中の台詞");
+        app.track();
+        let before = snapshot(&app.project);
+        app.request(Pending::FirstSample, &ctx);
+        assert!(matches!(app.pending, Some(Pending::FirstSample)));
+        assert!(snapshot(&app.project) == before);
+        app.pending = None; // Cancel the same confirmation used by New/Open.
+        assert!(snapshot(&app.project) == before);
+        assert!(app.dirty());
     }
     #[test]
     fn reading_every_main_panel_preserves_project() {

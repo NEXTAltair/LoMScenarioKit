@@ -1,0 +1,32 @@
+{
+  "format": 3,
+  "package_format": 3,
+  "story_schema": 2,
+  "content_schema": 1,
+  "target": "LoMScenarioAddon",
+  "id": "lsa_first_scene",
+  "name": "サンプル：裏山でひと休み",
+  "version": "0.1.0",
+  "author": "NEXTAltair",
+  "entry": "lsa_first_scene_main",
+  "description": "背景・立ち絵・表情・BGM・選択肢を試す短い会話。",
+  "_editor": {
+    "scenario_addon": {
+      "id": "lsa_first_scene",
+      "title": "裏山でひと休み",
+      "version": "0.1.0",
+      "default_language": "ja",
+      "flags": [],
+      "characters": [],
+      "events": [
+        {
+          "id": "lsa_first_scene_meet",
+          "position": "Back_Free_001",
+          "story": "lsa_first_scene_main",
+          "rate": 60,
+          "once": true
+        }
+      ]
+    }
+  }
+}

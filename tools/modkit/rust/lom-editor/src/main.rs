@@ -22,6 +22,7 @@ mod advanced;
 
 mod audio;
 mod content_panel;
+mod first_sample;
 mod manifest_panel;
 mod preview_music;
 mod review_panel;
