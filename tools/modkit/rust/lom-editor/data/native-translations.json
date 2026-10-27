@@ -3772,5 +3772,47 @@
     "ゲーム環境を再設定",
     "게임 환경 다시 설정",
     "Reconfigure game environment"
+  ],
+  "找不到音乐文件": [
+    "找不到音樂檔案",
+    "音楽ファイルが見つかりません",
+    "음악 파일을 찾을 수 없습니다",
+    "Music file not found"
+  ],
+  "无法播放音乐；请安装 FFplay，或用 LOM_FFPLAY 指定路径": [
+    "無法播放音樂；請安裝 FFplay，或用 LOM_FFPLAY 指定路徑",
+    "音楽を再生できません。FFplay をインストールするか、LOM_FFPLAY で実行ファイルを指定してください",
+    "음악을 재생할 수 없습니다. FFplay를 설치하거나 LOM_FFPLAY로 경로를 지정하세요",
+    "Cannot play music. Install FFplay or set LOM_FFPLAY to its executable"
+  ],
+  "请先在设置中选择游戏文件夹，再播放音乐": [
+    "請先在設定中選擇遊戲資料夾，再播放音樂",
+    "音楽を再生するには、設定でゲームフォルダーを選択してください",
+    "음악을 재생하려면 설정에서 게임 폴더를 선택하세요",
+    "Select the game folder in Settings to play music"
+  ],
+  "音乐准备失败": [
+    "音樂準備失敗",
+    "音楽を準備できませんでした",
+    "음악을 준비하지 못했습니다",
+    "Could not prepare music"
+  ],
+  "正在准备音乐…": [
+    "正在準備音樂…",
+    "音楽を準備しています…",
+    "음악 준비 중…",
+    "Preparing music…"
+  ],
+  "音频播放失败": [
+    "音訊播放失敗",
+    "音声を再生できませんでした",
+    "오디오 재생 실패",
+    "Audio playback failed"
+  ],
+  "无法读取试听播放状态": [
+    "無法讀取試聽播放狀態",
+    "音声の再生状態を確認できません",
+    "오디오 재생 상태를 확인할 수 없습니다",
+    "Could not read audio playback status"
   ]
 }

@@ -45,3 +45,9 @@ Noto Sans CJK Regular 2.004を改変せず同梱しています。Copyright 2014
 - 取得元・固定コミット・SHA-256: [フォントの記録](tools/modkit/rust/lom-editor/assets/fonts/README.md)
 
 フォントはエディターに埋め込み、対応するソースZIPにも原ファイルと表記を含めます。
+
+## プレビュー音楽の変換
+
+[ww2ogg](https://github.com/hcs64/ww2ogg) のコミット `14ed9b0dd62e815a38702b5f03c57006cbe2501b` を使用します。BSD 3-Clauseの[ライセンス全文](tools/modkit/third-party/ww2ogg/COPYING)、無改変のソース、コードブック、取得ハッシュを `tools/modkit/third-party/ww2ogg/` に保存しています。ビルド時に変換用実行ファイルを生成し、コードブックと許諾表示を抽出ヘルパーへ同梱します。対応するソースZIPにも原ファイルを含めます。ゲームから取り出したWEM・OGGは配布物に含めません。
+
+音楽の再生には利用者が用意したFFplayを外部プロセスとして呼び出します。FFplayのバイナリは同梱しません。

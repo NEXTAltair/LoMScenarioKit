@@ -146,6 +146,10 @@ impl Default for ToolsPanel {
     }
 }
 impl ToolsPanel {
+    pub fn game_folder(&self) -> &std::path::Path {
+        &self.game
+    }
+
     pub fn take_location(&mut self) -> Option<crate::advanced::Location> {
         self.location.take()
     }

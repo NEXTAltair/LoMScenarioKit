@@ -7,13 +7,57 @@ use std::{
 #[derive(Default)]
 pub struct Player {
     child: Option<Child>,
+    errors: Option<tempfile::NamedTempFile>,
+    #[cfg(test)]
+    pub test_program: Option<std::path::PathBuf>,
 }
 impl Player {
+    /// Decode to the resume offset: converted Wwise OGGs lack reliable seeking
+    /// granules. FFplay's -ss can otherwise exit successfully without any sound.
+    pub fn play_music(&mut self, path: &Path, offset: f64, fade: Option<f64>) -> Result<()> {
+        ensure!(path.is_file(), "{}", crate::i18n::tr("找不到音乐文件"));
+        self.stop();
+        let player = ffplay();
+        #[cfg(test)]
+        let player = self.test_program.clone().unwrap_or(player);
+        let mut command = Command::new(player);
+        command
+            .args(["-nodisp", "-autoexit", "-nostats", "-loglevel", "error"])
+            .args(["-loop", "1", "-i"])
+            .arg(path);
+        let mut filter = format!("atrim=start={},asetpts=PTS-STARTPTS", offset.max(0.0));
+        if let Some(seconds) = fade {
+            filter.push_str(&format!(",afade=t=out:st=0:d={}", seconds.max(0.001)));
+        }
+        command.arg("-af").arg(filter);
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            command.creation_flags(0x0800_0000);
+        }
+        self.launch(&mut command).context(crate::i18n::tr(
+            "无法播放音乐；请安装 FFplay，或用 LOM_FFPLAY 指定路径",
+        ))?;
+        Ok(())
+    }
     pub fn stop(&mut self) {
         if let Some(mut child) = self.child.take() {
             let _ = child.kill();
             let _ = child.wait();
         }
+        self.errors = None;
+    }
+    fn launch(&mut self, command: &mut Command) -> Result<()> {
+        let errors = tempfile::NamedTempFile::new()?;
+        self.child = Some(
+            command
+                .stdin(Stdio::null())
+                .stdout(Stdio::null())
+                .stderr(errors.reopen()?)
+                .spawn()?,
+        );
+        self.errors = Some(errors);
+        Ok(())
     }
     pub fn update(&mut self) -> Result<()> {
         let Some(child) = self.child.as_mut() else {
@@ -23,12 +67,23 @@ impl Player {
             Ok(status) => status,
             Err(error) => {
                 self.stop();
-                return Err(error).context("无法读取试听播放状态");
+                return Err(error).context(crate::i18n::tr("无法读取试听播放状态"));
             }
         };
         if let Some(status) = status {
             self.child = None;
-            ensure!(status.success(), "音频试听失败（{status}）");
+            use std::io::Read;
+            let mut details = String::new();
+            if let Some(log) = self.errors.take() {
+                log.reopen()?.take(8192).read_to_string(&mut details)?;
+            }
+            // FFplay can return success even when its decoder/audio device failed.
+            ensure!(
+                status.success() && details.trim().is_empty(),
+                "{} ({status}): {}",
+                crate::i18n::tr("音频播放失败"),
+                details.trim()
+            );
         }
         Ok(())
     }
@@ -59,18 +114,16 @@ impl Player {
             .env("LOM_PREVIEW_AUDIO", path);
             c
         } else {
-            let player = std::env::var_os("LOM_FFPLAY")
-                .map(std::path::PathBuf::from)
-                .or_else(|| {
-                    ["/opt/homebrew/bin/ffplay", "/usr/local/bin/ffplay"]
-                        .into_iter()
-                        .map(std::path::PathBuf::from)
-                        .find(|p| p.is_file())
-                })
-                .unwrap_or_else(|| "ffplay".into());
-            let mut c = Command::new(player);
-            c.args(["-nodisp", "-autoexit", "-loglevel", "error", "-i"])
-                .arg(path);
+            let mut c = Command::new(ffplay());
+            c.args([
+                "-nodisp",
+                "-autoexit",
+                "-nostats",
+                "-loglevel",
+                "error",
+                "-i",
+            ])
+            .arg(path);
             c
         };
         #[cfg(windows)]
@@ -78,20 +131,74 @@ impl Player {
             use std::os::windows::process::CommandExt;
             command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
         }
-        self.child = Some(
-            command
-                .stdin(Stdio::null())
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .spawn()
-                .context("无法启动试听；OGG 需要 FFplay（可用 LOM_FFPLAY 指定路径）")?,
-        );
+        self.launch(&mut command)
+            .context("无法启动试听；OGG 需要 FFplay（可用 LOM_FFPLAY 指定路径）")?;
         Ok(())
     }
+}
+fn ffplay() -> std::path::PathBuf {
+    std::env::var_os("LOM_FFPLAY")
+        .map(std::path::PathBuf::from)
+        .or_else(|| {
+            [
+                "/opt/homebrew/bin/ffplay",
+                "/usr/local/bin/ffplay",
+                "/home/linuxbrew/.linuxbrew/bin/ffplay",
+            ]
+            .into_iter()
+            .map(std::path::PathBuf::from)
+            .find(|p| p.is_file())
+        })
+        .unwrap_or_else(|| "ffplay".into())
 }
 impl Drop for Player {
     fn drop(&mut self) {
         self.stop();
+    }
+}
+
+#[cfg(all(test, unix))]
+mod lifecycle_tests {
+    use super::*;
+    #[test]
+    fn dropping_player_reaps_its_process() {
+        let child = Command::new("sleep").arg("60").spawn().unwrap();
+        let pid = child.id();
+        let player = Player {
+            child: Some(child),
+            errors: None,
+            test_program: None,
+        };
+        drop(player);
+        assert!(!Command::new("kill")
+            .args(["-0", &pid.to_string()])
+            .stderr(Stdio::null())
+            .status()
+            .unwrap()
+            .success());
+    }
+
+    #[test]
+    fn decoder_error_with_success_exit_is_reported_once() {
+        let mut player = Player::default();
+        let mut command = Command::new("sh");
+        command.args(["-c", "echo 'invalid audio' >&2; exit 0"]);
+        player.launch(&mut command).unwrap();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        loop {
+            match player.update() {
+                Err(error) => {
+                    assert!(error.to_string().contains("invalid audio"));
+                    break;
+                }
+                Ok(()) => {
+                    assert!(std::time::Instant::now() < deadline);
+                    std::thread::sleep(std::time::Duration::from_millis(10));
+                }
+            }
+        }
+        assert!(!player.playing());
+        player.update().unwrap();
     }
 }
 
@@ -118,7 +225,7 @@ mod tests {
         let mut player = Player::default();
         player.play(&path).unwrap();
         let error = wait_for_completion(&mut player).unwrap_err();
-        assert!(error.to_string().contains("音频试听失败"));
+        assert!(error.to_string().contains(&crate::i18n::tr("音频播放失败")));
         assert!(error.to_string().contains("exit code: 1"));
         assert!(!player.playing());
         player.update().unwrap();

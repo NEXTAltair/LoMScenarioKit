@@ -46,6 +46,8 @@ class EditorBuildTests(unittest.TestCase):
             folder = Path(args[args.index("--output-dir") + 1]) / "lom-asset-extractor"
             self.write(folder / editor.helper_name(), "new executable")
             self.write(folder / "_internal/runtime", "runtime")
+            self.write(folder / ("ww2ogg.exe" if editor.os.name == "nt" else "ww2ogg"), "decoder")
+            self.write(folder / "packed_codebooks_aoTuV_603.bin", "codebook")
             self.write(folder / "third-party-licenses/dependencies.txt", "license fixtures")
 
     def test_initial_prepare_reuses_exact_inputs_and_builds_in_private_environment(self):

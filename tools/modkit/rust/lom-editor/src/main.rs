@@ -23,6 +23,7 @@ mod advanced;
 mod audio;
 mod content_panel;
 mod manifest_panel;
+mod preview_music;
 mod review_panel;
 mod scenario_panel;
 mod scenario_quick;

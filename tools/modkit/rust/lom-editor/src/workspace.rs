@@ -302,6 +302,7 @@ struct App {
     advanced: crate::advanced::Advanced,
     content_panel: crate::content_panel::ContentPanel,
     audio: crate::audio::Player,
+    music: crate::preview_music::Music,
     review_panel: crate::review_panel::Panel,
     disk_revision: Option<String>,
     last_sync: Instant,
@@ -579,6 +580,7 @@ impl App {
             advanced: crate::advanced::Advanced::default(),
             content_panel: Default::default(),
             audio: Default::default(),
+            music: Default::default(),
             review_panel: Default::default(),
             disk_revision,
             last_sync: Instant::now(),
@@ -996,6 +998,7 @@ impl App {
         self.rename_dialog = None;
         self.asset_import_dialog = None;
         self.audio.stop();
+        self.music.reset();
         self.auto = false;
         self.preview_elapsed = None;
         self.remember_source();
@@ -2512,6 +2515,7 @@ impl App {
     fn sync_preview_selection(&mut self) {
         let location = (self.current.clone(), self.selected);
         if self.preview_location != location {
+            self.music.reset();
             self.preview_location = location;
             self.auto = false;
             self.preview_elapsed = None;
@@ -2685,6 +2689,12 @@ impl App {
                                         }
                                     }
                                 });
+                                if self.music.preparing() {
+                                    ui.horizontal(|ui| {
+                                        ui.spinner();
+                                        ui.label(tr("正在准备音乐…"));
+                                    });
+                                }
                                 let node = &story["nodes"][self.selected];
                                 if node["type"] == "transition" {
                                     ui.label(RichText::new(tr("黑幕转场预览（节奏示意）")).small());
@@ -4356,7 +4366,34 @@ impl eframe::App for App {
             self.remember_source();
         }
         self.sync_preview_selection();
+        let music_story = self.story();
+        let cue = preview::music_cue(
+            &music_story,
+            music_story["nodes"][self.selected]["id"]
+                .as_str()
+                .unwrap_or(""),
+        );
+        let waiting_for_music = match self.music.sync(
+            cue,
+            self.auto,
+            &self.project,
+            self.tools_panel.game_folder(),
+            &user_root().join("rust/preview-music"),
+            self.last_step.elapsed().as_secs_f64(),
+        ) {
+            Ok(waiting) => waiting,
+            Err(error) => {
+                self.error = Some(format!("{error:#}"));
+                self.auto = false;
+                self.preview_elapsed = Some(self.last_step.elapsed().as_secs_f64());
+                false
+            }
+        };
+        if waiting_for_music {
+            self.last_step = Instant::now();
+        }
         if self.auto
+            && !waiting_for_music
             && self.last_step.elapsed().as_secs_f64()
                 >= preview::playback_duration(&self.story()["nodes"][self.selected])
         {

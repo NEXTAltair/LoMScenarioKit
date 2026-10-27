@@ -237,6 +237,9 @@ fn apply(s: &mut Value, n: &Value) {
         "parallel" => {
             for action in lom_core::parallel::actions(n) {
                 apply(s, action);
+                if action["type"] == "music" && s["music"].is_object() {
+                    s["music"]["origin"] = n["id"].clone();
+                }
             }
         }
         "transition" => {
@@ -302,15 +305,44 @@ fn apply(s: &mut Value, n: &Value) {
             }
         }
         "say" => {
-            if s["actors"].get(cid).is_some() {
+            if !cid.is_empty() && !matches!(text(n, "mode"), "narrative" | "center") {
+                if s["actors"].get(cid).is_none() {
+                    s["actors"][cid] = json!({"position":"M","facing":"right","appearance":null,"offset_x":0.0,"offset_y":0.0,"rotation":0.0,"dimmed":false});
+                }
                 s["actors"][cid]["portrait"] =
                     n.get("portrait").cloned().unwrap_or(json!("normal"));
             }
             s["dialog"] = n.clone();
         }
         "choice" => s["choice"] = n["options"].clone(),
+        "music" => {
+            s["music"] = if matches!(text(n, "op"), "stop" | "fadeout") {
+                Value::Null
+            } else {
+                json!({"name":n["name"],"origin":n["id"]})
+            };
+        }
+        "end" => s["music"] = Value::Null,
         _ => {}
     }
+}
+
+/// Reconstruct BGM at a selected step, including a fade currently in progress.
+pub fn music_cue(story: &Value, target: &str) -> Option<crate::preview_music::Cue> {
+    let node = story["nodes"]
+        .as_array()?
+        .iter()
+        .find(|n| n["id"] == target)?;
+    let fading = lom_core::parallel::actions(node)
+        .iter()
+        .find(|n| n["type"] == "music" && n["op"] == "fadeout");
+    let state = simulate_until(story, target, fading.is_none());
+    let music = &state["music"];
+    Some(crate::preview_music::Cue {
+        name: music["name"].as_str().filter(|s| !s.is_empty())?.into(),
+        origin: music["origin"].as_str().unwrap_or(target).into(),
+        fade: fading.map(|n| number(n, "seconds", 2.0).max(0.0)),
+    })
 }
 fn text<'a>(v: &'a Value, key: &str) -> &'a str {
     v[key].as_str().unwrap_or("")
@@ -347,11 +379,85 @@ pub fn playback_duration(node: &Value) -> f64 {
             .max(0.1)
     } else {
         match text(node, "type") {
+            "music" if node["op"] == "fadeout" => duration(node).max(0.1),
             "show" | "hide" | "move" | "offset" | "rotate" | "wait" | "transition" => {
                 duration(node).max(0.1)
             }
             _ => 1.8,
         }
+    }
+}
+
+#[cfg(test)]
+mod playback_regression_tests {
+    use super::*;
+
+    #[test]
+    fn speech_shows_its_speaker_without_show_and_keeps_existing_placement() {
+        let story = json!({"start":"talk","nodes":[
+            {"id":"talk","type":"say","character":"大媽2","portrait":"angry","text":"test"},
+            {"id":"move","type":"move","character":"大媽2","to":"L"},
+            {"id":"face","type":"face","character":"大媽2","facing":"left"},
+            {"id":"next","type":"say","character":"大媽2","portrait":"normal"},
+            {"id":"hide","type":"hide","character":"大媽2"},
+            {"id":"return","type":"say","character":"大媽2","mode":"think"}
+        ]});
+        let original = story.clone();
+        assert_eq!(
+            simulate(&story, "talk")["actors"]["大媽2"]["portrait"],
+            "angry"
+        );
+        let state = simulate(&story, "next");
+        assert_eq!(state["actors"]["大媽2"]["position"], "L");
+        assert_eq!(state["actors"]["大媽2"]["facing"], "left");
+        assert_eq!(state["actors"]["大媽2"]["portrait"], "normal");
+        assert_eq!(
+            simulate(&story, "return")["actors"]["大媽2"]["position"],
+            "M"
+        );
+        assert_eq!(story, original);
+        for mode in ["narrative", "center"] {
+            let story = json!({"nodes":[{"id":"n","type":"say","character":"player","mode":mode}]});
+            assert_eq!(simulate(&story, "n")["actors"], json!({}));
+        }
+    }
+
+    #[test]
+    fn music_follows_reachable_steps_and_stops_after_fade_or_end() {
+        let story = json!({"start":"music","nodes":[
+            {"id":"music","type":"music","name":"主題_001"},
+            {"id":"talk","type":"say","character":"player"},
+            {"id":"fade","type":"music","op":"fadeout","seconds":4.0},
+            {"id":"wait","type":"wait","seconds":2.0},
+            {"id":"again","type":"music","name":"傳奇_001"},
+            {"id":"end","type":"end"}
+        ]});
+        let cue = music_cue(&story, "talk").unwrap();
+        assert_eq!(cue.name, "主題_001");
+        assert_eq!(cue.origin, "music");
+        assert_eq!(music_cue(&story, "fade").unwrap().fade, Some(4.0));
+        assert_eq!(playback_duration(&story["nodes"][2]), 4.0);
+        assert!(music_cue(&story, "wait").is_none());
+        assert_eq!(music_cue(&story, "again").unwrap().name, "傳奇_001");
+        assert!(music_cue(&story, "end").is_none());
+    }
+
+    #[test]
+    fn portrait_without_normal_uses_the_extracted_first_portrait() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join("assets")).unwrap();
+        std::fs::write(dir.path().join("assets/first.png"), b"first portrait").unwrap();
+        let mut preview = Preview::new(dir.path());
+        preview.library = dir.path().into();
+        preview.mapping = json!({"characters":{"picture1":{"first":"picture","portraits":{"picture":"assets/first.png"}}},"views":{}});
+        let project = lom_core::scenario_addon::new_project("test");
+        assert_eq!(
+            preview
+                .asset(&project, "picture1", true, "normal")
+                .unwrap()
+                .1,
+            b"first portrait"
+        );
     }
 }
 
@@ -574,7 +680,11 @@ impl Preview {
         let rel = if character {
             self.mapping["characters"][name]["portraits"][portrait]
                 .as_str()
-                .or_else(|| self.mapping["characters"][name]["portraits"]["normal"].as_str())?
+                .or_else(|| self.mapping["characters"][name]["portraits"]["normal"].as_str())
+                .or_else(|| {
+                    let first = self.mapping["characters"][name]["first"].as_str()?;
+                    self.mapping["characters"][name]["portraits"][first].as_str()
+                })?
         } else {
             self.mapping["views"][name].as_str().unwrap_or(name)
         };
