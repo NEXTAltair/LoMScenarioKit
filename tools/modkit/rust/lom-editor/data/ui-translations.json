@@ -3218,5 +3218,61 @@
     "人物・背景の一覧を読み取れませんでした。ゲームの素材構成が変わった可能性があります。抽出ツールを更新してください。",
     "인물 또는 배경 목록을 읽지 못했습니다. 게임 리소스 구조가 변경되었을 수 있습니다. 추출 도구를 업데이트하세요.",
     "Could not read the character or background catalog. The game resource layout may have changed; update the extractor."
+  ],
+  "无法读取文件夹：{error}": [
+    "无法读取文件夹：{error}",
+    "無法讀取資料夾：{error}",
+    "フォルダーを開けません：{error}",
+    "폴더를 열 수 없습니다: {error}",
+    "Cannot open the folder: {error}"
+  ],
+  "文件夹路径": [
+    "文件夹路径",
+    "資料夾路徑",
+    "フォルダーのパス",
+    "폴더 경로",
+    "Folder path"
+  ],
+  "前往文件夹": [
+    "前往文件夹",
+    "前往資料夾",
+    "移動",
+    "이동",
+    "Go"
+  ],
+  "上一级文件夹": [
+    "上一级文件夹",
+    "上一層資料夾",
+    "親フォルダーへ",
+    "상위 폴더",
+    "Parent folder"
+  ],
+  "没有子文件夹": [
+    "没有子文件夹",
+    "沒有子資料夾",
+    "サブフォルダーはありません",
+    "하위 폴더가 없습니다",
+    "No subfolders"
+  ],
+  "使用此文件夹": [
+    "使用此文件夹",
+    "使用此資料夾",
+    "このフォルダーを使う",
+    "이 폴더 사용",
+    "Use this folder"
+  ],
+  "请选择包含 Mortal.exe 和 Mortal_Data/Managed 的游戏目录": [
+    "请选择包含 Mortal.exe 和 Mortal_Data/Managed 的游戏目录",
+    "請選擇包含 Mortal.exe 和 Mortal_Data/Managed 的遊戲資料夾",
+    "Mortal.exe と Mortal_Data/Managed を含むゲームフォルダーを選んでください。",
+    "Mortal.exe와 Mortal_Data/Managed가 있는 게임 폴더를 선택하세요.",
+    "Select the game folder containing Mortal.exe and Mortal_Data/Managed."
+  ],
+  "无法读取或识别 Mortal.exe，请重新选择游戏目录": [
+    "无法读取或识别 Mortal.exe，请重新选择游戏目录",
+    "無法讀取或辨識 Mortal.exe，請重新選擇遊戲資料夾",
+    "Mortal.exe を読み取れないか、対応するゲーム形式ではありません。ゲームフォルダーを選び直してください。",
+    "Mortal.exe를 읽거나 인식할 수 없습니다. 게임 폴더를 다시 선택하세요.",
+    "Cannot read or recognize Mortal.exe. Select the game folder again."
   ]
 }

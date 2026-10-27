@@ -2,6 +2,7 @@
 // GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 mod asset_extraction;
 mod authoring;
+mod folder_picker;
 mod forms;
 mod game_setup;
 mod help;
