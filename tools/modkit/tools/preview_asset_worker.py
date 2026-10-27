@@ -28,6 +28,49 @@ def token(value):
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+UI_SPRITES = {
+    # Confirmed Image references in level2's Character/Think/NarrativeSayDialog
+    # and OptionMenuDialog. Names, unlike Unity path IDs, survive repacking.
+    "dialog_frame": "back_dialog_1",
+    "choice_normal": "875x87_option_normal",
+    "choice_hover": "875x87_option_selected2",
+    "dialog_next": "dialog_next_1_0",
+}
+
+
+def extract_ui(data, output, max_size):
+    import UnityPy
+    from PIL import Image
+
+    mapping, failures = {}, []
+    sprites = {name: [] for name in UI_SPRITES.values()}
+    try:
+        environment = UnityPy.load(str(data / "sharedassets2.assets"))
+        for obj in environment.objects:
+            if obj.type.name == "Sprite":
+                name = obj.peek_name()
+                if name in sprites:
+                    sprites[name].append(obj)
+    except Exception as error:
+        return mapping, [{"address": "dialog_ui", "error": str(error)}]
+    for key, name in UI_SPRITES.items():
+        try:
+            if len(sprites[name]) != 1:
+                raise ValueError(f"对话界面图片必须唯一：{name}（找到 {len(sprites[name])} 张）")
+            image = sprites[name][0].read().image
+            image.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+            relative = "assets/ui/" + token(name) + ".png"
+            path = output / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            temporary = path.with_suffix(".tmp")
+            image.save(temporary, format="PNG")
+            temporary.replace(path)
+            mapping[key] = relative
+        except Exception as error:
+            failures.append({"address": name, "error": str(error)})
+    return mapping, failures
+
+
 def extract(game, output, max_size):
     import UnityPy
     from PIL import Image
@@ -117,10 +160,16 @@ def extract(game, output, max_size):
     if not succeeded:
         details = list(dict.fromkeys(failure["error"] for failure in failures))[:3]
         raise ValueError("未能导出任何游戏图片，原素材库保持不变。具体原因：" + "；".join(details))
+    # Optional UI images never prevent usable portraits/backgrounds publishing.
+    emit("progress", message="正在导出对话界面图片", done=0, total=len(UI_SPRITES))
+    mapping["ui"], ui_failures = extract_ui(data, output, max_size)
+    failures.extend(ui_failures)
+    succeeded += len(mapping["ui"])
     report = {"exported": succeeded, "failed": len(failures), "failures": failures,
               "resource_platform": bundles.name,
               "unavailable_characters": unavailable,
               "characters": len(mapping["characters"]), "views": len(mapping["views"]),
+              "ui_images": len(mapping["ui"]),
               "game_tested": False}
     write_json(output / "preview_map.json", mapping)
     write_json(output / "extract_report.json", report)

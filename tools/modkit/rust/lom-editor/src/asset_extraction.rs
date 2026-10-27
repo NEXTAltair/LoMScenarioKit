@@ -183,6 +183,9 @@ pub(crate) fn validate_mapping(root: &Path, mapping: &Value) -> Result<()> {
         files.extend(portraits.values());
     }
     files.extend(mapping["views"].as_object().unwrap().values());
+    if let Some(ui) = mapping.get("ui") {
+        files.extend(ui.as_object().context("对话界面映射格式不正确")?.values());
+    }
     for value in files {
         let name = value.as_str().context("图片路径格式不正确")?;
         lom_core::package::canonical_archive_name(name)?;
@@ -222,6 +225,26 @@ mod tests {
         validate_mapping(dir.path(), &map).unwrap();
         map["views"]["bad"] = json!("../outside.png");
         assert!(validate_mapping(dir.path(), &map).is_err());
+    }
+    #[test]
+    fn optional_ui_mapping_requires_existing_confined_image_paths() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join("assets")).unwrap();
+        std::fs::write(dir.path().join("assets/frame.png"), b"fixture").unwrap();
+        let mut map = json!({"characters":{},"views":{}});
+        validate_mapping(dir.path(), &map).unwrap(); // older libraries remain valid
+        map["ui"] = json!({"dialog_frame":"assets/frame.png"});
+        validate_mapping(dir.path(), &map).unwrap();
+        for invalid in [
+            json!(null),
+            json!([]),
+            json!({"dialog_frame":42}),
+            json!({"dialog_frame":"assets/missing.png"}),
+            json!({"dialog_frame":"../outside.png"}),
+        ] {
+            map["ui"] = invalid;
+            assert!(validate_mapping(dir.path(), &map).is_err());
+        }
     }
     #[cfg(unix)]
     fn fake_game_and_helper(root: &Path, script: &str) -> (PathBuf, PathBuf, PathBuf) {

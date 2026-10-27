@@ -5153,7 +5153,7 @@ mod application_regression_tests {
             "{text}"
         );
         assert!(
-            text.contains("F6"),
+            text.contains("Hello!"),
             "The guide must be open without another expansion: {text}"
         );
         draw(

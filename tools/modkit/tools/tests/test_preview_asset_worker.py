@@ -42,7 +42,7 @@ class PreviewWorkerTest(unittest.TestCase):
                 calls.append(address)
                 return SimpleNamespace(read=lambda: SimpleNamespace(image=Image.new("RGBA", (300, 150), (255, 0, 0, 128))))
 
-            with patch.object(probe, "parse_catalog", return_value=addresses), patch.object(probe, "load_sa2", return_value=(chars, {"room": {"address": "view"}, "alias": {"address": "view"}})), patch.object(probe, "resolve_sprite", side_effect=sprite), patch("UnityPy.load", return_value=object()), contextlib.redirect_stdout(io.StringIO()) as stdout:
+            with patch.object(probe, "parse_catalog", return_value=addresses), patch.object(probe, "load_sa2", return_value=(chars, {"room": {"address": "view"}, "alias": {"address": "view"}})), patch.object(probe, "resolve_sprite", side_effect=sprite), patch("UnityPy.load", return_value=SimpleNamespace(objects=self.ui_sprites())), contextlib.redirect_stdout(io.StringIO()) as stdout:
                 report = worker.extract(game, output, 128)
             mapping = json.loads((output / "preview_map.json").read_text())
             portraits = mapping["characters"]["player"]["portraits"]
@@ -50,7 +50,10 @@ class PreviewWorkerTest(unittest.TestCase):
             self.assertNotIn("bad", portraits)
             self.assertEqual(mapping["views"]["room"], mapping["views"]["alias"])
             self.assertEqual(calls, ["full/player.png", "full/view.png"])
-            self.assertEqual((report["exported"], report["failed"]), (2, 1))
+            self.assertEqual((report["exported"], report["failed"], report["ui_images"]), (6, 1, 4))
+            self.assertEqual(set(mapping["ui"]), set(worker.UI_SPRITES))
+            for relative in mapping["ui"].values():
+                self.assertTrue((output / relative).is_file())
             with Image.open(output / portraits["normal"]) as image:
                 self.assertEqual(image.size, (128, 64))
                 self.assertEqual(image.mode, "RGBA")
@@ -86,8 +89,34 @@ class PreviewWorkerTest(unittest.TestCase):
             with patch.object(probe, "parse_catalog", return_value=addresses), patch.object(probe, "load_sa2", return_value=(chars, {"room": {"address": "view"}})), patch.object(probe, "resolve_sprite", return_value=sprite), patch("UnityPy.load", return_value=object()) as load, contextlib.redirect_stdout(io.StringIO()):
                 report = worker.extract(game, output, 128)
             self.assertEqual(report["resource_platform"], "StandaloneWindows64")
-            self.assertIn("StandaloneWindows64", load.call_args[0][0])
+            self.assertTrue(any("StandaloneWindows64" in call.args[0] for call in load.call_args_list))
             self.assertEqual(report["exported"], 2)
+            self.assertEqual(report["ui_images"], 0)
+            self.assertTrue(report["failures"])
+
+    @staticmethod
+    def ui_sprites():
+        return [SimpleNamespace(
+            type=SimpleNamespace(name="Sprite"),
+            peek_name=lambda name=name: name,
+            read=lambda: SimpleNamespace(image=Image.new("RGBA", (300, 150), (255, 0, 0, 128))),
+        ) for name in worker.UI_SPRITES.values()]
+
+    def test_ui_sprites_keep_transparency_and_skip_missing_or_ambiguous_names(self):
+        with TemporaryDirectory() as folder:
+            root = Path(folder)
+            sprites = self.ui_sprites()
+            # A duplicate frame and absent hover must never silently pick another sprite.
+            objects = [sprites[0], sprites[0], sprites[1], sprites[3]]
+            with patch("UnityPy.load", return_value=SimpleNamespace(objects=objects)):
+                mapping, failures = worker.extract_ui(root, root, 128)
+            self.assertEqual(set(mapping), {"choice_normal", "dialog_next"})
+            self.assertEqual(len(failures), 2)
+            for path in mapping.values():
+                with Image.open(root / path) as image:
+                    self.assertEqual(image.size, (128, 64))
+                    self.assertEqual(image.mode, "RGBA")
+                    self.assertEqual(image.getpixel((0, 0))[3], 128)
 
     def test_missing_platform_directory_is_reported_before_loading_bundles(self):
         with TemporaryDirectory() as folder:

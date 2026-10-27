@@ -931,7 +931,7 @@ impl ToolsPanel {
             .default_open(true)
             .show(ui, |ui| {
                 ui.label(crate::i18n::tr(
-                    "从自己的游戏中提取立绘、表情和背景，完成后自动用于右侧预览。",
+                    "从自己的游戏中提取立绘、表情、背景和对话界面，完成后自动用于右侧预览。",
                 ));
                 if !self.game.as_os_str().is_empty() {
                     ui.label(self.game.display().to_string());

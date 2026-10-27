@@ -813,6 +813,11 @@ impl Preview {
         let (x, feet) = position(&self.positions, pos);
         (x as f32, feet as f32)
     }
+    fn ui_texture(&mut self, ctx: &egui::Context, p: &Project, key: &str) -> Option<TextureHandle> {
+        let path = self.mapping["ui"][key].as_str()?.to_owned();
+        self.texture(ctx, p, &path, false, "")
+            .map(|(texture, _)| texture)
+    }
     pub fn show(
         &mut self,
         ui: &mut egui::Ui,
@@ -962,47 +967,105 @@ impl Preview {
                 .get("mode")
                 .and_then(Value::as_str)
                 .unwrap_or("character");
-            let dr = if mode == "center" {
-                rect.shrink2(Vec2::new(rect.width() * 0.08, rect.height() * 0.25))
+            let frame = (mode != "center")
+                .then(|| self.ui_texture(&ctx, p, "dialog_frame"))
+                .flatten();
+            if let Some(frame) = frame {
+                // The game's 1920x1080 canvas uses a 1536x252 bottom frame.
+                // These text regions are relative to that frame's RectTransforms.
+                let dr = relative(rect, 0.10, 1.0 - 252.0 / 1080.0, 0.80, 252.0 / 1080.0);
+                painter.image(
+                    frame.id(),
+                    dr,
+                    Rect::from_min_max(Pos2::ZERO, Pos2::new(1.0, 1.0)),
+                    Color32::WHITE,
+                );
+                if mode == "character" || mode == "think" {
+                    let name_rect = relative(
+                        dr,
+                        11.6 / 1536.0,
+                        28.3 / 252.0,
+                        350.0 / 1536.0,
+                        97.2 / 252.0,
+                    );
+                    paint_text(
+                        &painter.with_clip_rect(name_rect),
+                        name_rect,
+                        &character_display_name(
+                            p,
+                            dialog
+                                .get("character")
+                                .and_then(Value::as_str)
+                                .unwrap_or(""),
+                        ),
+                        (rect.width() / 40.0).clamp(12.0, 20.0),
+                        Color32::from_rgb(221, 168, 110),
+                    );
+                }
+                let body = relative(
+                    dr,
+                    400.0 / 1536.0,
+                    46.0 / 252.0,
+                    1050.0 / 1536.0,
+                    200.0 / 252.0,
+                );
+                let galley = painter.layout(
+                    txt.to_owned(),
+                    FontId::proportional((rect.width() / 38.0).clamp(12.0, 19.0)),
+                    Color32::from_rgb(246, 241, 221),
+                    body.width(),
+                );
+                painter
+                    .with_clip_rect(body)
+                    .galley(body.min, galley, Color32::WHITE);
+                if next_index(story, index).is_some() {
+                    if let Some(next) = self.ui_texture(&ctx, p, "dialog_next") {
+                        fit_image(&painter, &next, relative(dr, 0.96, 0.72, 0.025, 0.20));
+                    }
+                }
             } else {
-                Rect::from_min_max(
-                    Pos2::new(rect.left() + 12.0, rect.bottom() - rect.height() * 0.28),
-                    Pos2::new(rect.right() - 12.0, rect.bottom() - 9.0),
-                )
-            };
-            painter.rect_filled(dr, 5.0, Color32::from_black_alpha(195));
-            let character = dialog
-                .get("character")
-                .and_then(Value::as_str)
-                .unwrap_or("");
-            if mode == "character" || mode == "think" {
-                painter.text(
-                    dr.left_top() + Vec2::new(12.0, 9.0),
-                    egui::Align2::LEFT_TOP,
-                    character_display_name(p, character),
-                    FontId::proportional(13.0),
-                    Color32::from_rgb(221, 168, 110),
+                let dr = if mode == "center" {
+                    rect.shrink2(Vec2::new(rect.width() * 0.08, rect.height() * 0.25))
+                } else {
+                    Rect::from_min_max(
+                        Pos2::new(rect.left() + 12.0, rect.bottom() - rect.height() * 0.28),
+                        Pos2::new(rect.right() - 12.0, rect.bottom() - 9.0),
+                    )
+                };
+                painter.rect_filled(dr, 5.0, Color32::from_black_alpha(195));
+                let character = dialog
+                    .get("character")
+                    .and_then(Value::as_str)
+                    .unwrap_or("");
+                if mode == "character" || mode == "think" {
+                    painter.text(
+                        dr.left_top() + Vec2::new(12.0, 9.0),
+                        egui::Align2::LEFT_TOP,
+                        character_display_name(p, character),
+                        FontId::proportional(13.0),
+                        Color32::from_rgb(221, 168, 110),
+                    );
+                }
+                let galley = painter.layout(
+                    txt.to_owned(),
+                    FontId::proportional((rect.width() / 38.0).clamp(12.0, 19.0)),
+                    Color32::from_rgb(246, 241, 221),
+                    dr.width() - 24.0,
+                );
+                painter.galley(
+                    dr.left_top()
+                        + Vec2::new(
+                            12.0,
+                            if mode == "character" || mode == "think" {
+                                30.0
+                            } else {
+                                12.0
+                            },
+                        ),
+                    galley,
+                    Color32::WHITE,
                 );
             }
-            let galley = painter.layout(
-                txt.to_owned(),
-                FontId::proportional((rect.width() / 38.0).clamp(12.0, 19.0)),
-                Color32::from_rgb(246, 241, 221),
-                dr.width() - 24.0,
-            );
-            painter.galley(
-                dr.left_top()
-                    + Vec2::new(
-                        12.0,
-                        if mode == "character" || mode == "think" {
-                            30.0
-                        } else {
-                            12.0
-                        },
-                    ),
-                galley,
-                Color32::WHITE,
-            );
         }
         if let Some(card) = card_data(p, node) {
             if card.kind == "ending" {
@@ -1136,21 +1199,79 @@ impl Preview {
         let mut choice = None;
         let covered = number(&state["blackout"], "amount", 0.0);
         if let Some(options) = state["choice"].as_array().filter(|_| covered == 0.0) {
-            for (i, item) in options.iter().enumerate() {
-                let button = Rect::from_min_size(
-                    Pos2::new(
-                        rect.left() + rect.width() * 0.25,
-                        rect.top() + rect.height() * 0.30 + i as f32 * 35.0,
-                    ),
-                    Vec2::new(rect.width() * 0.5, 30.0),
-                );
-                if ui
-                    .put(button, egui::Button::new(text(item, "text")))
-                    .clicked()
-                {
-                    choice = Some(text(item, "goto").to_owned());
-                }
-            }
+            let normal = self.ui_texture(&ctx, p, "choice_normal");
+            let hover = self.ui_texture(&ctx, p, "choice_hover");
+            let choices_rect = Rect::from_min_max(
+                Pos2::new(
+                    rect.left() + rect.width() * 0.25,
+                    rect.top() + rect.height() * 0.30,
+                ),
+                Pos2::new(rect.left() + rect.width() * 0.75, rect.bottom() - 8.0),
+            );
+            // The scene already reserves its space. Use a child UI so wrapped
+            // labels grow vertically without moving the editor's outer layout.
+            let mut choices_ui = ui.new_child(
+                egui::UiBuilder::new()
+                    .id_salt(("stage-choices", target))
+                    .max_rect(choices_rect)
+                    .layout(egui::Layout::top_down(egui::Align::Min)),
+            );
+            choices_ui.set_clip_rect(choices_rect.intersect(ui.clip_rect()));
+            choices_ui.spacing_mut().item_spacing.y = 5.0;
+            egui::ScrollArea::vertical()
+                .id_salt("choice-scroll")
+                .max_height(choices_rect.height())
+                .auto_shrink([false, true])
+                .show(&mut choices_ui, |ui| {
+                    for item in options {
+                        let width = ui.available_width();
+                        let response = if let Some(normal) = &normal {
+                            let galley = ui.painter().layout(
+                                text(item, "text").to_owned(),
+                                FontId::proportional(13.0),
+                                Color32::from_rgb(45, 33, 22),
+                                (width - 32.0).max(1.0),
+                            );
+                            // Keep text inside the image's central panel, away
+                            // from its transparent top/bottom border.
+                            let height = ((galley.size().y + 6.0) / 0.75).max(30.0);
+                            let (button, response) = ui.allocate_exact_size(
+                                Vec2::new(width, height),
+                                egui::Sense::click(),
+                            );
+                            response.widget_info(|| {
+                                egui::WidgetInfo::labeled(
+                                    egui::WidgetType::Button,
+                                    ui.is_enabled(),
+                                    text(item, "text"),
+                                )
+                            });
+                            let texture = if response.hovered() || response.has_focus() {
+                                hover.as_ref().unwrap_or(normal)
+                            } else {
+                                normal
+                            };
+                            ui.painter()
+                                .image(texture.id(), button, uv(), Color32::WHITE);
+                            let text_rect = button.shrink2(Vec2::new(16.0, height * 0.125));
+                            ui.painter().with_clip_rect(text_rect).galley(
+                                text_rect.center() - galley.size() / 2.0,
+                                galley,
+                                Color32::WHITE,
+                            );
+                            response
+                        } else {
+                            ui.add(
+                                egui::Button::new(text(item, "text"))
+                                    .wrap()
+                                    .min_size(Vec2::new(width, 30.0)),
+                            )
+                        };
+                        if response.clicked() {
+                            choice = Some(text(item, "goto").to_owned());
+                        }
+                    }
+                });
         }
         if covered > 0.0 {
             painter.rect_filled(
@@ -1670,8 +1791,11 @@ mod tests {
 mod content_tests {
     use super::*;
     fn click_preview(story: &Value, position: Pos2) -> Vec<Action> {
-        let context = egui::Context::default();
         let mut preview = Preview::new(Path::new("/not-a-repository"));
+        click_with_preview(&mut preview, story, position)
+    }
+    fn click_with_preview(preview: &mut Preview, story: &Value, position: Pos2) -> Vec<Action> {
+        let context = egui::Context::default();
         let project = Project::new();
         let mut actions = Vec::new();
         for events in [
@@ -1710,6 +1834,243 @@ mod content_tests {
             );
         }
         actions
+    }
+    fn ui_library() -> (tempfile::TempDir, Preview) {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::create_dir(root.path().join("assets")).unwrap();
+        let mut mapping = json!({"characters":{}, "views":{}, "ui":{}});
+        for (i, key) in [
+            "dialog_frame",
+            "dialog_next",
+            "choice_normal",
+            "choice_hover",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let relative = format!("assets/{key}.png");
+            image::RgbaImage::from_pixel(16, 4, image::Rgba([i as u8 * 60, 50, 50, 128]))
+                .save(root.path().join(&relative))
+                .unwrap();
+            mapping["ui"][key] = json!(relative);
+        }
+        std::fs::write(
+            root.path().join("preview_map.json"),
+            serde_json::to_vec(&mapping).unwrap(),
+        )
+        .unwrap();
+        let mut preview = Preview::new(Path::new("/not-a-repository"));
+        preview.set_library(root.path()).unwrap();
+        (root, preview)
+    }
+    #[test]
+    fn game_choice_images_preserve_click_targets_and_partial_library_fallback() {
+        let (_root, mut preview) = ui_library();
+        let story = json!({"start":"choice","nodes":[
+            {"id":"choice","type":"choice","options":[
+                {"text":"First","goto":"a"},{"text":"Second","goto":"b"}]},
+            {"id":"a","type":"end"},{"id":"b","type":"end"}
+        ]});
+        assert_eq!(
+            click_with_preview(&mut preview, &story, Pos2::new(400.0, 175.0)),
+            vec![Action::Choose("a".into())]
+        );
+        assert!(click_with_preview(&mut preview, &story, Pos2::new(400.0, 450.0)).is_empty());
+        assert_eq!(preview.cache.len(), 2); // both normal and hover images decoded
+        preview.mapping["ui"]
+            .as_object_mut()
+            .unwrap()
+            .remove("choice_hover");
+        assert_eq!(
+            click_with_preview(&mut preview, &story, Pos2::new(400.0, 210.0)),
+            vec![Action::Choose("b".into())]
+        );
+    }
+    fn draw_choice_test(
+        ctx: &egui::Context,
+        preview: &mut Preview,
+        story: &Value,
+        size: Vec2,
+        events: Vec<egui::Event>,
+    ) -> (egui::FullOutput, Option<Action>) {
+        let mut action = None;
+        let output = ctx.run(
+            egui::RawInput {
+                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, size)),
+                events,
+                ..Default::default()
+            },
+            |ctx| {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    action = preview.show(ui, &Project::new(), story, 0, None);
+                });
+            },
+        );
+        (output, action)
+    }
+    fn choice_bounds(output: &egui::FullOutput, label: &str) -> Rect {
+        let bounds = output
+            .platform_output
+            .accesskit_update
+            .as_ref()
+            .unwrap()
+            .nodes
+            .iter()
+            .find_map(|(_, node)| {
+                (node.role() == egui::accesskit::Role::Button && node.label() == Some(label))
+                    .then(|| node.bounds())
+                    .flatten()
+            })
+            .expect("choice button bounds");
+        Rect::from_min_max(
+            Pos2::new(bounds.x0 as f32, bounds.y0 as f32),
+            Pos2::new(bounds.x1 as f32, bounds.y1 as f32),
+        )
+    }
+    #[test]
+    fn wrapped_game_choice_labels_fit_their_buttons_and_keep_following_choices_clickable() {
+        let label =
+            "Take the quiet path through the forest and return after speaking to the guard.";
+        let story = json!({"start":"choice","nodes":[
+            {"id":"choice","type":"choice","options":[
+                {"text":label,"goto":"a"},{"text":"Second route","goto":"b"}]},
+            {"id":"a","type":"end"},{"id":"b","type":"end"}
+        ]});
+        for size in [Vec2::new(800.0, 500.0), Vec2::new(400.0, 350.0)] {
+            let (_root, mut preview) = ui_library();
+            let ctx = egui::Context::default();
+            ctx.enable_accesskit();
+            draw_choice_test(&ctx, &mut preview, &story, size, vec![]);
+            let (output, _) = draw_choice_test(&ctx, &mut preview, &story, size, vec![]);
+            let first = choice_bounds(&output, label);
+            let second = choice_bounds(&output, "Second route");
+            let shape = output
+                .shapes
+                .iter()
+                .find_map(|shape| match &shape.shape {
+                    egui::Shape::Text(text) if text.galley.job.text == label => Some((shape, text)),
+                    _ => None,
+                })
+                .expect("painted full label");
+            assert!(shape.1.galley.rows.len() > 1, "label must wrap at {size:?}");
+            let text_bounds = Rect::from_min_size(shape.1.pos, shape.1.galley.size());
+            assert!(
+                shape.0.clip_rect.contains_rect(text_bounds),
+                "{size:?}: {:?} clips {text_bounds:?}",
+                shape.0.clip_rect
+            );
+            assert!(first.contains_rect(text_bounds));
+            assert!(second.top() >= first.bottom() + 4.0, "choices overlap");
+            let pos = second.center();
+            let mut actions = Vec::new();
+            for pressed in [true, false] {
+                let (_, action) = draw_choice_test(
+                    &ctx,
+                    &mut preview,
+                    &story,
+                    size,
+                    vec![
+                        egui::Event::PointerMoved(pos),
+                        egui::Event::PointerButton {
+                            pos,
+                            button: egui::PointerButton::Primary,
+                            pressed,
+                            modifiers: Default::default(),
+                        },
+                    ],
+                );
+                actions.extend(action);
+            }
+            assert_eq!(actions, vec![Action::Choose("b".into())]);
+        }
+    }
+    #[test]
+    fn oversized_choices_scroll_to_the_last_route_with_and_without_game_images() {
+        let label =
+            "A long description that must remain readable from its beginning to its ending. "
+                .repeat(45);
+        let story = json!({"start":"choice","nodes":[
+            {"id":"choice","type":"choice","options":[
+                {"text":label,"goto":"a"},{"text":"Last route","goto":"b"}]},
+            {"id":"a","type":"end"},{"id":"b","type":"end"}
+        ]});
+        for game_images in [true, false] {
+            let (_root, mut preview) = ui_library();
+            if !game_images {
+                preview.mapping["ui"] = json!({});
+            }
+            let ctx = egui::Context::default();
+            ctx.enable_accesskit();
+            let size = Vec2::new(800.0, 500.0);
+            draw_choice_test(&ctx, &mut preview, &story, size, vec![]);
+            let (output, _) = draw_choice_test(&ctx, &mut preview, &story, size, vec![]);
+            assert!(choice_bounds(&output, "Last route").top() > size.y);
+            let (_, action) = draw_choice_test(
+                &ctx,
+                &mut preview,
+                &story,
+                size,
+                vec![
+                    egui::Event::PointerMoved(Pos2::new(400.0, 220.0)),
+                    egui::Event::MouseWheel {
+                        unit: egui::MouseWheelUnit::Point,
+                        delta: Vec2::new(0.0, -10000.0),
+                        modifiers: Default::default(),
+                    },
+                ],
+            );
+            assert!(action.is_none(), "scrolling must not advance the story");
+            for _ in 0..30 {
+                draw_choice_test(&ctx, &mut preview, &story, size, vec![]);
+            }
+            let (output, _) = draw_choice_test(&ctx, &mut preview, &story, size, vec![]);
+            let last = choice_bounds(&output, "Last route");
+            assert!(
+                last.top() >= 0.0 && last.bottom() <= size.y,
+                "{game_images}: {last:?}"
+            );
+            let pos = last.center();
+            let mut actions = Vec::new();
+            for pressed in [true, false] {
+                let (_, action) = draw_choice_test(
+                    &ctx,
+                    &mut preview,
+                    &story,
+                    size,
+                    vec![
+                        egui::Event::PointerMoved(pos),
+                        egui::Event::PointerButton {
+                            pos,
+                            button: egui::PointerButton::Primary,
+                            pressed,
+                            modifiers: Default::default(),
+                        },
+                    ],
+                );
+                actions.extend(action);
+            }
+            assert_eq!(actions, vec![Action::Choose("b".into())], "{game_images}");
+        }
+    }
+
+    #[test]
+    fn game_dialog_frame_is_drawn_for_bottom_dialogues_but_not_center_text() {
+        for mode in ["character", "think", "narrative", "center"] {
+            let (_root, mut preview) = ui_library();
+            let story = json!({"start":"say","nodes":[
+                {"id":"say","type":"say","mode":mode,"text":"Dialogue text"},
+                {"id":"end","type":"end"}
+            ]});
+            assert_eq!(
+                click_with_preview(&mut preview, &story, Pos2::new(400.0, 450.0)),
+                vec![Action::Advance]
+            );
+            assert_eq!(
+                preview.cache.len(),
+                if mode == "center" { 0 } else { 2 },
+                "{mode}"
+            );
+        }
     }
     #[test]
     fn preview_canvas_emits_one_advance_for_one_click_inside_the_scene() {
