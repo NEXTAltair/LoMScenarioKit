@@ -1,11 +1,14 @@
 # Copyright (C) 2026 NEXTAltair
 # GPL-3.0-only with the additional permission in LICENSE-GAME-EXCEPTION.txt.
 """Helper preparation is reusable and cannot destroy an existing working build."""
+import contextlib
 import importlib.util
 import io
 import json
 from pathlib import Path
 import subprocess
+import shutil
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -47,12 +50,12 @@ class EditorBuildTests(unittest.TestCase):
 
     def test_initial_prepare_reuses_exact_inputs_and_builds_in_private_environment(self):
         with patch.object(editor, "run_logged", side_effect=self.fake_command) as run:
-            first = editor.prepare_helper(self.target, "debug")
+            first = editor.prepare_helper(self.target, "debug", "test-host")
             calls = run.call_args_list.copy()
-            second = editor.prepare_helper(self.target, "debug")
+            second = editor.prepare_helper(self.target, "debug", "test-host")
             self.assertEqual(first, second)
             self.assertEqual(run.call_args_list, calls, "unchanged startup must not install or rebuild")
-        self.assertEqual(first.parent, self.target / "debug")
+        self.assertEqual(first.parent, self.target / "test-host/debug")
         install = calls[0].args[0]
         self.assertIn(str(self.target), str(install[0]))
         self.assertEqual(install[1:4], ["-m", "pip", "install"])
@@ -61,24 +64,24 @@ class EditorBuildTests(unittest.TestCase):
 
     def test_changed_worker_rebuilds_and_failed_update_preserves_old_helper(self):
         with patch.object(editor, "run_logged", side_effect=self.fake_command):
-            folder = editor.prepare_helper(self.target, "debug")
+            folder = editor.prepare_helper(self.target, "debug", "test-host")
         old_state = (folder / "build-state.json").read_bytes()
         self.write(folder / "keep.txt", "previous working build")
         self.write(self.modkit / "tools/preview_asset_worker.py", "updated worker")
         with patch.object(editor, "run_logged", side_effect=subprocess.CalledProcessError(1, "fixture")):
             with self.assertRaisesRegex(RuntimeError, "ログ"):
-                editor.prepare_helper(self.target, "debug")
+                editor.prepare_helper(self.target, "debug", "test-host")
         self.assertEqual((folder / "keep.txt").read_text(), "previous working build")
         self.assertEqual((folder / "build-state.json").read_bytes(), old_state)
         self.assertEqual(list(folder.parent.glob("extractor-staging-*")), [])
         with patch.object(editor, "run_logged", side_effect=self.fake_command):
-            editor.prepare_helper(self.target, "debug")
+            editor.prepare_helper(self.target, "debug", "test-host")
         self.assertFalse((folder / "keep.txt").exists())
         self.assertNotEqual((folder / "build-state.json").read_bytes(), old_state)
 
     def test_self_check_failure_never_publishes_staged_helper(self):
         with patch.object(editor, "run_logged", side_effect=self.fake_command):
-            folder = editor.prepare_helper(self.target, "debug")
+            folder = editor.prepare_helper(self.target, "debug", "test-host")
         state = (folder / "build-state.json").read_bytes()
         self.write(self.modkit / "tools/preview_asset_worker.py", "updated worker")
 
@@ -89,7 +92,7 @@ class EditorBuildTests(unittest.TestCase):
 
         with patch.object(editor, "run_logged", side_effect=fail_check):
             with self.assertRaises(RuntimeError):
-                editor.prepare_helper(self.target, "debug")
+                editor.prepare_helper(self.target, "debug", "test-host")
         self.assertEqual((folder / "build-state.json").read_bytes(), state)
         self.assertEqual(list(folder.parent.glob("extractor-staging-*")), [])
 
@@ -121,8 +124,41 @@ class EditorBuildTests(unittest.TestCase):
         output = self.root / "existing output"
         self.write(output / "user.txt", "keep")
         with self.assertRaisesRegex(RuntimeError, "新しいフォルダー"):
-            editor.package_editor(self.target, self.target / "helper", output)
+            editor.package_editor(self.target, self.target / "helper", output, "test-host")
         self.assertEqual((output / "user.txt").read_text(), "keep")
+
+    @unittest.skipUnless(shutil.which("cargo") and shutil.which("rustc"), "Rust toolchain required")
+    def test_configured_cross_target_cannot_separate_native_binaries_from_helper(self):
+        # Exercise Cargo's real configuration lookup with two dependency-free
+        # binaries. Without --target, this attempts to build WebAssembly.
+        self.write(self.modkit / "Cargo.toml",
+                   '[workspace]\nmembers = ["editor", "cli"]\nresolver = "2"\n')
+        for folder, name in [("editor", "lom-editor"), ("cli", "lomc")]:
+            self.write(self.modkit / folder / "Cargo.toml",
+                       f'[package]\nname = "{name}"\nversion = "0.1.0"\nedition = "2021"\n')
+            self.write(self.modkit / folder / "src/main.rs", 'fn main() {}\n')
+        self.write(self.modkit / ".cargo/config.toml",
+                   '[build]\ntarget = "wasm32-unknown-unknown"\n')
+        output = self.root / "portable"
+
+        def verify_package(target, helper, destination, build_target):
+            suffix = ".exe" if editor.os.name == "nt" else ""
+            binaries = target / build_target / "release"
+            self.assertTrue((binaries / ("lom-editor" + suffix)).is_file())
+            self.assertTrue((binaries / ("lomc" + suffix)).is_file())
+            self.assertEqual(helper, binaries / "asset-extractor")
+            self.assertTrue((helper / editor.helper_name()).is_file())
+            return destination
+
+        with contextlib.chdir(self.modkit), patch.dict(editor.os.environ, {
+                "CARGO_TARGET_DIR": str(self.target), "CARGO_BUILD_TARGET": "wasm32-unknown-unknown"}), \
+                patch.object(sys, "argv", ["build_editor.py", "--output-dir", str(output)]), \
+                patch.object(editor, "run_logged", side_effect=self.fake_command), \
+                patch.object(editor, "package_editor", side_effect=verify_package) as package:
+            subprocess.run(["cargo", "generate-lockfile", "--offline"], check=True,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            editor.main()
+        package.assert_called_once()
 
 
 if __name__ == "__main__":

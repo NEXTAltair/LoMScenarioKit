@@ -39,6 +39,15 @@ def target_directory():
     return Path(json.loads(result.stdout)["target_directory"])
 
 
+def native_target():
+    result = subprocess.run([os.environ.get("RUSTC", "rustc"), "-vV"],
+                            check=True, stdout=subprocess.PIPE, text=True)
+    for line in result.stdout.splitlines():
+        if line.startswith("host: "):
+            return line.removeprefix("host: ").strip()
+    raise RuntimeError("Rustコンパイラーの実行環境を確認できませんでした。")
+
+
 def fingerprint():
     digest = hashlib.sha256()
     digest.update(f"{sys.version_info[:2]}:{sys.platform}:{platform.machine()}".encode())
@@ -112,9 +121,9 @@ def replace_directory(staged, destination):
         shutil.rmtree(backup)
 
 
-def prepare_helper(target, profile):
+def prepare_helper(target, profile, build_target):
     target = Path(target)
-    destination = target / profile / "asset-extractor"
+    destination = target / build_target / profile / "asset-extractor"
     expected = fingerprint()
     with build_lock(target / "asset-extractor-build/prepare.lock"):
         if current_helper(destination, expected):
@@ -149,7 +158,7 @@ def prepare_helper(target, profile):
     return destination
 
 
-def package_editor(target, helper, output):
+def package_editor(target, helper, output, build_target):
     output = Path(output).resolve()
     if output.exists():
         raise RuntimeError(f"配布先は新しいフォルダーを指定してください: {output}")
@@ -159,7 +168,7 @@ def package_editor(target, helper, output):
         package = Path(temporary) / "LoMScenarioKit"
         package.mkdir()
         for name in ["lom-editor", "lomc"]:
-            shutil.copy2(Path(target) / "release" / (name + suffix), package / (name + suffix))
+            shutil.copy2(Path(target) / build_target / "release" / (name + suffix), package / (name + suffix))
         # Follow PyInstaller's internal symlinks: plain folder copies and ZIPs
         # must work on machines where symlink creation is unavailable.
         shutil.copytree(helper, package / "asset-extractor")
@@ -194,20 +203,26 @@ def main():
     parser.add_argument("--prepare-extractor", action="store_true", help="Prepare only the helper for cargo run")
     parser.add_argument("--profile", choices=["debug", "release"], default="debug")
     parser.add_argument("--output-dir", type=Path, help="New directory for a portable release build")
+    parser.add_argument("--print-target", action="store_true", help="Print the native target for the source launcher")
     args = parser.parse_args()
     if sys.version_info < (3, 12):
         parser.error("抽出ツールのビルドにはPython 3.12以降を使ってください。")
-    if os.environ.get("CARGO_BUILD_TARGET"):
-        parser.error("抽出ツールは実行先OSでビルドします。CARGO_BUILD_TARGETを外してください。")
+    if args.print_target and not args.prepare_extractor:
+        parser.error("--print-target は --prepare-extractor と一緒に指定してください。")
     target = target_directory()
+    build_target = native_target()
     profile = args.profile if args.prepare_extractor else "release"
-    helper = prepare_helper(target, profile)
+    # Both executables run here; override build.target and CARGO_BUILD_TARGET.
+    helper = prepare_helper(target, profile, build_target)
     if args.prepare_extractor:
+        if args.print_target:
+            print(build_target)
         return
     subprocess.run(["cargo", "build", "--quiet", "--locked", "--release", "--manifest-path",
-                    str(MODKIT / "Cargo.toml"), "-p", "lom-editor", "-p", "lomc"], check=True)
+                    str(MODKIT / "Cargo.toml"), "--target", build_target,
+                    "-p", "lom-editor", "-p", "lomc"], check=True)
     output = args.output_dir or ROOT / "dist" / f"LoMScenarioKit-editor-{sys.platform}-{platform.machine()}"
-    print(f"エディターの配布フォルダー: {package_editor(target, helper, output)}")
+    print(f"エディターの配布フォルダー: {package_editor(target, helper, output, build_target)}")
 
 
 if __name__ == "__main__":

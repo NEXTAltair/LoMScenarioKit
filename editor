@@ -31,9 +31,9 @@ else
     printf '%s\n' '初回の抽出ツール準備にはPython 3.12以降が必要です。' >&2
     exit 127
 fi
-"$editor_python" "$editor_root/tools/build_editor.py" --prepare-extractor
+editor_target=$("$editor_python" "$editor_root/tools/build_editor.py" --prepare-extractor --print-target)
 
 # Keep the caller's working directory so relative project paths still work.
 exec cargo run --quiet --locked \
     --manifest-path "$editor_root/tools/modkit/Cargo.toml" \
-    -p lom-editor -- "$@"
+    --target "$editor_target" -p lom-editor -- "$@"

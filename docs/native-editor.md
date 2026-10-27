@@ -37,7 +37,9 @@ WSLではX11とCPU描画を自動で選びます。`WAYLAND_DISPLAY` / `WAYLAND_
 cargo run --locked --manifest-path tools/modkit/Cargo.toml -p lom-editor
 ```
 
-`cargo run`を直接使う場合は、先に`python tools/build_editor.py --prepare-extractor`で抽出ツールを準備してください。
+`cargo run`を直接使う場合は、`python tools/build_editor.py --prepare-extractor --print-target`で抽出ツールを準備し、表示されたターゲットを`cargo run`の`--target`に指定してください。
+
+エディターと抽出ツールを同じ環境で動かすため、起動・配布スクリプトはRustコンパイラーのホストターゲットを明示します。Cargoの`build.target`や`CARGO_BUILD_TARGET`より、この指定を優先します。両方を`target/<ホストターゲット>/<debugまたはrelease>/`へ配置します。`CARGO_TARGET_DIR`などの出力先設定は引き継ぎます。
 
 既存のMortalModHost制作フォルダ・JSON・`.lommod` も読み込めます。新規プロジェクトはLoMScenarioAddon向けです。互換用のMortalModHostプロジェクトはファイルメニューから作成できます。両形式のランタイムや書き出し先は異なります。
 
