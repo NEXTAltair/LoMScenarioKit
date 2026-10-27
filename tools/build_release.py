@@ -52,11 +52,15 @@ def package_source(destination):
                    for p in path.relative_to(ROOT).parts):
                 continue
             embedded = {
+                "tools/modkit/third-party/ww2ogg/COPYING",
+                "tools/modkit/third-party/ww2ogg/packed_codebooks_aoTuV_603.bin",
                 "tools/modkit/editor/assets/doorstop/win-x64-doorstop.dll",
                 "tools/modkit/editor/assets/doorstop/win-x86-doorstop.dll",
                 "tools/modkit/editor/assets/doorstop/UnityDoorstop-4.3.0-source.zip",
             }
-            if path.is_file() and (path.suffix in extensions or path.name.startswith("LICENSE")
+            decoder_source = (path.relative_to(ROOT).as_posix().startswith("tools/modkit/third-party/ww2ogg/src/")
+                              and path.suffix in {".c", ".cpp", ".h"})
+            if path.is_file() and (path.suffix in extensions or decoder_source or path.name.startswith("LICENSE")
                                    or path.relative_to(ROOT).as_posix() in embedded):
                 paths.append(path)
     with zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED) as archive:

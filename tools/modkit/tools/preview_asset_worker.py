@@ -134,6 +134,7 @@ def main():
     parser.add_argument("--game-dir", type=Path)
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--max-size", default=1024, type=int)
+    parser.add_argument("--music-name", help="Prepare one named BGM instead of exporting images")
     args = parser.parse_args()
     if args.self_check:
         import UnityPy
@@ -141,6 +142,9 @@ def main():
         from UnityPy.export import SpriteHelper, Texture2DConverter
         from PIL import Image
         from io import BytesIO
+        from preview_music import decoder_files
+        if not all(path.is_file() for path in decoder_files()):
+            raise RuntimeError("Music decoder or codebook is missing")
         Image.new("RGBA", (2, 2)).save(BytesIO(), format="PNG")
         emit("self-check", unitypy=UnityPy.__version__, pillow=Image.__version__,
              sprite_decoder_ready=callable(SpriteHelper.get_image_from_sprite), game_accessed=False)
@@ -150,7 +154,11 @@ def main():
     if not 128 <= args.max_size <= 1600:
         parser.error("图片尺寸必须在 128 到 1600 之间")
     try:
-        extract(args.game_dir, args.output_dir, args.max_size)
+        if args.music_name is not None:
+            from preview_music import prepare
+            emit("result", path=str(prepare(args.game_dir, args.output_dir, args.music_name)))
+        else:
+            extract(args.game_dir, args.output_dir, args.max_size)
     except Exception as error:
         emit("error", message=str(error))
         return 1

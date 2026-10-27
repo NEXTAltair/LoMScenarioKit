@@ -19,9 +19,15 @@ import venv
 ROOT = Path(__file__).resolve().parents[1]
 MODKIT = ROOT / "tools/modkit"
 HELPER_INPUTS = [
-    "tools/preview_asset_worker.py", "tools/_probe_assets.py",
+    "tools/preview_asset_worker.py", "tools/preview_music.py", "tools/_probe_assets.py",
     "tools/requirements-preview-extractor.txt", "scripts/build_asset_extractor.py",
     "scripts/pyinstaller-hooks/hook-archspec.py",
+    "third-party/ww2ogg/COPYING", "third-party/ww2ogg/provenance.json",
+    "third-party/ww2ogg/packed_codebooks_aoTuV_603.bin",
+    *["third-party/ww2ogg/src/" + name for name in [
+        "ww2ogg.cpp", "wwriff.cpp", "codebook.cpp", "crc.c",
+        "wwriff.h", "codebook.h", "Bit_stream.h", "crc.h", "errors.h",
+    ]],
 ]
 LEGAL_FILES = ["LICENSE", "LICENSE-GAME-EXCEPTION.txt", "THIRD-PARTY-NOTICES.md"]
 
@@ -63,6 +69,8 @@ def current_helper(folder, expected):
         return (state.get("fingerprint") == expected
                 and (folder / helper_name()).is_file()
                 and (folder / "_internal").is_dir()
+                and (folder / ("ww2ogg.exe" if os.name == "nt" else "ww2ogg")).is_file()
+                and (folder / "packed_codebooks_aoTuV_603.bin").is_file()
                 and (folder / "third-party-licenses/dependencies.txt").is_file())
     except (OSError, ValueError):
         return False

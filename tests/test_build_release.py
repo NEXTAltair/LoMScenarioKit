@@ -128,7 +128,10 @@ class ReleaseTests(unittest.TestCase):
                     "rust/lom-editor/src/main.rs", "editor/i18n/help/ja.html",
                     "editor/i18n/help/en.html", "editor/i18n/locales/en.json",
                     "editor/i18n/terms/en.json", "rust/lom-editor/data/ui-translations.json",
-                    "tools/preview_asset_worker.py", "tools/_probe_assets.py",
+                    "tools/preview_asset_worker.py", "tools/_probe_assets.py", "tools/preview_music.py",
+                    "third-party/ww2ogg/src/ww2ogg.cpp", "third-party/ww2ogg/src/crc.c",
+                    "third-party/ww2ogg/src/crc.h", "third-party/ww2ogg/COPYING",
+                    "third-party/ww2ogg/packed_codebooks_aoTuV_603.bin", "third-party/ww2ogg/provenance.json",
                     "tools/requirements-preview-extractor.txt", "scripts/build_asset_extractor.py",
                     "scripts/pyinstaller-hooks/hook-archspec.py",
                     "rust/lom-editor/assets/fonts/NotoSansCJK-Regular.ttc",
@@ -140,7 +143,7 @@ class ReleaseTests(unittest.TestCase):
                     "editor/assets/doorstop/UnityDoorstop-4.3.0-source.zip"]
         excluded = ["target/debug/output.json", "target/debug/asset-extractor/private.json",
                     "target/asset-extractor-build/venv-3.12/dependency.py", ".authoring/history/private.json",
-                    "editor/assets/unrelated.dll"]
+                    "editor/assets/unrelated.dll", "third-party/ww2ogg/ww2ogg", "third-party/ww2ogg/ww2ogg.exe"]
         for rel in included + excluded:
             self.write(self.root / "tools/modkit" / rel, "fixture")
         (self.root / "editor").chmod(0o755)
