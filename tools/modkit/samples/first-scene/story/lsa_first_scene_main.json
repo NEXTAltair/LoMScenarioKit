@@ -1,0 +1,139 @@
+{
+  "story_schema": 2,
+  "id": "lsa_first_scene_main",
+  "title": "裏山でひと休み",
+  "start": "backdrop",
+  "nodes": [
+    {
+      "id": "backdrop",
+      "type": "scene",
+      "view": "backmountain2"
+    },
+    {
+      "id": "bgm",
+      "type": "music",
+      "op": "play",
+      "name": "主題_001"
+    },
+    {
+      "id": "player_enters",
+      "type": "show",
+      "character": "player",
+      "portrait": "normal",
+      "position": "L2",
+      "facing": "right",
+      "fadeDuration": 0.5
+    },
+    {
+      "id": "brother_enters",
+      "type": "show",
+      "character": "brother1",
+      "portrait": "normal",
+      "position": "R2",
+      "facing": "left",
+      "fadeDuration": 0.5
+    },
+    {
+      "id": "greeting",
+      "type": "say",
+      "mode": "character",
+      "character": "brother1",
+      "portrait": "laugh1",
+      "text": "趙活、こんな所にいたのか。"
+    },
+    {
+      "id": "reply",
+      "type": "say",
+      "mode": "character",
+      "character": "player",
+      "portrait": "normal",
+      "text": "少し風に当たりたくて。"
+    },
+    {
+      "id": "invitation",
+      "type": "say",
+      "mode": "character",
+      "character": "brother1",
+      "portrait": "normal",
+      "text": "休むか？ それとも、一緒に稽古するか？"
+    },
+    {
+      "id": "choose",
+      "type": "choice",
+      "dialog": "Options",
+      "options": [
+        {
+          "text": "少し休む",
+          "goto": "rest_reply"
+        },
+        {
+          "text": "一緒に稽古する",
+          "goto": "train_reply"
+        }
+      ]
+    },
+    {
+      "id": "rest_reply",
+      "type": "say",
+      "mode": "character",
+      "character": "player",
+      "portrait": "laugh1",
+      "text": "では、お言葉に甘えて。"
+    },
+    {
+      "id": "rest_answer",
+      "type": "say",
+      "mode": "character",
+      "character": "brother1",
+      "portrait": "laugh1",
+      "text": "よし。今日は俺も付き合おう。",
+      "goto": "closing"
+    },
+    {
+      "id": "train_reply",
+      "type": "say",
+      "mode": "character",
+      "character": "player",
+      "portrait": "nervous1",
+      "text": "大師兄、お手柔らかに。"
+    },
+    {
+      "id": "train_answer",
+      "type": "say",
+      "mode": "character",
+      "character": "brother1",
+      "portrait": "laugh1",
+      "text": "はは、まずは構えからだ。",
+      "goto": "closing"
+    },
+    {
+      "id": "closing",
+      "type": "say",
+      "mode": "narrative",
+      "text": "裏山を、涼しい風が吹き抜けた。"
+    },
+    {
+      "id": "music_out",
+      "type": "music",
+      "op": "fadeout",
+      "seconds": 2.0,
+      "name": "主題_001"
+    },
+    {
+      "id": "brother_leaves",
+      "type": "hide",
+      "character": "brother1",
+      "fadeDuration": 0.5
+    },
+    {
+      "id": "player_leaves",
+      "type": "hide",
+      "character": "player",
+      "fadeDuration": 0.5
+    },
+    {
+      "id": "end",
+      "type": "end"
+    }
+  ]
+}

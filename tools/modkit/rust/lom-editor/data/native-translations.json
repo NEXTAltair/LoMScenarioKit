@@ -3814,5 +3814,29 @@
     "音声の再生状態を確認できません",
     "오디오 재생 상태를 확인할 수 없습니다",
     "Could not read audio playback status"
+  ],
+  "从示例开始": [
+    "從範例開始",
+    "サンプルから始める",
+    "예제로 시작",
+    "Start from an example"
+  ],
+  "用一段短对话练习背景、立绘、表情、音乐和选项。创建可直接保存的编辑副本。": [
+    "用一段短對話練習背景、立繪、表情、音樂和選項。建立可直接儲存的編輯副本。",
+    "短い会話で背景・立ち絵・表情・BGM・選択肢を試します。編集して保存できるコピーを作ります。",
+    "짧은 대화로 배경, 인물, 표정, 음악과 선택지를 연습합니다. 편집하고 저장할 수 있는 사본을 만듭니다.",
+    "Try backgrounds, portraits, expressions, music, and choices in a short conversation. Creates an editable copy you can save."
+  ],
+  "示例副本已打开。点击右下角的播放；可在资料页阅读使用方法。": [
+    "範例副本已開啟。點選右下角的播放；可在資料頁閱讀使用方法。",
+    "サンプルのコピーを開きました。右下の「再生」で進めます。使い方は「資料」で読めます。",
+    "예제 사본을 열었습니다. 오른쪽 아래 재생을 누르세요. 사용법은 자료 페이지에서 읽을 수 있습니다.",
+    "Opened an example copy. Press Play at the bottom right; find instructions in References."
+  ],
+  "无法创建示例副本": [
+    "無法建立範例副本",
+    "サンプルのコピーを作成できませんでした",
+    "예제 사본을 만들 수 없습니다",
+    "Could not create an example copy"
   ]
 }
