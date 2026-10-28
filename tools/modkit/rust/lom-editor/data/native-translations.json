@@ -3874,5 +3874,17 @@
     "クリックして拡大",
     "클릭하여 확대",
     "Click to enlarge"
+  ],
+  "输入中的评论（{count}）": [
+    "輸入中的評論（{count}）",
+    "入力中のコメント（{count}件）",
+    "작성 중인 댓글 ({count})",
+    "Unposted comments ({count})"
+  ],
+  "放弃草稿": [
+    "捨棄草稿",
+    "下書きを破棄",
+    "초안 버리기",
+    "Discard draft"
   ]
 }
