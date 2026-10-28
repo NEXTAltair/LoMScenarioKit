@@ -1,4 +1,4 @@
-// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-27.
+// LoMScenarioKit modifications: Copyright (C) 2026 NEXTAltair, 2026-10-28.
 // GPL-3.0-only with the repository game-linking exception; upstream portions retain MIT.
 use crate::i18n::tr;
 
@@ -2907,6 +2907,33 @@ impl App {
                 }
             });
     }
+    fn jump_to_review(&mut self, target: crate::review_panel::Target) {
+        let Some(story) = self.project.stories.get_mut(&target.story) else {
+            self.status = tr("引用的节点已删除。请查看评论中的引用。");
+            return;
+        };
+        if let Some(node) = &target.node {
+            let Some(index) = story["nodes"]
+                .as_array()
+                .and_then(|nodes| nodes.iter().position(|n| n["id"] == *node))
+            else {
+                self.status = tr("引用的节点已删除。请查看评论中的引用。");
+                return;
+            };
+            self.selected = index;
+            authoring::expand_for_node(story, index);
+            self.center = Center::Node;
+        } else {
+            self.selected = 0;
+            self.review_panel.open_chapter();
+            self.center = Center::Review;
+        }
+        self.current = target.story;
+        self.multiselect.clear();
+        self.search.clear();
+        self.needs_compile = true;
+    }
+
     fn center(&mut self, ctx: &egui::Context) {
         egui::CentralPanel::default()
             .frame(surface(true))
@@ -2922,6 +2949,37 @@ impl App {
                         }
                     }
                 }
+                if self.center == Center::Node {
+                    let node = self.story()["nodes"]
+                        .get(self.selected)
+                        .and_then(|node| node["id"].as_str())
+                        .map(str::to_owned);
+                    if let Some(node) = node {
+                        // Keep review actions on screen while long node forms scroll.
+                        let max_height = (ui.available_height() * 0.6).max(120.0);
+                        let mut jump = None;
+                        egui::TopBottomPanel::bottom("node-review")
+                            .resizable(true)
+                            .default_height(240.0)
+                            .min_height(120.0)
+                            .max_height(max_height)
+                            .show_inside(ui, |ui| {
+                                egui::ScrollArea::vertical()
+                                    .id_salt(("node-review", &self.current, &node))
+                                    .show(ui, |ui| {
+                                        jump = self.review_panel.show_node(
+                                            ui,
+                                            &mut self.project,
+                                            &self.current,
+                                            &node,
+                                        );
+                                    });
+                            });
+                        if let Some(target) = jump {
+                            self.jump_to_review(target);
+                        }
+                    }
+                }
                 egui::ScrollArea::vertical()
                     .id_salt(format!(
                         "properties-{:?}-{:?}",
@@ -2933,22 +2991,13 @@ impl App {
                                 .get(self.selected)
                                 .and_then(|n| n["id"].as_str())
                                 .map(str::to_owned);
-                            if let Some(id) = self.review_panel.show(
+                            if let Some(target) = self.review_panel.show(
                                 ui,
                                 &mut self.project,
                                 &self.current,
                                 node.as_deref(),
                             ) {
-                                if let Some(index) = self.story()["nodes"]
-                                    .as_array()
-                                    .and_then(|nodes| nodes.iter().position(|n| n["id"] == id))
-                                {
-                                    self.selected = index;
-                                    self.center = Center::Node;
-                                } else {
-                                    self.status =
-                                        tr("引用的节点已删除。请查看评论中的引用。").into();
-                                }
+                                self.jump_to_review(target);
                             }
                         }
                         Center::Node => {
@@ -5174,6 +5223,84 @@ mod application_regression_tests {
         assert!(snapshot(&app.project) == before);
         assert!(!app.dirty());
     }
+    #[test]
+    fn graph_selection_exposes_review_buttons_for_the_selected_node() {
+        use lom_core::review::{self, Verdict};
+        for size in [Vec2::new(1200.0, 800.0), Vec2::new(1000.0, 650.0)] {
+            let mut app = app();
+            app.view = View::Graph;
+            let original = app.project.stories.clone();
+            let ctx = egui::Context::default();
+            ctx.enable_accesskit();
+            let draw = |app: &mut App, events| {
+                ctx.run(
+                    egui::RawInput {
+                        screen_rect: Some(egui::Rect::from_min_size(egui::Pos2::ZERO, size)),
+                        events,
+                        ..Default::default()
+                    },
+                    |ctx| {
+                        app.sidebar(ctx);
+                        app.right(ctx);
+                        app.center(ctx);
+                    },
+                )
+            };
+            let output = draw(&mut app, vec![]);
+            let suffix = format!(" · {}", app.story()["nodes"][1]["id"].as_str().unwrap());
+            let (graph_node, _) = output
+                .platform_output
+                .accesskit_update
+                .as_ref()
+                .unwrap()
+                .nodes
+                .iter()
+                .find(|(_, node)| {
+                    node.label()
+                        .is_some_and(|label| label.starts_with("02 ") && label.ends_with(&suffix))
+                })
+                .expect("second node in the flow graph");
+            let event = egui::Event::AccessKitActionRequest(egui::accesskit::ActionRequest {
+                action: egui::accesskit::Action::Click,
+                target: *graph_node,
+                data: None,
+            });
+            draw(&mut app, vec![event]);
+            assert_eq!(app.selected, 1);
+            assert_eq!(app.center, Center::Node);
+            let selected_id = app.story()["nodes"][1]["id"].as_str().unwrap().to_owned();
+            let output = draw(&mut app, vec![]);
+            let nodes = &output
+                .platform_output
+                .accesskit_update
+                .as_ref()
+                .unwrap()
+                .nodes;
+            for label in ["需要修改", "添加评论"] {
+                let (_, node) = nodes
+                    .iter()
+                    .find(|(_, node)| node.label() == Some(tr(label).as_str()))
+                    .unwrap();
+                let bounds = node.bounds().expect("review control should have bounds");
+                assert!(
+                    bounds.y0 >= 0.0 && bounds.y1 <= size.y as f64,
+                    "review control is off screen: {bounds:?}"
+                );
+            }
+            let event = click_named_option(&output, &tr("需要修改"));
+            draw(&mut app, vec![event]);
+            let review = review::load(&app.project).unwrap();
+            assert_eq!(
+                review::verdict(&review, "main", Some(&selected_id)),
+                Verdict::Fix
+            );
+            assert_eq!(review::verdict(&review, "main", None), Verdict::Unreviewed);
+            assert_eq!(app.project.stories, original);
+            app.track();
+            assert!(app.dirty());
+        }
+    }
+
     #[test]
     fn node_description_button_opens_its_own_reference_without_editing() {
         let mut app = app();
