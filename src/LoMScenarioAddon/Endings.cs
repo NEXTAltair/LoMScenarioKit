@@ -126,7 +126,7 @@ namespace LoMScenarioAddon
         {
             try
             {
-                var type = AccessTools.TypeByName("Mortal.HookCustomStory");
+                var type = AssistantCompatibility.FindLoadedType("Mortal.HookCustomStory");
                 var map = type != null ? AccessTools.Field(type, "mapStory")?.GetValue(null) as Dictionary<string, string> : null;
                 if (map != null && map.TryGetValue(name, out var path) && File.Exists(path))
                     return File.ReadAllText(path, Encoding.UTF8);
