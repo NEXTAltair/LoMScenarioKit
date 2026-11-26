@@ -197,7 +197,7 @@ namespace LoMScenarioAddon
         /// </summary>
         internal static void PatchBinarizerStoryRedirect(Harmony harmony)
         {
-            var type = AccessTools.TypeByName("Mortal.HookCustomStory");
+            var type = AssistantCompatibility.FindLoadedType("Mortal.HookCustomStory");
             var method = type != null ? AccessTools.Method(type, "LuaScriptRedirect") : null;
             if (method == null)
                 return;

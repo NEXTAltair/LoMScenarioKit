@@ -21,14 +21,35 @@ namespace LoMScenarioAddon
         private static bool _present;
         private static bool _inputReady;
 
+        internal static Type FindLoadedType(string fullName)
+        {
+            if (string.IsNullOrEmpty(fullName))
+                return null;
+            // AccessTools.TypeByName は全アセンブリの GetTypes() を走査し、
+            // 日本語化 MOD 同梱の NAudio.dll 等で ReflectionTypeLoadException の警告を出すため使わない。
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    var type = assembly.GetType(fullName, false);
+                    if (type != null)
+                        return type;
+                }
+                catch
+                {
+                }
+            }
+            return null;
+        }
+
         internal static void Patch(Harmony harmony)
         {
-            if (AccessTools.TypeByName("LOMAssistant.LOMAssistantPlugin") == null)
+            if (FindLoadedType("LOMAssistant.LOMAssistantPlugin") == null)
                 return;
             _present = true;
             TrySetup("event list", () =>
             {
-                var type = AccessTools.TypeByName("LOMAssistant.PositionEventCache");
+                var type = FindLoadedType("LOMAssistant.PositionEventCache");
                 var method = type?.GetMethod("GetPositionEvents", new[] { typeof(string) });
                 _eventCache = type?.GetField("positionEventDataCache", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (method == null || method.ReturnType != typeof(List<PositionEventData>) || _eventCache == null
@@ -38,7 +59,7 @@ namespace LoMScenarioAddon
             });
             TrySetup("Lua preview", () =>
             {
-                var type = AccessTools.TypeByName("LOMAssistant.DataHelper");
+                var type = FindLoadedType("LOMAssistant.DataHelper");
                 var method = type?.GetMethod("LoadLuaScript", new[] { typeof(string) });
                 if (method == null || !method.IsStatic || method.ReturnType != typeof(string))
                     throw new MissingMemberException("DataHelper.LoadLuaScript");
@@ -48,11 +69,11 @@ namespace LoMScenarioAddon
             {
                 InputGuards.Clear();
                 AssistantKeys.Clear();
-                var guard = AccessTools.TypeByName("LOMAssistant.InputGuard");
+                var guard = FindLoadedType("LOMAssistant.InputGuard");
                 foreach (var name in new[] { "BlockKeyboard", "BlockPointer", "CapturingKey", "ModWindowOpen" })
                     BindGuard(guard, name);
-                BindGuard(AccessTools.TypeByName("LOMAssistant.Features.Extras.SaveBrowser"), "Typing");
-                var config = AccessTools.TypeByName("LOMAssistant.Config.ConfigManager");
+                BindGuard(FindLoadedType("LOMAssistant.Features.Extras.SaveBrowser"), "Typing");
+                var config = FindLoadedType("LOMAssistant.Config.ConfigManager");
                 if (config == null) throw new MissingMemberException("ConfigManager");
                 foreach (var field in config.GetFields(BindingFlags.Public | BindingFlags.Static))
                 {

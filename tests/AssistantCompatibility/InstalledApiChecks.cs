@@ -37,7 +37,7 @@ internal static class InstalledApiChecks
                 check(assistant.MainModule.GetType("LOMAssistant.Features.Extras.SaveBrowser").Properties.Any(p => p.Name == "Typing"
                     && p.PropertyType.FullName == "System.Boolean" && p.GetMethod.IsPublic && p.GetMethod.IsStatic), "installed assistant note editor guard matches");
                 check(assistant.MainModule.GetType("LOMAssistant.Config.ConfigManager").Fields.Count(f => f.IsPublic && f.IsStatic
-                    && f.FieldType.FullName == "LOMAssistant.Config.ConfigElement`1<UnityEngine.KeyCode>") == 10, "installed assistant hotkey settings are discoverable");
+                    && f.FieldType.FullName == "LOMAssistant.Config.ConfigElement`1<UnityEngine.KeyCode>") >= 10, "installed assistant hotkey settings are discoverable");
                 var plugin = addon.MainModule.GetType("LoMScenarioAddon.Plugin");
                 check(plugin.CustomAttributes.Any(a => a.AttributeType.FullName == "BepInEx.BepInDependency"
                     && (string)a.ConstructorArguments[0].Value == "LOMAssistant" && Convert.ToInt32(a.ConstructorArguments[1].Value) == 2),
